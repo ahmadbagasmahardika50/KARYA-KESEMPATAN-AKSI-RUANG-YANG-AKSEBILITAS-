@@ -2,34 +2,23 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KARYA - Dashboard Admin</title>
+    <title>KARYA - Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <style>body { font-family: 'Lexend', sans-serif; background-color: #fcf9f8; }</style>
-    <script>tailwind.config = { theme: { extend: { colors: { primary: "#001855", "primary-container": "#002a84", secondary: "#7c5800", "secondary-container": "#feb700", surface: "#fcf9f8", "surface-container-low": "#f6f3f2", "surface-container-high": "#eae7e7", "on-surface": "#1b1c1c", "on-surface-variant": "#43474f", outline: "#737780" }, fontFamily: { sans: ["Lexend"] }, borderRadius: { xl: "0.75rem", "2xl": "1rem", "3xl": "1.5rem" } } } }</script>
+    <style>body{font-family:'Lexend',sans-serif;background:#fcf9f8;}</style>
+    <script>tailwind.config={theme:{extend:{colors:{primary:"#001855",secondary:"#7c5800"},fontFamily:{sans:["Lexend"]},borderRadius:{xl:"0.75rem"}}}}</script>
 </head>
-<body class="bg-surface text-on-surface">
-    <nav class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-2"><span class="material-symbols-outlined text-2xl text-primary">admin_panel_settings</span><span class="text-xl font-black text-primary tracking-tighter">KARYA Admin</span></div>
-        <a href="login.html" class="text-primary hover:underline flex items-center gap-1" onclick="localStorage.removeItem('user')"><span class="material-symbols-outlined text-sm">logout</span> Logout</a>
-    </nav>
-    <div class="max-w-6xl mx-auto px-6 py-12">
-        <h1 class="text-3xl font-black text-primary tracking-tight">Dashboard Admin</h1>
-        <p class="text-on-surface-variant mt-1">Kelola data master penyandang disabilitas dan perusahaan mitra.</p>
-        <div class="grid md:grid-cols-2 gap-8 mt-8">
-            <a href="admin-penyandang.html" class="group bg-white p-6 rounded-2xl shadow-md border-l-8 border-primary hover:shadow-lg transition flex items-center gap-4">
-                <span class="material-symbols-outlined text-4xl text-primary">people</span>
-                <div><h2 class="text-xl font-bold text-primary">Penyandang Disabilitas</h2><p class="text-on-surface-variant text-sm">Tambah, edit, hapus data penyandang</p></div>
-            </a>
-            <a href="admin-perusahaan.html" class="group bg-white p-6 rounded-2xl shadow-md border-l-8 border-secondary hover:shadow-lg transition flex items-center gap-4">
-                <span class="material-symbols-outlined text-4xl text-secondary">business</span>
-                <div><h2 class="text-xl font-bold text-secondary">Perusahaan</h2><p class="text-on-surface-variant text-sm">Tambah, edit, hapus data perusahaan mitra</p></div>
-            </a>
-        </div>
-    </div>
-    <footer class="bg-surface-container-low py-6 px-6 mt-12 border-t border-surface-container"><div class="max-w-6xl mx-auto text-center text-xs text-outline">© 2026 KARYA. Memberdayakan Kemampuan.</div></footer>
-    <script>if(!localStorage.getItem('user') || JSON.parse(localStorage.getItem('user')).role !== 'admin') location.href='login.html';</script>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-md px-6 py-4 flex justify-between items-center"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-2xl text-primary">admin_panel_settings</span><span class="text-xl font-black text-primary">KARYA Admin</span></div><a href="login.html" onclick="localStorage.removeItem('user')" class="text-primary">Logout</a></nav>
+    <div class="max-w-6xl mx-auto px-6 py-12"><h1 class="text-3xl font-black text-primary">Dashboard Admin</h1><p class="text-gray-600">Kelola data master</p>
+    <div class="grid md:grid-cols-2 gap-8 mt-8">
+        <a href="admin-penyandang.html" class="bg-white p-6 rounded-2xl shadow-md border-l-8 border-primary hover:shadow-lg"><span class="material-symbols-outlined text-4xl text-primary">people</span><h2 class="text-xl font-bold">Penyandang Disabilitas</h2></a>
+        <a href="admin-perusahaan.html" class="bg-white p-6 rounded-2xl shadow-md border-l-8 border-secondary hover:shadow-lg"><span class="material-symbols-outlined text-4xl text-secondary">business</span><h2 class="text-xl font-bold">Perusahaan</h2></a>
+    </div></div>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'admin') { alert('Akses ditolak'); location.href = 'login.html'; }
+    </script>
 </body>
 </html>
