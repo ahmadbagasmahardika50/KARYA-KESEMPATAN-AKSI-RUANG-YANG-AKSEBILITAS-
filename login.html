@@ -2,69 +2,21 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Login - KARYA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KARYA - Beranda</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
-    <style>body{font-family:'Lexend',sans-serif;}</style>
+    <style>body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }</style>
 </head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
-        <h2 class="text-2xl font-bold text-blue-900 text-center">Masuk ke KARYA</h2>
-        <form id="loginForm" class="mt-6">
-            <div class="mb-4"><label class="block font-bold">Email</label><input type="email" id="email" class="w-full p-3 rounded-xl bg-gray-100" required></div>
-            <div class="mb-6"><label class="block font-bold">Password</label><input type="password" id="password" class="w-full p-3 rounded-xl bg-gray-100" required></div>
-            <button type="submit" class="w-full bg-blue-900 text-white py-3 rounded-xl font-bold">Masuk</button>
-        </form>
-        <p class="text-center mt-4">Belum punya akun? <a href="register.html" class="text-blue-900 font-bold">Daftar</a></p>
-        <p class="text-center text-xs text-gray-400 mt-4">Demo: admin@karya.com / admin | perusahaan@karya.com / perusahaan | penyandang@karya.com / penyandang</p>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col items-center justify-center text-center px-4">
+        <h1 class="text-5xl font-black text-blue-900">KARYA</h1>
+        <p class="text-xl text-gray-600 mt-2">Kesempatan Aksi Ruang Yang Aksesibel</p>
+        <p class="text-gray-500 max-w-md mt-4">Platform lowongan kerja inklusif untuk penyandang disabilitas dan perusahaan yang menghargai keberagaman.</p>
+        <div class="mt-8 space-x-4">
+            <a href="login.html" class="bg-blue-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-800">Masuk</a>
+            <a href="register.html" class="border border-blue-900 text-blue-900 px-6 py-3 rounded-xl font-bold hover:bg-blue-50">Daftar</a>
+        </div>
     </div>
-    <script>
-        // Data default akun (tidak akan hilang)
-        const defaultUsers = [
-            { nama: "Admin KARYA", email: "admin@karya.com", password: "admin", role: "admin" },
-            { nama: "PT Maju Jaya", email: "perusahaan@karya.com", password: "perusahaan", role: "perusahaan" },
-            { nama: "Budi Santoso", email: "penyandang@karya.com", password: "penyandang", role: "penyandang" }
-        ];
-
-        // Fungsi untuk memastikan default users selalu ada
-        function ensureDefaultUsers() {
-            let users = localStorage.getItem('registeredUsers');
-            if (!users) {
-                // Jika belum ada, simpan default
-                localStorage.setItem('registeredUsers', JSON.stringify(defaultUsers));
-                return;
-            }
-            let parsed = JSON.parse(users);
-            let changed = false;
-            // Tambahkan default jika belum ada
-            for (let def of defaultUsers) {
-                if (!parsed.some(u => u.email === def.email)) {
-                    parsed.push(def);
-                    changed = true;
-                }
-            }
-            if (changed) {
-                localStorage.setItem('registeredUsers', JSON.stringify(parsed));
-            }
-        }
-
-        ensureDefaultUsers();
-
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-            const user = users.find(u => u.email === email && u.password === password);
-            if (user) {
-                localStorage.setItem('user', JSON.stringify({ email: user.email, role: user.role, nama: user.nama }));
-                if (user.role === 'admin') window.location.href = 'admin-dashboard.html';
-                else if (user.role === 'perusahaan') window.location.href = 'perusahaan-dashboard.html';
-                else window.location.href = 'penyandang-lowongan.html';
-            } else {
-                alert('Email atau password salah.\n\nGunakan akun default:\nadmin@karya.com / admin\nperusahaan@karya.com / perusahaan\npenyandang@karya.com / penyandang\n\nAtau akun yang sudah didaftarkan.');
-            }
-        });
-    </script>
 </body>
 </html>
