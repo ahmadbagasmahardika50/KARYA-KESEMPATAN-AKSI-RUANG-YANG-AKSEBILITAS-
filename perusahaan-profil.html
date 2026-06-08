@@ -1,8 +1,538 @@
 <!DOCTYPE html>
 <html lang="id">
-<head><meta charset="UTF-8"><title>Profil Perusahaan</title><script src="https://cdn.tailwindcss.com"></script><style>body{font-family:'Lexend',sans-serif;}</style></head>
-<body class="bg-gray-50"><nav class="bg-white shadow px-6 py-3"><a href="perusahaan-dashboard.html">← Kembali</a></nav>
-<div class="max-w-2xl mx-auto px-6 py-12"><div class="bg-white p-8 rounded shadow"><h1 class="text-2xl font-bold">Profil Perusahaan</h1><form id="form"><div class="mt-4"><label>Nama Perusahaan</label><input type="text" id="nama" class="w-full p-3 rounded bg-gray-100" value="PT Maju Jaya"></div><div><label>Email</label><input type="email" id="email" class="w-full p-3 rounded bg-gray-100" value="info@majujaya.com"></div><div><label>Telepon</label><input type="text" id="telp" class="w-full p-3 rounded bg-gray-100" value="0211234567"></div><div><label>Alamat</label><textarea id="alamat" class="w-full p-3 rounded bg-gray-100">Jl. Sudirman No.1, Jakarta</textarea></div><button type="submit" class="mt-4 bg-blue-900 text-white px-6 py-3 rounded-xl">Simpan Perubahan</button></form></div></div>
-<script>document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();alert('Profil perusahaan diperbarui (simulasi).');});</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KARYA - Profil Perusahaan</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :focus {
+            outline: 2px solid #2563eb;
+            outline-offset: 2px;
+        }
+        .form-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        .image-preview {
+            transition: all 0.3s ease;
+        }
+        .image-preview:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <h1 class="text-2xl font-bold text-blue-800">Sistem KARYA</h1>
+                <span class="text-sm text-gray-500">Perusahaan</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-building text-gray-500"></i>
+                    <span class="text-gray-700 font-medium">PT. Maju Bersama</span>
+                </div>
+                <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 focus:ring-2" aria-label="Logout">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Alert Notifikasi -->
+            <div id="alert" class="hidden mb-4 p-3 rounded-md transition-all duration-300"></div>
+
+            <!-- Profil Perusahaan Card -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <!-- Header Card dengan Banner -->
+                <div class="bg-gradient-to-r from-blue-700 to-blue-500 px-6 py-8">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Profil Perusahaan</h2>
+                            <p class="text-blue-100 mt-1">Kelola informasi profil perusahaan Anda</p>
+                        </div>
+                        <button id="edit-mode-btn" class="bg-white text-blue-700 px-4 py-2 rounded-md hover:bg-gray-100 focus:ring-2 flex items-center gap-2">
+                            <i class="fas fa-edit"></i> Edit Profil
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Form Profil -->
+                <form id="profil-form" class="p-6">
+                    <!-- Logo Perusahaan -->
+                    <div class="flex flex-col items-center mb-8">
+                        <div class="relative">
+                            <div id="logo-preview" class="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
+                                <i class="fas fa-building text-5xl text-gray-400"></i>
+                            </div>
+                            <div id="logo-upload-wrapper" class="absolute bottom-0 right-0 hidden">
+                                <label for="logo" class="bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 text-sm">
+                                    <i class="fas fa-camera"></i>
+                                </label>
+                                <input type="file" id="logo" name="logo" accept="image/*" class="hidden">
+                            </div>
+                        </div>
+                        <p id="logo-help" class="text-xs text-gray-500 mt-2 hidden">Klik ikon kamera untuk mengganti logo (maks 2MB)</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Kolom Kiri -->
+                        <div>
+                            <div class="mb-4">
+                                <label for="nama" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Nama Perusahaan <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="nama" name="nama" required 
+                                    class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100"
+                                    value="PT. Maju Bersama" readonly disabled>
+                            </div>
+                            <div class="mb-4">
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Email Perusahaan <span class="text-red-500">*</span>
+                                </label>
+                                <input type="email" id="email" name="email" required 
+                                    class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100"
+                                    value="info@majubersama.com" readonly disabled>
+                            </div>
+                            <div class="mb-4">
+                                <label for="telepon" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Nomor Telepon
+                                </label>
+                                <input type="tel" id="telepon" name="telepon" 
+                                    class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100"
+                                    value="(021) 5551234" readonly disabled>
+                            </div>
+                            <div class="mb-4">
+                                <label for="website" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Website Perusahaan
+                                </label>
+                                <input type="url" id="website" name="website" 
+                                    class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100"
+                                    value="https://www.majubersama.com" readonly disabled>
+                            </div>
+                        </div>
+
+                        <!-- Kolom Kanan -->
+                        <div>
+                            <div class="mb-4">
+                                <label for="bidang" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Bidang Usaha
+                                </label>
+                                <select id="bidang" name="bidang" 
+                                    class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100" disabled>
+                                    <option value="Teknologi Informasi" selected>Teknologi Informasi</option>
+                                    <option value="Manufaktur">Manufaktur</option>
+                                    <option value="Jasa Keuangan">Jasa Keuangan</option>
+                                    <option value="Pendidikan">Pendidikan</option>
+                                    <option value="Kesehatan">Kesehatan</option>
+                                    <option value="Retail">Retail</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label for="ukuran" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Ukuran Perusahaan
+                                </label>
+                                <select id="ukuran" name="ukuran" 
+                                    class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100" disabled>
+                                    <option value="1-10">1-10 karyawan</option>
+                                    <option value="11-50">11-50 karyawan</option>
+                                    <option value="51-200" selected>51-200 karyawan</option>
+                                    <option value="201-500">201-500 karyawan</option>
+                                    <option value="500+">500+ karyawan</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label for="tahun" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Tahun Berdiri
+                                </label>
+                                <input type="number" id="tahun" name="tahun" 
+                                    class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100"
+                                    value="2015" readonly disabled>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alamat - Full Width -->
+                    <div class="mb-4">
+                        <label for="alamat" class="block text-sm font-medium text-gray-700 mb-1">
+                            Alamat Lengkap
+                        </label>
+                        <textarea id="alamat" name="alamat" rows="3" 
+                            class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100"
+                            readonly disabled>Jl. Gatot Subroto No. 10, RT 05 RW 03, Kelurahan Karet Semanggi, Kecamatan Setiabudi, Jakarta Selatan 12930</textarea>
+                    </div>
+
+                    <!-- Deskripsi Perusahaan -->
+                    <div class="mb-4">
+                        <label for="deskripsi" class="block text-sm font-medium text-gray-700 mb-1">
+                            Deskripsi Perusahaan
+                        </label>
+                        <textarea id="deskripsi" name="deskripsi" rows="4" 
+                            class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100"
+                            readonly disabled>PT. Maju Bersama adalah perusahaan teknologi informasi yang berkomitmen untuk menciptakan solusi digital yang inklusif dan aksesibel bagi semua kalangan, termasuk penyandang disabilitas. Berdiri sejak tahun 2015, kami telah melayani lebih dari 100 klien di seluruh Indonesia.</textarea>
+                    </div>
+
+                    <!-- Sosial Media -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                        <div>
+                            <label for="linkedin" class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fab fa-linkedin text-blue-700 mr-1"></i> LinkedIn
+                            </label>
+                            <input type="url" id="linkedin" name="linkedin" 
+                                class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100"
+                                value="https://linkedin.com/company/maju-bersama" readonly disabled>
+                        </div>
+                        <div>
+                            <label for="instagram" class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fab fa-instagram text-pink-600 mr-1"></i> Instagram
+                            </label>
+                            <input type="url" id="instagram" name="instagram" 
+                                class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100"
+                                value="https://instagram.com/majubersama" readonly disabled>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Aksi (Edit Mode) -->
+                    <div id="action-buttons" class="flex justify-end space-x-3 mt-6 pt-4 border-t hidden">
+                        <button type="button" id="cancel-edit" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 focus:ring-2">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Statistik Perusahaan -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div class="bg-white rounded-lg shadow-md p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Total Lowongan</p>
+                            <p id="stat-lowongan" class="text-2xl font-bold text-gray-800">5</p>
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <i class="fas fa-briefcase text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Total Pelamar</p>
+                            <p id="stat-pelamar" class="text-2xl font-bold text-gray-800">21</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <i class="fas fa-users text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Lowongan Aktif</p>
+                            <p id="stat-aktif" class="text-2xl font-bold text-gray-800">3</p>
+                        </div>
+                        <div class="bg-yellow-100 p-3 rounded-full">
+                            <i class="fas fa-check-circle text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informasi Tambahan -->
+            <div class="bg-white rounded-lg shadow-md p-6 mt-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                    Informasi Akun
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-500">Status Akun:</span>
+                        <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Aktif</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Terdaftar Sejak:</span>
+                        <span class="ml-2 text-gray-700">15 Januari 2024</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Terakhir Login:</span>
+                        <span class="ml-2 text-gray-700">08 Juni 2026, 10:30 WIB</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Verifikasi Email:</span>
+                        <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Terverifikasi</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hapus Akun Section -->
+            <div class="border border-red-300 rounded-lg p-5 mt-8 bg-red-50">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Hapus Akun Perusahaan
+                        </h3>
+                        <p class="text-sm text-red-600 mt-1">Tindakan ini tidak dapat dibatalkan. Semua data lowongan dan pelamar akan dihapus secara permanen.</p>
+                    </div>
+                    <button id="hapus-akun-btn" class="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800 focus:ring-2">
+                        Hapus Akun Saya
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Konfirmasi Hapus Akun -->
+    <div id="modal-hapus" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+        <div class="relative top-40 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="text-center">
+                <i class="fas fa-exclamation-triangle text-red-500 text-5xl mb-3"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Hapus Akun Perusahaan</h3>
+                <p class="text-gray-600 mb-3">Apakah Anda yakin ingin menghapus akun perusahaan <strong>"PT. Maju Bersama"</strong>?</p>
+                <div class="bg-yellow-50 border border-yellow-200 rounded p-3 mb-4">
+                    <p class="text-sm text-yellow-800">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Semua data berikut akan ikut terhapus:
+                    </p>
+                    <ul class="text-xs text-yellow-700 mt-2 list-disc list-inside">
+                        <li>5 lowongan pekerjaan</li>
+                        <li>21 data pelamar</li>
+                        <li>Riwayat aktivitas perusahaan</li>
+                    </ul>
+                </div>
+                <p class="text-sm text-red-600 mb-4">Tindakan ini tidak dapat dibatalkan!</p>
+                <div class="flex justify-center space-x-3">
+                    <button id="confirm-hapus" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">Hapus Permanen</button>
+                    <button id="cancel-hapus" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data profil perusahaan (simulasi dari database)
+        let profilData = {
+            id: 1,
+            nama: "PT. Maju Bersama",
+            email: "info@majubersama.com",
+            telepon: "(021) 5551234",
+            website: "https://www.majubersama.com",
+            bidang: "Teknologi Informasi",
+            ukuran: "51-200",
+            tahun: "2015",
+            alamat: "Jl. Gatot Subroto No. 10, RT 05 RW 03, Kelurahan Karet Semanggi, Kecamatan Setiabudi, Jakarta Selatan 12930",
+            deskripsi: "PT. Maju Bersama adalah perusahaan teknologi informasi yang berkomitmen untuk menciptakan solusi digital yang inklusif dan aksesibel bagi semua kalangan, termasuk penyandang disabilitas. Berdiri sejak tahun 2015, kami telah melayani lebih dari 100 klien di seluruh Indonesia.",
+            linkedin: "https://linkedin.com/company/maju-bersama",
+            instagram: "https://instagram.com/majubersama",
+            logo: null
+        };
+
+        // Statistik
+        let statsData = {
+            lowongan: 5,
+            pelamar: 21,
+            aktif: 3
+        };
+
+        let isEditMode = false;
+
+        // Tampilkan alert
+        function showAlert(message, isError = false) {
+            const alertDiv = document.getElementById('alert');
+            alertDiv.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            alertDiv.className = `mb-4 p-3 rounded-md ${isError ? 'bg-red-100 text-red-800 border border-red-300' : 'bg-green-100 text-green-800 border border-green-300'}`;
+            alertDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                alertDiv.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Isi data ke form
+        function loadDataToForm() {
+            document.getElementById('nama').value = profilData.nama;
+            document.getElementById('email').value = profilData.email;
+            document.getElementById('telepon').value = profilData.telepon;
+            document.getElementById('website').value = profilData.website;
+            document.getElementById('bidang').value = profilData.bidang;
+            document.getElementById('ukuran').value = profilData.ukuran;
+            document.getElementById('tahun').value = profilData.tahun;
+            document.getElementById('alamat').value = profilData.alamat;
+            document.getElementById('deskripsi').value = profilData.deskripsi;
+            document.getElementById('linkedin').value = profilData.linkedin;
+            document.getElementById('instagram').value = profilData.instagram;
+        }
+
+        // Update statistik di UI
+        function updateStats() {
+            document.getElementById('stat-lowongan').innerText = statsData.lowongan;
+            document.getElementById('stat-pelamar').innerText = statsData.pelamar;
+            document.getElementById('stat-aktif').innerText = statsData.aktif;
+        }
+
+        // Aktifkan mode edit
+        function enableEditMode() {
+            isEditMode = true;
+            const inputs = document.querySelectorAll('#profil-form input, #profil-form select, #profil-form textarea');
+            inputs.forEach(input => {
+                input.readOnly = false;
+                input.disabled = false;
+                input.classList.remove('bg-gray-100');
+                input.classList.add('bg-white');
+            });
+            
+            document.getElementById('logo-upload-wrapper').classList.remove('hidden');
+            document.getElementById('logo-help').classList.remove('hidden');
+            document.getElementById('action-buttons').classList.remove('hidden');
+            document.getElementById('edit-mode-btn').innerHTML = '<i class="fas fa-eye"></i> Mode Lihat';
+            document.getElementById('edit-mode-btn').classList.remove('bg-white', 'text-blue-700');
+            document.getElementById('edit-mode-btn').classList.add('bg-gray-200', 'text-gray-700');
+        }
+
+        // Nonaktifkan mode edit
+        function disableEditMode() {
+            isEditMode = false;
+            const inputs = document.querySelectorAll('#profil-form input, #profil-form select, #profil-form textarea');
+            inputs.forEach(input => {
+                input.readOnly = true;
+                input.disabled = true;
+                input.classList.remove('bg-white');
+                input.classList.add('bg-gray-100');
+            });
+            
+            document.getElementById('logo-upload-wrapper').classList.add('hidden');
+            document.getElementById('logo-help').classList.add('hidden');
+            document.getElementById('action-buttons').classList.add('hidden');
+            document.getElementById('edit-mode-btn').innerHTML = '<i class="fas fa-edit"></i> Edit Profil';
+            document.getElementById('edit-mode-btn').classList.remove('bg-gray-200', 'text-gray-700');
+            document.getElementById('edit-mode-btn').classList.add('bg-white', 'text-blue-700');
+            
+            // Reload data dari yang tersimpan
+            loadDataToForm();
+        }
+
+        // Simpan perubahan profil
+        function saveProfil(event) {
+            event.preventDefault();
+            
+            // Simpan data dari form ke object
+            profilData.nama = document.getElementById('nama').value;
+            profilData.email = document.getElementById('email').value;
+            profilData.telepon = document.getElementById('telepon').value;
+            profilData.website = document.getElementById('website').value;
+            profilData.bidang = document.getElementById('bidang').value;
+            profilData.ukuran = document.getElementById('ukuran').value;
+            profilData.tahun = document.getElementById('tahun').value;
+            profilData.alamat = document.getElementById('alamat').value;
+            profilData.deskripsi = document.getElementById('deskripsi').value;
+            profilData.linkedin = document.getElementById('linkedin').value;
+            profilData.instagram = document.getElementById('instagram').value;
+            
+            // Handle logo upload (simulasi)
+            const logoFile = document.getElementById('logo').files[0];
+            if (logoFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const logoPreview = document.getElementById('logo-preview');
+                    logoPreview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                    profilData.logo = e.target.result;
+                };
+                reader.readAsDataURL(logoFile);
+            }
+            
+            showAlert('Profil perusahaan berhasil diperbarui!');
+            disableEditMode();
+            
+            // Reset file input
+            document.getElementById('logo').value = '';
+        }
+
+        // Preview logo awal (jika ada)
+        function initLogoPreview() {
+            if (profilData.logo) {
+                const logoPreview = document.getElementById('logo-preview');
+                logoPreview.innerHTML = `<img src="${profilData.logo}" class="w-full h-full object-cover">`;
+            }
+        }
+
+        // Hapus akun (simulasi)
+        function deleteAccount() {
+            showAlert('Akun perusahaan telah dihapus. Anda akan dialihkan ke halaman utama.', false);
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        }
+
+        // Event Listeners
+        document.getElementById('edit-mode-btn').addEventListener('click', () => {
+            if (isEditMode) {
+                disableEditMode();
+            } else {
+                enableEditMode();
+            }
+        });
+        
+        document.getElementById('cancel-edit').addEventListener('click', () => {
+            disableEditMode();
+            showAlert('Perubahan dibatalkan', false);
+        });
+        
+        document.getElementById('profil-form').addEventListener('submit', saveProfil);
+        
+        // Hapus akun
+        const hapusBtn = document.getElementById('hapus-akun-btn');
+        const modalHapus = document.getElementById('modal-hapus');
+        const confirmHapus = document.getElementById('confirm-hapus');
+        const cancelHapus = document.getElementById('cancel-hapus');
+        
+        hapusBtn.addEventListener('click', () => {
+            modalHapus.classList.remove('hidden');
+        });
+        
+        confirmHapus.addEventListener('click', () => {
+            modalHapus.classList.add('hidden');
+            deleteAccount();
+        });
+        
+        cancelHapus.addEventListener('click', () => {
+            modalHapus.classList.add('hidden');
+        });
+        
+        // Logo preview saat memilih file
+        document.getElementById('logo').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const logoPreview = document.getElementById('logo-preview');
+                    logoPreview.innerHTML = `<img src="${event.target.result}" class="w-full h-full object-cover">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Inisialisasi
+        loadDataToForm();
+        updateStats();
+        initLogoPreview();
+    </script>
 </body>
 </html>
