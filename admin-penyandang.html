@@ -2,26 +2,226 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Kelola Penyandang Disabilitas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KARYA - Kelola Penyandang Disabilitas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>body{font-family:'Lexend',sans-serif;}</style>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+        body { font-family: 'Lexend', sans-serif; background-color: #fcf9f8; }
+        :focus { outline: 2px solid #feb700; outline-offset: 2px; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#001855",
+                        "primary-container": "#002a84",
+                        secondary: "#7c5800",
+                        "secondary-container": "#feb700",
+                        surface: "#fcf9f8",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1b1c1c",
+                        "on-surface-variant": "#43474f",
+                        outline: "#737780",
+                        error: "#ba1a1a"
+                    },
+                    fontFamily: { sans: ["Lexend"] },
+                    borderRadius: { xl: "0.75rem", "2xl": "1rem", "3xl": "1.5rem" }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-50">
-    <nav class="bg-white shadow px-6 py-3 flex justify-between"><div class="font-bold text-blue-900">Admin</div><a href="admin-dashboard.html">← Kembali</a></nav>
-    <div class="max-w-5xl mx-auto px-6 py-8">
-        <div class="flex justify-between mb-4"><h1 class="text-2xl font-bold">Data Penyandang</h1><button id="tambahBtn" class="bg-blue-900 text-white px-4 py-2 rounded">+ Tambah</button></div>
-        <div class="bg-white rounded shadow overflow-hidden"><table class="w-full text-left"><thead class="bg-gray-100"><tr><th class="p-3">Nama</th><th>Email</th><th>Disabilitas</th><th>Aksi</th></tr></thead><tbody id="tabel"></tbody></table></div>
+<body class="bg-surface text-on-surface">
+
+    <!-- Navbar KARYA Admin -->
+    <nav class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-2xl text-primary">admin_panel_settings</span>
+            <div class="text-xl font-black text-primary tracking-tighter">KARYA Admin</div>
+        </div>
+        <a href="admin-dashboard.html" class="text-primary hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">arrow_back</span> Kembali
+        </a>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-6 py-10">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-black text-primary tracking-tight">Data Penyandang Disabilitas</h1>
+                <p class="text-on-surface-variant mt-1">Kelola data penyandang disabilitas yang terdaftar di sistem KARYA.</p>
+            </div>
+            <button id="tambahBtn" class="bg-primary text-white px-5 py-2.5 rounded-xl font-bold hover:bg-primary/90 shadow-md flex items-center gap-2 transition">
+                <span class="material-symbols-outlined text-lg">add</span> Tambah
+            </button>
+        </div>
+
+        <!-- Tabel -->
+        <div class="bg-white rounded-2xl shadow-md border border-surface-container-high overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-surface-container-high">
+                        <tr class="border-b border-surface-container">
+                            <th class="p-4 text-sm font-bold text-primary">Nama</th>
+                            <th class="p-4 text-sm font-bold text-primary">Email</th>
+                            <th class="p-4 text-sm font-bold text-primary">Jenis Disabilitas</th>
+                            <th class="p-4 text-sm font-bold text-primary text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel" class="divide-y divide-surface-container"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center"><div class="bg-white p-6 rounded w-96"><h3 class="text-xl font-bold mb-4" id="modalTitle">Tambah</h3><form id="form"><input type="hidden" id="editId"><div><label>Nama</label><input type="text" id="nama" class="w-full p-2 border rounded" required></div><div><label>Email</label><input type="email" id="email" class="w-full p-2 border rounded" required></div><div><label>Jenis Disabilitas</label><input type="text" id="disabilitas" class="w-full p-2 border rounded"></div><div class="mt-4 flex justify-end gap-2"><button type="button" id="closeModal" class="bg-gray-300 px-3 py-1 rounded">Batal</button><button type="submit" class="bg-blue-900 text-white px-3 py-1 rounded">Simpan</button></div></form></div></div>
+
+    <!-- Modal Form (Solid) -->
+    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-surface-container-high">
+            <div class="flex justify-between items-center p-5 border-b border-surface-container-high">
+                <h3 id="modalTitle" class="text-xl font-bold text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined">person_add</span> Tambah Penyandang
+                </h3>
+                <button id="closeModal" class="text-outline hover:text-primary text-2xl leading-none">&times;</button>
+            </div>
+            <form id="form" class="p-5">
+                <input type="hidden" id="editId">
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Nama Lengkap</label>
+                    <input type="text" id="nama" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary focus:ring-0 transition" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Email</label>
+                    <input type="email" id="email" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Jenis Disabilitas</label>
+                    <input type="text" id="disabilitas" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition" placeholder="Contoh: Fisik, Netra, Rungu">
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="closeModalBtn" class="px-5 py-2 bg-surface-container-high rounded-xl font-medium hover:bg-surface-container transition">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 shadow-sm transition">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-low w-full py-6 px-6 mt-12 border-t border-surface-container">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-outline">
+            <div>© 2026 KARYA. Memberdayakan Kemampuan.</div>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-primary transition">Pernyataan Aksesibilitas</a>
+                <a href="#" class="hover:text-primary transition">Kebijakan Privasi</a>
+            </div>
+        </div>
+    </footer>
+
     <script>
         let data = JSON.parse(localStorage.getItem('penyandang') || '[{"id":1,"nama":"Budi Santoso","email":"budi@ex.com","disabilitas":"Fisik"},{"id":2,"nama":"Siti Aminah","email":"siti@ex.com","disabilitas":"Netra"}]');
-        let nextId = data.length? Math.max(...data.map(d=>d.id))+1 : 1;
+        let nextId = data.length ? Math.max(...data.map(d => d.id)) + 1 : 1;
+
         function save() { localStorage.setItem('penyandang', JSON.stringify(data)); }
-        function render() { let html=''; data.forEach(p=>{ html+=`<tr class="border-b"><td class="p-3">${p.nama}</td><td>${p.email}</td><td>${p.disabilitas}</td><td><button class="editBtn text-blue-600 mr-2" data-id="${p.id}">Edit</button><button class="delBtn text-red-600" data-id="${p.id}">Hapus</button></td></tr>`; }); document.getElementById('tabel').innerHTML=html; }
-        document.getElementById('tambahBtn').onclick=()=>{ document.getElementById('form').reset(); document.getElementById('editId').value=''; document.getElementById('modal').style.display='flex'; };
-        document.getElementById('closeModal').onclick=()=>document.getElementById('modal').style.display='none';
-        document.getElementById('form').onsubmit=(e)=>{ e.preventDefault(); let id=document.getElementById('editId').value; let newData={ nama:document.getElementById('nama').value, email:document.getElementById('email').value, disabilitas:document.getElementById('disabilitas').value }; if(id){ let idx=data.findIndex(p=>p.id==id); data[idx]={id:parseInt(id),...newData}; } else { data.push({id:nextId++, ...newData}); } save(); render(); document.getElementById('modal').style.display='none'; };
-        document.getElementById('tabel').addEventListener('click',(e)=>{ if(e.target.classList.contains('editBtn')){ let id=e.target.getAttribute('data-id'); let p=data.find(p=>p.id==id); document.getElementById('editId').value=p.id; document.getElementById('nama').value=p.nama; document.getElementById('email').value=p.email; document.getElementById('disabilitas').value=p.disabilitas; document.getElementById('modal').style.display='flex'; } if(e.target.classList.contains('delBtn')){ if(confirm('Hapus?')){ data=data.filter(p=>p.id!=e.target.getAttribute('data-id')); save(); render(); } } });
+
+        function render() {
+            const tbody = document.getElementById('tabel');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-outline">Belum ada data penyandang</td></tr>';
+                return;
+            }
+            let html = '';
+            data.forEach(p => {
+                html += `<tr class="border-b border-surface-container-high hover:bg-surface-container-low transition">
+                    <td class="p-4 font-medium">${escapeHtml(p.nama)}</td>
+                    <td class="p-4">${escapeHtml(p.email)}</td>
+                    <td class="p-4">${escapeHtml(p.disabilitas)}</td>
+                    <td class="p-4 text-center">
+                        <button class="editBtn text-primary font-bold hover:underline mr-3" data-id="${p.id}">Edit</button>
+                        <button class="delBtn text-error font-bold hover:underline" data-id="${p.id}">Hapus</button>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
+
+        // Modal handlers
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const form = document.getElementById('form');
+        const editId = document.getElementById('editId');
+        const namaInput = document.getElementById('nama');
+        const emailInput = document.getElementById('email');
+        const disabilitasInput = document.getElementById('disabilitas');
+
+        function openModal(isEdit = false, p = null) {
+            if (isEdit && p) {
+                modalTitle.innerHTML = '<span class="material-symbols-outlined">edit</span> Edit Penyandang';
+                editId.value = p.id;
+                namaInput.value = p.nama;
+                emailInput.value = p.email;
+                disabilitasInput.value = p.disabilitas;
+            } else {
+                modalTitle.innerHTML = '<span class="material-symbols-outlined">person_add</span> Tambah Penyandang';
+                editId.value = '';
+                form.reset();
+            }
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+        }
+
+        document.getElementById('tambahBtn').onclick = () => openModal(false);
+        document.getElementById('closeModal').onclick = closeModal;
+        document.getElementById('closeModalBtn').onclick = closeModal;
+
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            const id = editId.value;
+            const newData = {
+                nama: namaInput.value.trim(),
+                email: emailInput.value.trim(),
+                disabilitas: disabilitasInput.value.trim()
+            };
+            if (!newData.nama || !newData.email) {
+                alert('Nama dan Email harus diisi');
+                return;
+            }
+            if (id) {
+                const idx = data.findIndex(p => p.id == id);
+                if (idx !== -1) data[idx] = { id: parseInt(id), ...newData };
+            } else {
+                data.push({ id: nextId++, ...newData });
+            }
+            save();
+            render();
+            closeModal();
+        };
+
+        document.getElementById('tabel').addEventListener('click', (e) => {
+            if (e.target.classList.contains('editBtn')) {
+                const id = e.target.getAttribute('data-id');
+                const p = data.find(p => p.id == id);
+                if (p) openModal(true, p);
+            }
+            if (e.target.classList.contains('delBtn')) {
+                if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                    const id = e.target.getAttribute('data-id');
+                    data = data.filter(p => p.id != id);
+                    save();
+                    render();
+                }
+            }
+        });
+
         render();
     </script>
 </body>
