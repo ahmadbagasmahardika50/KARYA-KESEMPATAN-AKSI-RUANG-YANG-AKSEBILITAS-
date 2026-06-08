@@ -16,30 +16,53 @@
             <button type="submit" class="w-full bg-blue-900 text-white py-3 rounded-xl font-bold">Masuk</button>
         </form>
         <p class="text-center mt-4">Belum punya akun? <a href="register.html" class="text-blue-900 font-bold">Daftar</a></p>
+        <p class="text-center text-xs text-gray-400 mt-4">Demo: admin@karya.com / admin | perusahaan@karya.com / perusahaan | penyandang@karya.com / penyandang</p>
     </div>
     <script>
-        // Inisialisasi data default jika belum ada
-        if(!localStorage.getItem('registeredUsers')) {
-            const defaultUsers = [
-                { nama: "Admin KARYA", email: "admin@karya.com", password: "admin", role: "admin" },
-                { nama: "PT Maju Jaya", email: "perusahaan@karya.com", password: "perusahaan", role: "perusahaan" },
-                { nama: "Budi Santoso", email: "penyandang@karya.com", password: "penyandang", role: "penyandang" }
-            ];
-            localStorage.setItem('registeredUsers', JSON.stringify(defaultUsers));
+        // Data default akun (tidak akan hilang)
+        const defaultUsers = [
+            { nama: "Admin KARYA", email: "admin@karya.com", password: "admin", role: "admin" },
+            { nama: "PT Maju Jaya", email: "perusahaan@karya.com", password: "perusahaan", role: "perusahaan" },
+            { nama: "Budi Santoso", email: "penyandang@karya.com", password: "penyandang", role: "penyandang" }
+        ];
+
+        // Fungsi untuk memastikan default users selalu ada
+        function ensureDefaultUsers() {
+            let users = localStorage.getItem('registeredUsers');
+            if (!users) {
+                // Jika belum ada, simpan default
+                localStorage.setItem('registeredUsers', JSON.stringify(defaultUsers));
+                return;
+            }
+            let parsed = JSON.parse(users);
+            let changed = false;
+            // Tambahkan default jika belum ada
+            for (let def of defaultUsers) {
+                if (!parsed.some(u => u.email === def.email)) {
+                    parsed.push(def);
+                    changed = true;
+                }
+            }
+            if (changed) {
+                localStorage.setItem('registeredUsers', JSON.stringify(parsed));
+            }
         }
+
+        ensureDefaultUsers();
+
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
             const user = users.find(u => u.email === email && u.password === password);
-            if(user) {
+            if (user) {
                 localStorage.setItem('user', JSON.stringify({ email: user.email, role: user.role, nama: user.nama }));
-                if(user.role === 'admin') window.location.href = 'admin-dashboard.html';
-                else if(user.role === 'perusahaan') window.location.href = 'perusahaan-dashboard.html';
+                if (user.role === 'admin') window.location.href = 'admin-dashboard.html';
+                else if (user.role === 'perusahaan') window.location.href = 'perusahaan-dashboard.html';
                 else window.location.href = 'penyandang-lowongan.html';
             } else {
-                alert('Email atau password salah. Jika belum punya akun, silakan daftar.');
+                alert('Email atau password salah.\n\nGunakan akun default:\nadmin@karya.com / admin\nperusahaan@karya.com / perusahaan\npenyandang@karya.com / penyandang\n\nAtau akun yang sudah didaftarkan.');
             }
         });
     </script>
