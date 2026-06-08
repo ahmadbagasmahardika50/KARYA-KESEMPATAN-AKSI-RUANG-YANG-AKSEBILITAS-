@@ -4,65 +4,106 @@
     <meta charset="UTF-8">
     <title>Kelola Lowongan - Perusahaan</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Lexend', sans-serif; }</style>
 </head>
-<body class="bg-surface">
-
-    <nav class="bg-white shadow px-8 py-4 flex justify-between">
-        <div class="text-2xl font-black text-primary">KARYA Perusahaan</div>
-        <a href="perusahaan-dashboard.html" class="text-primary">← Kembali</a>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow px-6 py-3">
+        <a href="perusahaan-dashboard.html" class="text-blue-600 hover:underline">← Kembali ke Dashboard</a>
     </nav>
-
-    <div class="max-w-6xl mx-auto px-6 py-12">
-        <div class="flex justify-between mb-6">
-            <h1 class="text-3xl font-black text-primary">Daftar Lowongan</h1>
-            <button id="btnTambah" class="bg-primary text-white px-4 py-2 rounded-xl">+ Tambah Lowongan</button>
+    <div class="max-w-5xl mx-auto px-6 py-8">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold text-blue-900">Daftar Lowongan</h1>
+            <button id="tambahBtn" class="bg-blue-900 text-white px-4 py-2 rounded-xl hover:bg-blue-800">+ Tambah Lowongan</button>
         </div>
         <div class="bg-white rounded-2xl shadow overflow-hidden">
             <table class="w-full text-left">
-                <thead class="bg-surface-container-high"><tr><th class="p-3">Judul</th><th>Lokasi</th><th>Disabilitas</th><th>Status</th><th>Aksi</th></tr></thead>
-                <tbody id="tabelLowongan"></tbody>
+                <thead class="bg-gray-100">
+                    <tr><th class="p-3">Judul</th><th>Lokasi</th><th>Disabilitas</th><th>Status</th><th>Aksi</th></tr>
+                </thead>
+                <tbody id="tabel"></tbody>
             </table>
         </div>
     </div>
 
     <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-md">
-            <h2 id="modalTitle" class="text-xl font-bold mb-4">Tambah Lowongan</h2>
-            <form id="formLowongan">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-md">
+            <h3 id="modalTitle" class="text-xl font-bold mb-4">Tambah Lowongan</h3>
+            <form id="form">
                 <input type="hidden" id="editId">
-                <div><label>Judul</label><input type="text" id="judul" required class="w-full p-2 border rounded"></div>
-                <div><label>Lokasi</label><input type="text" id="lokasi" required class="w-full p-2 border rounded"></div>
-                <div><label>Jenis Disabilitas</label><select id="jenis" class="w-full p-2 border rounded"><option>Fisik</option><option>Netra</option><option>Rungu</option><option>Mental</option></select></div>
-                <div><label>Deskripsi</label><textarea id="deskripsi" class="w-full p-2 border rounded"></textarea></div>
-                <div><label>Status</label><select id="status" class="w-full p-2 border rounded"><option>Aktif</option><option>Tutup</option></select></div>
-                <div class="flex justify-end gap-2 mt-4"><button type="button" id="closeModal" class="px-4 py-2 bg-gray-300 rounded">Batal</button><button type="submit" class="px-4 py-2 bg-primary text-white rounded">Simpan</button></div>
+                <div class="mb-3"><label class="block font-bold">Judul</label><input type="text" id="judul" class="w-full p-2 border rounded" required></div>
+                <div class="mb-3"><label class="block font-bold">Lokasi</label><input type="text" id="lokasi" class="w-full p-2 border rounded" required></div>
+                <div class="mb-3"><label class="block font-bold">Jenis Disabilitas</label>
+                    <select id="jenis" class="w-full p-2 border rounded">
+                        <option>Fisik</option><option>Netra</option><option>Rungu</option><option>Mental</option>
+                    </select>
+                </div>
+                <div class="mb-3"><label class="block font-bold">Deskripsi</label><textarea id="deskripsi" class="w-full p-2 border rounded"></textarea></div>
+                <div class="mb-3"><label class="block font-bold">Status</label>
+                    <select id="status" class="w-full p-2 border rounded">
+                        <option>Aktif</option><option>Tutup</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" id="closeModal" class="bg-gray-300 px-4 py-2 rounded">Batal</button>
+                    <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded">Simpan</button>
+                </div>
             </form>
         </div>
     </div>
 
     <script>
-        let lowongan = [{ id:1, judul:"Frontend Developer", lokasi:"Surakarta", jenis:"Fisik", deskripsi:"...", status:"Aktif" }];
-        let nextId = 2;
+        let lowongan = [
+            { id: 1, judul: "Frontend Developer", lokasi: "Surakarta", jenis: "Fisik", deskripsi: "Membangun UI aksesibel", status: "Aktif" },
+            { id: 2, judul: "Admin Data Entry", lokasi: "Jakarta", jenis: "Netra", deskripsi: "Entry data dengan screen reader", status: "Aktif" }
+        ];
+        let nextId = 3;
+
         function render() {
-            const tbody = document.getElementById('tabelLowongan');
-            tbody.innerHTML = lowongan.map(l => `<tr><td class="p-3">${l.judul}</td><td>${l.lokasi}</td><td>${l.jenis}</td><td><span class="px-2 py-1 rounded-full text-xs ${l.status==='Aktif'?'bg-green-100 text-green-800':'bg-red-100'}">${l.status}</span></td><td><button class="editBtn" data-id="${l.id}">Edit</button> <button class="deleteBtn text-red-600" data-id="${l.id}">Hapus</button></td></tr>`).join('');
+            let html = '';
+            lowongan.forEach(l => {
+                html += `<tr class="border-b">
+                    <td class="p-3">${l.judul}</td>
+                    <td class="p-3">${l.lokasi}</td>
+                    <td class="p-3">${l.jenis}</td>
+                    <td class="p-3"><span class="px-2 py-1 rounded-full text-xs ${l.status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${l.status}</span></td>
+                    <td class="p-3">
+                        <button class="editBtn text-blue-600 mr-2" data-id="${l.id}">Edit</button>
+                        <button class="deleteBtn text-red-600" data-id="${l.id}">Hapus</button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('tabel').innerHTML = html;
         }
-        document.getElementById('btnTambah').onclick = () => { document.getElementById('modal').style.display = 'flex'; document.getElementById('formLowongan').reset(); document.getElementById('editId').value = ''; };
+
+        document.getElementById('tambahBtn').onclick = () => {
+            document.getElementById('form').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('modal').style.display = 'flex';
+        };
         document.getElementById('closeModal').onclick = () => document.getElementById('modal').style.display = 'none';
-        document.getElementById('formLowongan').onsubmit = (e) => {
+        document.getElementById('form').onsubmit = (e) => {
             e.preventDefault();
             const id = document.getElementById('editId').value;
-            const data = { judul: document.getElementById('judul').value, lokasi: document.getElementById('lokasi').value, jenis: document.getElementById('jenis').value, deskripsi: document.getElementById('deskripsi').value, status: document.getElementById('status').value };
-            if(id) { const i = lowongan.findIndex(l=>l.id==id); if(i!==-1) lowongan[i] = { id: parseInt(id), ...data }; }
-            else lowongan.push({ id: nextId++, ...data });
-            render(); document.getElementById('modal').style.display = 'none';
+            const data = {
+                judul: document.getElementById('judul').value,
+                lokasi: document.getElementById('lokasi').value,
+                jenis: document.getElementById('jenis').value,
+                deskripsi: document.getElementById('deskripsi').value,
+                status: document.getElementById('status').value
+            };
+            if (id) {
+                const idx = lowongan.findIndex(l => l.id == id);
+                if (idx !== -1) lowongan[idx] = { id: parseInt(id), ...data };
+            } else {
+                lowongan.push({ id: nextId++, ...data });
+            }
+            render();
+            document.getElementById('modal').style.display = 'none';
         };
-        document.getElementById('tabelLowongan').addEventListener('click', (e) => {
-            if(e.target.classList.contains('editBtn')) {
+        document.getElementById('tabel').addEventListener('click', (e) => {
+            if (e.target.classList.contains('editBtn')) {
                 const id = e.target.getAttribute('data-id');
-                const l = lowongan.find(l=>l.id==id);
+                const l = lowongan.find(l => l.id == id);
                 document.getElementById('editId').value = l.id;
                 document.getElementById('judul').value = l.judul;
                 document.getElementById('lokasi').value = l.lokasi;
@@ -71,8 +112,12 @@
                 document.getElementById('status').value = l.status;
                 document.getElementById('modal').style.display = 'flex';
             }
-            if(e.target.classList.contains('deleteBtn')) {
-                if(confirm('Hapus lowongan?')) lowongan = lowongan.filter(l=>l.id != e.target.getAttribute('data-id')); render();
+            if (e.target.classList.contains('deleteBtn')) {
+                if (confirm('Hapus lowongan ini?')) {
+                    const id = e.target.getAttribute('data-id');
+                    lowongan = lowongan.filter(l => l.id != id);
+                    render();
+                }
             }
         });
         render();
