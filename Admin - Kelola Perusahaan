@@ -2,74 +2,105 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Kelola Perusahaan - Admin KARYA</title>
+    <title>Kelola Perusahaan</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>body { font-family: 'Lexend', sans-serif; }</style>
 </head>
-<body class="bg-surface">
-
-    <nav class="bg-white shadow px-8 py-4 flex justify-between">
-        <div class="text-2xl font-black text-primary">KARYA Admin</div>
-        <a href="admin-dashboard.html" class="text-primary">← Kembali</a>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow px-6 py-3 flex justify-between">
+        <div class="font-bold text-blue-900">Admin</div>
+        <a href="admin-dashboard.html" class="text-blue-600 hover:underline">← Kembali</a>
     </nav>
-
-    <div class="max-w-6xl mx-auto px-6 py-12">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-black text-primary">Data Perusahaan</h1>
-            <button id="btnTambah" class="bg-primary text-white px-4 py-2 rounded-xl">+ Tambah</button>
+    <div class="max-w-5xl mx-auto px-6 py-8">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold text-blue-900">Data Perusahaan</h1>
+            <button id="tambahBtn" class="bg-blue-900 text-white px-4 py-2 rounded-xl hover:bg-blue-800">+ Tambah</button>
         </div>
         <div class="bg-white rounded-2xl shadow overflow-hidden">
             <table class="w-full text-left">
-                <thead class="bg-surface-container-high"><tr><th class="p-3">Nama Perusahaan</th><th>Email</th><th>Telepon</th><th>Aksi</th></tr></thead>
-                <tbody id="tabelPerusahaan"></tbody>
+                <thead class="bg-gray-100">
+                    <tr><th class="p-3">Nama Perusahaan</th><th>Email</th><th>Telepon</th><th>Aksi</th></tr>
+                </thead>
+                <tbody id="tabel"></tbody>
             </table>
         </div>
     </div>
 
     <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-md">
-            <h2 id="modalTitle" class="text-xl font-bold mb-4">Tambah Perusahaan</h2>
-            <form id="formPerusahaan">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-md">
+            <h3 id="modalTitle" class="text-xl font-bold mb-4">Tambah Perusahaan</h3>
+            <form id="form">
                 <input type="hidden" id="editId">
-                <div><label>Nama Perusahaan</label><input type="text" id="nama" required class="w-full p-2 border rounded"></div>
-                <div><label>Email</label><input type="email" id="email" required class="w-full p-2 border rounded"></div>
-                <div><label>Telepon</label><input type="text" id="telepon" class="w-full p-2 border rounded"></div>
-                <div class="flex justify-end gap-2 mt-4"><button type="button" id="closeModal" class="px-4 py-2 bg-gray-300 rounded">Batal</button><button type="submit" class="px-4 py-2 bg-primary text-white rounded">Simpan</button></div>
+                <div class="mb-3"><label class="block font-bold">Nama Perusahaan</label><input type="text" id="nama" class="w-full p-2 border rounded" required></div>
+                <div class="mb-3"><label class="block font-bold">Email</label><input type="email" id="email" class="w-full p-2 border rounded" required></div>
+                <div class="mb-3"><label class="block font-bold">Telepon</label><input type="text" id="telepon" class="w-full p-2 border rounded"></div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" id="closeModal" class="bg-gray-300 px-4 py-2 rounded">Batal</button>
+                    <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded">Simpan</button>
+                </div>
             </form>
         </div>
     </div>
 
     <script>
-        let data = [{ id:1, nama:"PT Maju Jaya", email:"info@majujaya.com", telepon:"021123456" }];
+        let data = [{ id: 1, nama: "PT Maju Jaya", email: "info@majujaya.com", telepon: "0211234567" }];
         let nextId = 2;
+
         function render() {
-            const tbody = document.getElementById('tabelPerusahaan');
-            tbody.innerHTML = data.map(p => `<tr><td class="p-3">${p.nama}</td><td>${p.email}</td><td>${p.telepon}</td><td><button class="editBtn" data-id="${p.id}">Edit</button> <button class="deleteBtn text-red-600" data-id="${p.id}">Hapus</button></td></tr>`).join('');
+            let html = '';
+            data.forEach(p => {
+                html += `<tr class="border-b">
+                    <td class="p-3">${p.nama}</td>
+                    <td class="p-3">${p.email}</td>
+                    <td class="p-3">${p.telepon}</td>
+                    <td class="p-3">
+                        <button class="editBtn text-blue-600 mr-2" data-id="${p.id}">Edit</button>
+                        <button class="deleteBtn text-red-600" data-id="${p.id}">Hapus</button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('tabel').innerHTML = html;
         }
-        document.getElementById('btnTambah').onclick = () => { document.getElementById('modal').style.display = 'flex'; document.getElementById('formPerusahaan').reset(); document.getElementById('editId').value = ''; };
+
+        document.getElementById('tambahBtn').onclick = () => {
+            document.getElementById('form').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('modal').style.display = 'flex';
+        };
         document.getElementById('closeModal').onclick = () => document.getElementById('modal').style.display = 'none';
-        document.getElementById('formPerusahaan').onsubmit = (e) => {
+        document.getElementById('form').onsubmit = (e) => {
             e.preventDefault();
             const id = document.getElementById('editId').value;
-            const newData = { nama: document.getElementById('nama').value, email: document.getElementById('email').value, telepon: document.getElementById('telepon').value };
-            if(id) { const i = data.findIndex(p=>p.id==id); if(i!==-1) data[i] = { id: parseInt(id), ...newData }; }
-            else data.push({ id: nextId++, ...newData });
-            render(); document.getElementById('modal').style.display = 'none';
+            const newData = {
+                nama: document.getElementById('nama').value,
+                email: document.getElementById('email').value,
+                telepon: document.getElementById('telepon').value
+            };
+            if (id) {
+                const idx = data.findIndex(p => p.id == id);
+                if (idx !== -1) data[idx] = { id: parseInt(id), ...newData };
+            } else {
+                data.push({ id: nextId++, ...newData });
+            }
+            render();
+            document.getElementById('modal').style.display = 'none';
         };
-        document.getElementById('tabelPerusahaan').addEventListener('click', (e) => {
-            if(e.target.classList.contains('editBtn')) {
+        document.getElementById('tabel').addEventListener('click', (e) => {
+            if (e.target.classList.contains('editBtn')) {
                 const id = e.target.getAttribute('data-id');
-                const p = data.find(p=>p.id==id);
+                const p = data.find(p => p.id == id);
                 document.getElementById('editId').value = p.id;
                 document.getElementById('nama').value = p.nama;
                 document.getElementById('email').value = p.email;
                 document.getElementById('telepon').value = p.telepon;
                 document.getElementById('modal').style.display = 'flex';
             }
-            if(e.target.classList.contains('deleteBtn')) {
-                if(confirm('Hapus?')) { data = data.filter(p=>p.id != e.target.getAttribute('data-id')); render(); }
+            if (e.target.classList.contains('deleteBtn')) {
+                if (confirm('Hapus data ini?')) {
+                    const id = e.target.getAttribute('data-id');
+                    data = data.filter(p => p.id != id);
+                    render();
+                }
             }
         });
         render();
