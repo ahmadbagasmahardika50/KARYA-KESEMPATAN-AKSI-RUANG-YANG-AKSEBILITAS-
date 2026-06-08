@@ -1,15 +1,225 @@
 <!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><title>Profil Saya</title><script src="https://cdn.tailwindcss.com"></script><style>body{font-family:'Lexend',sans-serif;}</style></head>
-<body class="bg-gray-50"><nav class="bg-white shadow px-6 py-3"><a href="penyandang-lowongan.html">← Kembali</a></nav>
-<div class="max-w-2xl mx-auto px-6 py-12"><div class="bg-white p-8 rounded shadow"><h1 class="text-2xl font-bold">Profil Saya</h1><form id="form"><div class="mt-4"><label>Nama Lengkap</label><input type="text" id="nama" class="w-full p-3 rounded bg-gray-100" value="Budi Santoso"></div><div><label>Email</label><input type="email" id="email" class="w-full p-3 rounded bg-gray-100" value="budi@example.com" readonly></div><div><label>Jenis Disabilitas</label><select id="jenis" class="w-full p-3 rounded bg-gray-100"><option>Fisik</option><option>Netra</option><option>Rungu</option><option>Mental</option></select></div><div><label>Telepon</label><input type="text" id="telp" class="w-full p-3 rounded bg-gray-100" value="08123456789"></div><div><label>Alamat</label><textarea id="alamat" class="w-full p-3 rounded bg-gray-100">Jl. Merdeka 10, Surakarta</textarea></div><div class="flex gap-3 mt-6"><button type="button" id="resetBtn" class="border border-blue-900 text-blue-900 px-4 py-2 rounded">Reset</button><button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded">Simpan</button></div></form><hr class="my-8"><h2 class="text-xl font-bold">Riwayat Pendidikan</h2><div id="riwayatList" class="mt-4"></div><div class="flex gap-2 mt-4"><input type="text" id="riwayatInput" placeholder="Tambah riwayat" class="flex-1 p-2 rounded bg-gray-100"><button id="tambahRiwayat" class="bg-amber-500 text-white px-3 py-2 rounded">Tambah</button></div><hr class="my-8"><div class="bg-red-50 p-4 rounded"><h3 class="text-red-800 font-bold">Hapus Akun</h3><button id="hapusAkun" class="mt-2 bg-red-700 text-white px-4 py-2 rounded">Hapus Akun Saya</button></div></div></div>
-<script>let riwayat=JSON.parse(localStorage.getItem('riwayat')||'[{"id":1,"teks":"SMK Negeri 2 Surakarta"},{"id":2,"teks":"Pelatihan Web Accessibility"}]');
-function renderRiwayat(){let html=''; riwayat.forEach(r=>{html+=`<div class="flex justify-between bg-gray-50 p-2 mt-2 rounded"><span>${r.teks}</span><button class="hapus text-red-600" data-id="${r.id}">Hapus</button></div>`;}); document.getElementById('riwayatList').innerHTML=html;}
-document.getElementById('tambahRiwayat').onclick=()=>{let teks=document.getElementById('riwayatInput').value; if(teks){riwayat.push({id:Date.now(),teks}); localStorage.setItem('riwayat',JSON.stringify(riwayat)); renderRiwayat(); document.getElementById('riwayatInput').value=''; alert('Riwayat ditambahkan');}};
-document.getElementById('riwayatList').addEventListener('click',(e)=>{if(e.target.classList.contains('hapus')){let id=e.target.getAttribute('data-id'); riwayat=riwayat.filter(r=>r.id!=id); localStorage.setItem('riwayat',JSON.stringify(riwayat)); renderRiwayat(); alert('Riwayat dihapus');}});
-document.getElementById('form').addEventListener('submit',e=>{e.preventDefault(); alert('Profil diperbarui (simulasi)');});
-document.getElementById('resetBtn').onclick=()=>{document.getElementById('nama').value='Budi Santoso'; document.getElementById('jenis').value='Fisik'; document.getElementById('telp').value='08123456789'; document.getElementById('alamat').value='Jl. Merdeka 10, Surakarta'; alert('Reset ke data awal');};
-document.getElementById('hapusAkun').onclick=()=>{if(confirm('Hapus permanen?')){alert('Akun dihapus'); localStorage.clear(); window.location.href='login.html';}};
-renderRiwayat();
-</script>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KARYA - Profil Penyandang Disabilitas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :focus {
+            outline: 2px solid #2563eb;
+            outline-offset: 2px;
+        }
+        .form-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-blue-800">Sistem KARYA</h1>
+            <div class="flex items-center space-x-3">
+                <span class="text-gray-700">Halo, Budi Santoso</span>
+                <button class="text-red-600 hover:text-red-800">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-3xl">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Profil Saya</h2>
+
+            <!-- Alert notifikasi sukses/gagal -->
+            <div id="alert" class="hidden mb-4 p-3 rounded-md bg-green-100 text-green-800 border border-green-300"></div>
+
+            <!-- Form Profil -->
+            <form id="profil-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="nama" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                        <input type="text" id="nama" name="nama" required class="form-input w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500" value="Budi Santoso">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" name="email" required class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100" value="budi@example.com" readonly disabled>
+                        <p class="text-xs text-gray-500 mt-1">Email tidak dapat diubah</p>
+                    </div>
+                    <div>
+                        <label for="jenis_disabilitas" class="block text-sm font-medium text-gray-700 mb-1">Jenis Disabilitas <span class="text-red-500">*</span></label>
+                        <select id="jenis_disabilitas" name="jenis_disabilitas" class="w-full border border-gray-300 rounded-md p-2">
+                            <option value="Fisik (daksa)" selected>Fisik (daksa)</option>
+                            <option value="Netra">Netra</option>
+                            <option value="Rungu">Rungu</option>
+                            <option value="Mental">Mental</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="telepon" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon</label>
+                        <input type="tel" id="telepon" name="telepon" class="form-input w-full border border-gray-300 rounded-md p-2" value="08123456789">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="pendidikan" class="block text-sm font-medium text-gray-700 mb-1">Pendidikan Terakhir</label>
+                        <input type="text" id="pendidikan" name="pendidikan" class="form-input w-full border border-gray-300 rounded-md p-2" value="S1 Informatika">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="alamat" class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+                        <textarea id="alamat" name="alamat" rows="3" class="form-input w-full border border-gray-300 rounded-md p-2">Jl. Merdeka No. 10, Surakarta</textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="cv" class="block text-sm font-medium text-gray-700 mb-1">Upload CV (PDF maks 2MB)</label>
+                        <input type="file" id="cv" name="cv" accept=".pdf" class="w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <p class="text-xs text-gray-500 mt-1">Kosongkan jika tidak ingin mengubah file</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button type="button" id="reset-btn" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Reset</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 focus:ring-2">Simpan Perubahan</button>
+                </div>
+            </form>
+
+            <hr class="my-8">
+
+            <!-- Riwayat Pendidikan Tambahan (Create / Delete) -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Riwayat Pendidikan / Pelatihan</h3>
+                <div id="riwayat-list" class="space-y-3 mb-4">
+                    <!-- Item riwayat statis -->
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded">
+                        <span>SMK Negeri 2 Surakarta (2015-2018)</span>
+                        <button class="text-red-600 hover:text-red-800 hapus-riwayat" data-id="1">Hapus</button>
+                    </div>
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded">
+                        <span>Pelatihan Web Accessibility (2023)</span>
+                        <button class="text-red-600 hover:text-red-800 hapus-riwayat" data-id="2">Hapus</button>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="riwayat-baru" placeholder="Tambah riwayat pendidikan/pelatihan" class="flex-1 border border-gray-300 rounded-md p-2">
+                    <button id="tambah-riwayat" class="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700">Tambah</button>
+                </div>
+            </div>
+
+            <hr class="my-8">
+
+            <!-- Hapus Akun -->
+            <div class="border border-red-300 rounded-md p-4 bg-red-50">
+                <h3 class="text-lg font-semibold text-red-800">Hapus Akun</h3>
+                <p class="text-sm text-red-600 mt-1">Tindakan ini tidak dapat dibatalkan. Semua data profil dan riwayat lamaran akan dihapus secara permanen.</p>
+                <button id="hapus-akun-btn" class="mt-3 bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800">Hapus Akun Saya</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Simulasi penyimpanan data (dalam aplikasi nyata gunakan fetch ke API)
+        let profilData = {
+            nama: "Budi Santoso",
+            email: "budi@example.com",
+            jenis_disabilitas: "Fisik (daksa)",
+            telepon: "08123456789",
+            pendidikan: "S1 Informatika",
+            alamat: "Jl. Merdeka No. 10, Surakarta"
+        };
+
+        let riwayatList = [
+            { id: 1, text: "SMK Negeri 2 Surakarta (2015-2018)" },
+            { id: 2, text: "Pelatihan Web Accessibility (2023)" }
+        ];
+
+        function showAlert(message, isError = false) {
+            const alertDiv = document.getElementById('alert');
+            alertDiv.textContent = message;
+            alertDiv.className = `mb-4 p-3 rounded-md ${isError ? 'bg-red-100 text-red-800 border border-red-300' : 'bg-green-100 text-green-800 border border-green-300'}`;
+            alertDiv.classList.remove('hidden');
+            setTimeout(() => alertDiv.classList.add('hidden'), 3000);
+        }
+
+        function renderRiwayat() {
+            const container = document.getElementById('riwayat-list');
+            container.innerHTML = '';
+            riwayatList.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-gray-50 p-3 rounded';
+                div.innerHTML = `
+                    <span>${item.text}</span>
+                    <button class="text-red-600 hover:text-red-800 hapus-riwayat" data-id="${item.id}">Hapus</button>
+                `;
+                container.appendChild(div);
+            });
+            // Re-attach event listener untuk tombol hapus
+            document.querySelectorAll('.hapus-riwayat').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(btn.getAttribute('data-id'));
+                    riwayatList = riwayatList.filter(r => r.id !== id);
+                    renderRiwayat();
+                    showAlert('Riwayat berhasil dihapus');
+                });
+            });
+        }
+
+        // Simpan profil (Update)
+        document.getElementById('profil-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const updated = {
+                nama: document.getElementById('nama').value,
+                jenis_disabilitas: document.getElementById('jenis_disabilitas').value,
+                telepon: document.getElementById('telepon').value,
+                pendidikan: document.getElementById('pendidikan').value,
+                alamat: document.getElementById('alamat').value
+            };
+            // Simulasi update ke server
+            profilData = { ...profilData, ...updated };
+            // File upload diabaikan di demo
+            showAlert('Profil berhasil diperbarui!');
+            console.log('Data tersimpan:', profilData);
+        });
+
+        // Reset form ke nilai awal (dari profilData)
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            document.getElementById('nama').value = profilData.nama;
+            document.getElementById('jenis_disabilitas').value = profilData.jenis_disabilitas;
+            document.getElementById('telepon').value = profilData.telepon;
+            document.getElementById('pendidikan').value = profilData.pendidikan;
+            document.getElementById('alamat').value = profilData.alamat;
+            document.getElementById('cv').value = ''; // reset file input
+            showAlert('Form telah direset ke data terakhir yang tersimpan');
+        });
+
+        // Tambah riwayat (Create)
+        document.getElementById('tambah-riwayat').addEventListener('click', () => {
+            const input = document.getElementById('riwayat-baru');
+            const text = input.value.trim();
+            if (text === "") {
+                showAlert('Harap isi teks riwayat', true);
+                return;
+            }
+            const newId = Date.now();
+            riwayatList.push({ id: newId, text: text });
+            renderRiwayat();
+            input.value = '';
+            showAlert('Riwayat berhasil ditambahkan');
+        });
+
+        // Hapus akun (Delete) dengan konfirmasi
+        document.getElementById('hapus-akun-btn').addEventListener('click', () => {
+            const confirmDelete = confirm('PERINGATAN: Semua data Anda akan dihapus permanen. Apakah Anda yakin?');
+            if (confirmDelete) {
+                // Simulasi hapus akun
+                showAlert('Akun telah dihapus. Anda akan diarahkan ke halaman utama.');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            }
+        });
+
+        // Inisialisasi tampilan riwayat
+        renderRiwayat();
+    </script>
 </body>
 </html>
