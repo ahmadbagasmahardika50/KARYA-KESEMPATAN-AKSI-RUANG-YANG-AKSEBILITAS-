@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><title>Cari Lowongan</title><script src="https://cdn.tailwindcss.com"></script><style>body{font-family:'Lexend',sans-serif;}</style></head>
+<body class="bg-gray-50"><nav class="bg-white shadow px-6 py-4 flex justify-between items-center"><div class="text-xl font-black text-blue-900">KARYA</div><div><a href="penyandang-profil.html" class="text-blue-600 mr-4">Profil</a><a href="login.html" onclick="localStorage.removeItem('user')" class="text-red-600">Logout</a></div></nav>
+<div class="max-w-6xl mx-auto px-6 py-8"><h1 class="text-2xl font-bold">Cari Lowongan Kerja</h1><div class="mt-4 flex gap-4"><input type="text" id="cari" placeholder="Kata kunci..." class="flex-1 p-3 rounded bg-white border"><select id="filterJenis" class="p-3 rounded bg-white border"><option value="">Semua Disabilitas</option><option>Fisik</option><option>Netra</option><option>Rungu</option><option>Mental</option></select><button id="btnCari" class="bg-blue-900 text-white px-6 py-3 rounded">Cari</button></div>
+<div id="list" class="grid md:grid-cols-2 gap-6 mt-8"></div></div>
+<div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center"><div class="bg-white p-6 rounded w-96"><h3 class="text-xl font-bold mb-4">Detail Lowongan</h3><div id="modalContent"></div><div class="flex justify-end gap-2 mt-4"><button id="closeModal" class="bg-gray-300 px-4 py-2 rounded">Tutup</button><button id="lamarBtn" class="bg-amber-500 text-white px-4 py-2 rounded">Lamar Sekarang</button></div></div></div>
+<script>let lowongan=JSON.parse(localStorage.getItem('lowongan')||'[{"id":1,"judul":"Frontend Developer","perusahaan":"PT Teknologi Inklusif","lokasi":"Surakarta","jenis":"Fisik","deskripsi":"Membangun antarmuka web aksesibel"}]'); let currentId=null;
+function render(data){let html=''; data.forEach(l=>{html+=`<div class="bg-white p-5 rounded shadow"><h3 class="text-xl font-bold">${l.judul}</h3><p>${l.perusahaan} • ${l.lokasi}</p><p>Disabilitas: ${l.jenis}</p><button class="detailBtn mt-3 bg-amber-500 text-white px-4 py-2 rounded" data-id="${l.id}">Lihat Detail</button></div>`;}); document.getElementById('list').innerHTML=html;}
+document.getElementById('btnCari').onclick=()=>{let keyword=document.getElementById('cari').value.toLowerCase(); let jenis=document.getElementById('filterJenis').value; let filtered=lowongan.filter(l=>l.judul.toLowerCase().includes(keyword)&&(jenis===""||l.jenis===jenis)); render(filtered);};
+document.getElementById('list').addEventListener('click',(e)=>{if(e.target.classList.contains('detailBtn')){let id=e.target.getAttribute('data-id'); let l=lowongan.find(l=>l.id==id); if(l){currentId=id; document.getElementById('modalContent').innerHTML=`<p><strong>Judul:</strong> ${l.judul}</p><p><strong>Perusahaan:</strong> ${l.perusahaan}</p><p><strong>Lokasi:</strong> ${l.lokasi}</p><p><strong>Disabilitas:</strong> ${l.jenis}</p><p>${l.deskripsi}</p>`; document.getElementById('modal').style.display='flex';}}});
+document.getElementById('closeModal').onclick=()=>document.getElementById('modal').style.display='none';
+document.getElementById('lamarBtn').onclick=()=>{if(currentId) window.location.href=`penyandang-daftar.html?id=${currentId}`;};
+render(lowongan);
+</script>
+</body>
+</html>
