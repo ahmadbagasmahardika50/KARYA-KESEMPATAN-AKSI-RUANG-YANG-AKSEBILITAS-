@@ -54,25 +54,23 @@
                 <h1 class="text-2xl font-bold text-primary">Profil Saya</h1>
             </div>
 
-            <!-- Alert notifikasi -->
             <div id="alert" class="hidden mb-6 p-3 rounded-xl bg-green-100 text-green-800 border border-green-200"></div>
 
-            <!-- Form Profil -->
             <form id="profilForm" class="space-y-5">
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Nama Lengkap <span class="text-error">*</span></label>
-                        <input type="text" id="nama" required class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition" value="Budi Santoso">
+                        <input type="text" id="nama" required class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Email</label>
-                        <input type="email" id="email" readonly disabled class="w-full p-3 rounded-xl bg-surface-container-high opacity-70" value="budi@example.com">
+                        <input type="email" id="email" readonly disabled class="w-full p-3 rounded-xl bg-surface-container-high opacity-70">
                         <p class="text-xs text-outline mt-1">Email tidak dapat diubah</p>
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Jenis Disabilitas</label>
                         <select id="jenisDisabilitas" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
-                            <option value="Fisik (daksa)" selected>Fisik (daksa)</option>
+                            <option value="Fisik (daksa)">Fisik (daksa)</option>
                             <option value="Netra">Netra</option>
                             <option value="Rungu">Rungu</option>
                             <option value="Mental">Mental</option>
@@ -81,15 +79,15 @@
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Nomor Telepon</label>
-                        <input type="tel" id="telepon" class="w-full p-3 rounded-xl bg-surface-container-high" value="08123456789">
+                        <input type="tel" id="telepon" class="w-full p-3 rounded-xl bg-surface-container-high">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Pendidikan Terakhir</label>
-                        <input type="text" id="pendidikan" class="w-full p-3 rounded-xl bg-surface-container-high" value="S1 Informatika">
+                        <input type="text" id="pendidikan" class="w-full p-3 rounded-xl bg-surface-container-high">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Alamat</label>
-                        <textarea id="alamat" rows="3" class="w-full p-3 rounded-xl bg-surface-container-high">Jl. Merdeka No. 10, Surakarta</textarea>
+                        <textarea id="alamat" rows="3" class="w-full p-3 rounded-xl bg-surface-container-high"></textarea>
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Upload CV (PDF maks 2MB)</label>
@@ -97,7 +95,6 @@
                         <p class="text-xs text-outline mt-1">Kosongkan jika tidak ingin mengubah file</p>
                     </div>
                 </div>
-
                 <div class="flex justify-end gap-3 pt-4">
                     <button type="button" id="resetBtn" class="px-6 py-3 rounded-xl border-2 border-primary text-primary font-bold bg-white hover:bg-primary hover:text-white transition">Reset</button>
                     <button type="submit" class="px-6 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 shadow-md transition">Simpan Perubahan</button>
@@ -106,7 +103,6 @@
 
             <hr class="my-8 border-surface-container-high">
 
-            <!-- Riwayat Pendidikan / Pelatihan (CRUD Create, Read, Delete) -->
             <div>
                 <div class="flex items-center gap-2 mb-4">
                     <span class="material-symbols-outlined text-2xl text-primary">school</span>
@@ -121,7 +117,6 @@
 
             <hr class="my-8 border-surface-container-high">
 
-            <!-- Hapus Akun -->
             <div class="bg-red-50 rounded-xl p-5 border border-red-200">
                 <h3 class="text-lg font-bold text-error">Hapus Akun</h3>
                 <p class="text-sm text-error/80 mt-1">Tindakan ini tidak dapat dibatalkan. Semua data profil dan riwayat lamaran akan dihapus secara permanen.</p>
@@ -135,42 +130,49 @@
     </footer>
 
     <script>
-        // ========== INISIALISASI DATA DEFAULT (jika belum ada) ==========
-        if (!localStorage.getItem('profilPenyandang')) {
-            const defaultProfil = {
-                nama: "Budi Santoso",
-                email: "budi@example.com",
+        // ========== AMBIL DATA USER YANG LOGIN ==========
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        if (!currentUser || currentUser.role !== 'penyandang') {
+            alert('Akses ditolak. Halaman ini khusus untuk penyandang disabilitas.');
+            window.location.href = 'login.html';
+        }
+
+        const userEmail = currentUser.email;
+        const userNama = currentUser.nama;
+
+        // Key unik untuk localStorage berdasarkan email
+        const PROFIL_KEY = `profil_${userEmail}`;
+        const RIWAYAT_KEY = `riwayat_${userEmail}`;
+
+        // Fungsi untuk mendapatkan data profil default
+        function getDefaultProfil() {
+            return {
+                nama: userNama,
+                email: userEmail,
                 jenisDisabilitas: "Fisik (daksa)",
-                telepon: "08123456789",
-                pendidikan: "S1 Informatika",
-                alamat: "Jl. Merdeka No. 10, Surakarta",
-                cv: "" // path dummy
+                telepon: "",
+                pendidikan: "",
+                alamat: "",
+                cv: ""
             };
-            localStorage.setItem('profilPenyandang', JSON.stringify(defaultProfil));
         }
 
-        if (!localStorage.getItem('riwayatPenyandang')) {
-            const defaultRiwayat = [
-                { id: 1, teks: "SMK Negeri 2 Surakarta (2015-2018)" },
-                { id: 2, teks: "Pelatihan Web Accessibility (2023)" }
-            ];
-            localStorage.setItem('riwayatPenyandang', JSON.stringify(defaultRiwayat));
-        }
-
-        // Load data
-        let profil = JSON.parse(localStorage.getItem('profilPenyandang'));
-        let riwayat = JSON.parse(localStorage.getItem('riwayatPenyandang'));
+        // Load atau inisialisasi data profil
+        let profil = localStorage.getItem(PROFIL_KEY) ? JSON.parse(localStorage.getItem(PROFIL_KEY)) : getDefaultProfil();
+        let riwayat = localStorage.getItem(RIWAYAT_KEY) ? JSON.parse(localStorage.getItem(RIWAYAT_KEY)) : [
+            { id: 1, teks: "SMK Negeri 2 Surakarta (2015-2018)" },
+            { id: 2, teks: "Pelatihan Web Accessibility (2023)" }
+        ];
         let nextId = riwayat.length ? Math.max(...riwayat.map(r => r.id)) + 1 : 1;
 
-        // Fungsi simpan ke localStorage
         function saveProfil() {
-            localStorage.setItem('profilPenyandang', JSON.stringify(profil));
+            localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
         }
         function saveRiwayat() {
-            localStorage.setItem('riwayatPenyandang', JSON.stringify(riwayat));
+            localStorage.setItem(RIWAYAT_KEY, JSON.stringify(riwayat));
         }
 
-        // Render riwayat ke UI
+        // Render riwayat
         function renderRiwayat() {
             const container = document.getElementById('riwayatList');
             if (riwayat.length === 0) {
@@ -187,7 +189,6 @@
                 `;
             });
             container.innerHTML = html;
-            // Attach event listener ke tombol hapus
             document.querySelectorAll('.hapusRiwayatBtn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const id = parseInt(btn.getAttribute('data-id'));
@@ -199,7 +200,6 @@
             });
         }
 
-        // Helper escape HTML
         function escapeHtml(str) {
             return str.replace(/[&<>]/g, function(m) {
                 if (m === '&') return '&amp;';
@@ -209,7 +209,6 @@
             });
         }
 
-        // Alert
         function showAlert(message, isError = false) {
             const alertDiv = document.getElementById('alert');
             alertDiv.textContent = message;
@@ -218,17 +217,16 @@
             setTimeout(() => alertDiv.classList.add('hidden'), 3000);
         }
 
-        // Load data profil ke form
         function loadProfilToForm() {
-            document.getElementById('nama').value = profil.nama;
-            document.getElementById('jenisDisabilitas').value = profil.jenisDisabilitas;
-            document.getElementById('telepon').value = profil.telepon;
-            document.getElementById('pendidikan').value = profil.pendidikan;
-            document.getElementById('alamat').value = profil.alamat;
-            // email readonly sudah diisi
+            document.getElementById('nama').value = profil.nama || '';
+            document.getElementById('email').value = profil.email;
+            document.getElementById('jenisDisabilitas').value = profil.jenisDisabilitas || 'Fisik (daksa)';
+            document.getElementById('telepon').value = profil.telepon || '';
+            document.getElementById('pendidikan').value = profil.pendidikan || '';
+            document.getElementById('alamat').value = profil.alamat || '';
         }
 
-        // Simpan profil dari form
+        // Simpan profil
         document.getElementById('profilForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const nama = document.getElementById('nama').value.trim();
@@ -241,7 +239,7 @@
             profil.telepon = document.getElementById('telepon').value.trim();
             profil.pendidikan = document.getElementById('pendidikan').value.trim();
             profil.alamat = document.getElementById('alamat').value.trim();
-            // Handle file upload (simulasi, tidak disimpan ke localStorage karena kompleks)
+
             const fileInput = document.getElementById('cvFile');
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
@@ -253,24 +251,22 @@
                     showAlert('Ukuran file maksimal 2MB', true);
                     return;
                 }
-                // Simulasi upload: hanya menyimpan nama file
                 profil.cv = file.name;
                 showAlert(`File CV "${file.name}" siap diunggah (simulasi)`, false);
             }
             saveProfil();
-            loadProfilToForm(); // refresh form
+            loadProfilToForm();
             showAlert('Profil berhasil diperbarui!', false);
         });
 
-        // Reset form ke data terakhir yang tersimpan di localStorage
         document.getElementById('resetBtn').addEventListener('click', () => {
-            profil = JSON.parse(localStorage.getItem('profilPenyandang'));
+            // Reload dari localStorage
+            profil = localStorage.getItem(PROFIL_KEY) ? JSON.parse(localStorage.getItem(PROFIL_KEY)) : getDefaultProfil();
             loadProfilToForm();
             document.getElementById('cvFile').value = '';
             showAlert('Form telah direset ke data terakhir yang tersimpan', false);
         });
 
-        // Tambah riwayat
         document.getElementById('tambahRiwayatBtn').addEventListener('click', () => {
             const input = document.getElementById('riwayatInput');
             const teks = input.value.trim();
@@ -285,39 +281,30 @@
             showAlert('Riwayat berhasil ditambahkan', false);
         });
 
-        // Hapus akun
         document.getElementById('hapusAkunBtn').addEventListener('click', () => {
             if (confirm('PERINGATAN: Semua data Anda akan dihapus permanen. Apakah Anda yakin?')) {
-                // Hapus semua data terkait user ini
-                localStorage.removeItem('profilPenyandang');
-                localStorage.removeItem('riwayatPenyandang');
-                // Hapus lamaran yang terkait (opsional, bisa filter berdasarkan email)
+                // Hapus data profil dan riwayat user ini
+                localStorage.removeItem(PROFIL_KEY);
+                localStorage.removeItem(RIWAYAT_KEY);
+                // Hapus lamaran yang terkait dengan email ini
                 let lamaran = JSON.parse(localStorage.getItem('lamaran') || '[]');
                 lamaran = lamaran.filter(l => l.email !== profil.email);
                 localStorage.setItem('lamaran', JSON.stringify(lamaran));
-                // Hapus user dari registeredUsers (jika user saat ini adalah penyandang)
+                // Hapus user dari registeredUsers
                 let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
                 users = users.filter(u => u.email !== profil.email);
                 localStorage.setItem('registeredUsers', JSON.stringify(users));
                 // Hapus session
                 localStorage.removeItem('user');
-                showAlert('Akun telah dihapus. Anda akan diarahkan ke halaman utama.', false);
+                showAlert('Akun telah dihapus. Anda akan diarahkan ke halaman login.', false);
                 setTimeout(() => {
                     window.location.href = 'login.html';
                 }, 2000);
             }
         });
 
-        // Inisialisasi tampilan
         loadProfilToForm();
         renderRiwayat();
-
-        // Proteksi akses: hanya penyandang disabilitas yang boleh
-        const currentUser = JSON.parse(localStorage.getItem('user'));
-        if (!currentUser || currentUser.role !== 'penyandang') {
-            alert('Akses ditolak. Halaman ini khusus untuk penyandang disabilitas.');
-            window.location.href = 'login.html';
-        }
     </script>
 </body>
 </html>
