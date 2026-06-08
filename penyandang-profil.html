@@ -93,6 +93,7 @@
                         <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Upload CV (PDF maks 2MB)</label>
                         <input type="file" id="cvFile" accept=".pdf" class="w-full text-sm text-outline file:mr-2 file:py-2 file:px-4 file:rounded-full file:bg-primary file:text-white file:border-0 file:font-semibold hover:file:bg-primary/90">
                         <p class="text-xs text-outline mt-1">Kosongkan jika tidak ingin mengubah file</p>
+                        <p id="cvFileName" class="text-xs text-primary mt-1"></p>
                     </div>
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
@@ -157,14 +158,16 @@
             };
         }
 
-        // Load atau inisialisasi data profil
+        // Load atau inisialisasi data profil dari localStorage
         let profil = localStorage.getItem(PROFIL_KEY) ? JSON.parse(localStorage.getItem(PROFIL_KEY)) : getDefaultProfil();
+        // Load atau inisialisasi riwayat dari localStorage
         let riwayat = localStorage.getItem(RIWAYAT_KEY) ? JSON.parse(localStorage.getItem(RIWAYAT_KEY)) : [
             { id: 1, teks: "SMK Negeri 2 Surakarta (2015-2018)" },
             { id: 2, teks: "Pelatihan Web Accessibility (2023)" }
         ];
         let nextId = riwayat.length ? Math.max(...riwayat.map(r => r.id)) + 1 : 1;
 
+        // Fungsi simpan ke localStorage
         function saveProfil() {
             localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
         }
@@ -172,7 +175,7 @@
             localStorage.setItem(RIWAYAT_KEY, JSON.stringify(riwayat));
         }
 
-        // Render riwayat
+        // Render daftar riwayat
         function renderRiwayat() {
             const container = document.getElementById('riwayatList');
             if (riwayat.length === 0) {
@@ -189,6 +192,7 @@
                 `;
             });
             container.innerHTML = html;
+            // Event listener untuk tombol hapus
             document.querySelectorAll('.hapusRiwayatBtn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const id = parseInt(btn.getAttribute('data-id'));
@@ -201,6 +205,7 @@
         }
 
         function escapeHtml(str) {
+            if (!str) return '';
             return str.replace(/[&<>]/g, function(m) {
                 if (m === '&') return '&amp;';
                 if (m === '<') return '&lt;';
@@ -217,6 +222,7 @@
             setTimeout(() => alertDiv.classList.add('hidden'), 3000);
         }
 
+        // Load data profil ke form
         function loadProfilToForm() {
             document.getElementById('nama').value = profil.nama || '';
             document.getElementById('email').value = profil.email;
@@ -224,9 +230,14 @@
             document.getElementById('telepon').value = profil.telepon || '';
             document.getElementById('pendidikan').value = profil.pendidikan || '';
             document.getElementById('alamat').value = profil.alamat || '';
+            if (profil.cv) {
+                document.getElementById('cvFileName').innerHTML = `CV saat ini: ${profil.cv}`;
+            } else {
+                document.getElementById('cvFileName').innerHTML = '';
+            }
         }
 
-        // Simpan profil
+        // Simpan profil dari form
         document.getElementById('profilForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const nama = document.getElementById('nama').value.trim();
@@ -234,12 +245,14 @@
                 showAlert('Nama tidak boleh kosong', true);
                 return;
             }
+            // Update objek profil
             profil.nama = nama;
             profil.jenisDisabilitas = document.getElementById('jenisDisabilitas').value;
             profil.telepon = document.getElementById('telepon').value.trim();
             profil.pendidikan = document.getElementById('pendidikan').value.trim();
             profil.alamat = document.getElementById('alamat').value.trim();
 
+            // Proses upload CV (simulasi simpan nama file)
             const fileInput = document.getElementById('cvFile');
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
@@ -253,20 +266,22 @@
                 }
                 profil.cv = file.name;
                 showAlert(`File CV "${file.name}" siap diunggah (simulasi)`, false);
+                document.getElementById('cvFileName').innerHTML = `CV saat ini: ${file.name}`;
             }
             saveProfil();
-            loadProfilToForm();
+            loadProfilToForm(); // refresh form (CV name ditampilkan)
             showAlert('Profil berhasil diperbarui!', false);
         });
 
+        // Reset form ke data terakhir yang tersimpan di localStorage
         document.getElementById('resetBtn').addEventListener('click', () => {
-            // Reload dari localStorage
             profil = localStorage.getItem(PROFIL_KEY) ? JSON.parse(localStorage.getItem(PROFIL_KEY)) : getDefaultProfil();
             loadProfilToForm();
             document.getElementById('cvFile').value = '';
             showAlert('Form telah direset ke data terakhir yang tersimpan', false);
         });
 
+        // Tambah riwayat
         document.getElementById('tambahRiwayatBtn').addEventListener('click', () => {
             const input = document.getElementById('riwayatInput');
             const teks = input.value.trim();
@@ -281,20 +296,21 @@
             showAlert('Riwayat berhasil ditambahkan', false);
         });
 
+        // Hapus akun beserta semua data terkait
         document.getElementById('hapusAkunBtn').addEventListener('click', () => {
             if (confirm('PERINGATAN: Semua data Anda akan dihapus permanen. Apakah Anda yakin?')) {
-                // Hapus data profil dan riwayat user ini
+                // Hapus data profil dan riwayat
                 localStorage.removeItem(PROFIL_KEY);
                 localStorage.removeItem(RIWAYAT_KEY);
                 // Hapus lamaran yang terkait dengan email ini
                 let lamaran = JSON.parse(localStorage.getItem('lamaran') || '[]');
                 lamaran = lamaran.filter(l => l.email !== profil.email);
                 localStorage.setItem('lamaran', JSON.stringify(lamaran));
-                // Hapus user dari registeredUsers
+                // Hapus akun dari daftar registeredUsers
                 let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
                 users = users.filter(u => u.email !== profil.email);
                 localStorage.setItem('registeredUsers', JSON.stringify(users));
-                // Hapus session
+                // Hapus session user
                 localStorage.removeItem('user');
                 showAlert('Akun telah dihapus. Anda akan diarahkan ke halaman login.', false);
                 setTimeout(() => {
@@ -303,6 +319,7 @@
             }
         });
 
+        // Inisialisasi halaman
         loadProfilToForm();
         renderRiwayat();
     </script>
