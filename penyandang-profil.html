@@ -5,52 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KARYA - Profil Penyandang Disabilitas</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
-        :focus {
-            outline: 2px solid #2563eb;
-            outline-offset: 2px;
-        }
-        .form-input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-        }
+        body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
+        :focus { outline: 2px solid #feb700; outline-offset: 2px; }
     </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#001855",
+                        "primary-container": "#002a84",
+                        secondary: "#7c5800",
+                        "secondary-container": "#feb700",
+                        surface: "#fcf9f8",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1b1c1c",
+                        "on-surface-variant": "#43474f",
+                        outline: "#737780",
+                        error: "#ba1a1a"
+                    },
+                    fontFamily: { sans: ["Lexend"] },
+                    borderRadius: { xl: "0.75rem", "2xl": "1rem", "3xl": "1.5rem" }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-surface text-on-surface">
 
-    <!-- Header -->
-    <header class="bg-white shadow">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-blue-800">Sistem KARYA</h1>
-            <div class="flex items-center space-x-3">
-                <span class="text-gray-700">Halo, Budi Santoso</span>
-                <button class="text-red-600 hover:text-red-800">Logout</button>
-            </div>
+    <!-- Navbar KARYA -->
+    <nav class="bg-white shadow-md py-4 px-6 md:px-12 flex justify-between items-center">
+        <div class="text-2xl font-black text-primary tracking-tighter">KARYA</div>
+        <div class="space-x-4">
+            <a href="penyandang-lowongan.html" class="text-primary font-medium hover:underline">Cari Lowongan</a>
+            <a href="penyandang-profil.html" class="text-primary font-bold border-b-2 border-secondary-container pb-1">Profil</a>
+            <a href="login.html" onclick="localStorage.removeItem('user')" class="text-red-600">Logout</a>
         </div>
-    </header>
+    </nav>
 
-    <main class="container mx-auto px-4 py-8 max-w-3xl">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Profil Saya</h2>
+    <main class="max-w-4xl mx-auto px-6 py-12">
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="material-symbols-outlined text-3xl text-primary">account_circle</span>
+                <h1 class="text-2xl font-bold text-primary">Profil Saya</h1>
+            </div>
 
-            <!-- Alert notifikasi sukses/gagal -->
-            <div id="alert" class="hidden mb-4 p-3 rounded-md bg-green-100 text-green-800 border border-green-300"></div>
+            <!-- Alert notifikasi -->
+            <div id="alert" class="hidden mb-6 p-3 rounded-xl bg-green-100 text-green-800 border border-green-200"></div>
 
             <!-- Form Profil -->
-            <form id="profil-form">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form id="profilForm" class="space-y-5">
+                <div class="grid md:grid-cols-2 gap-6">
                     <div>
-                        <label for="nama" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
-                        <input type="text" id="nama" name="nama" required class="form-input w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500" value="Budi Santoso">
+                        <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Nama Lengkap <span class="text-error">*</span></label>
+                        <input type="text" id="nama" required class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition" value="Budi Santoso">
                     </div>
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
-                        <input type="email" id="email" name="email" required class="form-input w-full border border-gray-300 rounded-md p-2 bg-gray-100" value="budi@example.com" readonly disabled>
-                        <p class="text-xs text-gray-500 mt-1">Email tidak dapat diubah</p>
+                        <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Email</label>
+                        <input type="email" id="email" readonly disabled class="w-full p-3 rounded-xl bg-surface-container-high opacity-70" value="budi@example.com">
+                        <p class="text-xs text-outline mt-1">Email tidak dapat diubah</p>
                     </div>
                     <div>
-                        <label for="jenis_disabilitas" class="block text-sm font-medium text-gray-700 mb-1">Jenis Disabilitas <span class="text-red-500">*</span></label>
-                        <select id="jenis_disabilitas" name="jenis_disabilitas" class="w-full border border-gray-300 rounded-md p-2">
+                        <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Jenis Disabilitas</label>
+                        <select id="jenisDisabilitas" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
                             <option value="Fisik (daksa)" selected>Fisik (daksa)</option>
                             <option value="Netra">Netra</option>
                             <option value="Rungu">Rungu</option>
@@ -59,167 +80,244 @@
                         </select>
                     </div>
                     <div>
-                        <label for="telepon" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon</label>
-                        <input type="tel" id="telepon" name="telepon" class="form-input w-full border border-gray-300 rounded-md p-2" value="08123456789">
+                        <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Nomor Telepon</label>
+                        <input type="tel" id="telepon" class="w-full p-3 rounded-xl bg-surface-container-high" value="08123456789">
                     </div>
                     <div class="md:col-span-2">
-                        <label for="pendidikan" class="block text-sm font-medium text-gray-700 mb-1">Pendidikan Terakhir</label>
-                        <input type="text" id="pendidikan" name="pendidikan" class="form-input w-full border border-gray-300 rounded-md p-2" value="S1 Informatika">
+                        <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Pendidikan Terakhir</label>
+                        <input type="text" id="pendidikan" class="w-full p-3 rounded-xl bg-surface-container-high" value="S1 Informatika">
                     </div>
                     <div class="md:col-span-2">
-                        <label for="alamat" class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
-                        <textarea id="alamat" name="alamat" rows="3" class="form-input w-full border border-gray-300 rounded-md p-2">Jl. Merdeka No. 10, Surakarta</textarea>
+                        <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Alamat</label>
+                        <textarea id="alamat" rows="3" class="w-full p-3 rounded-xl bg-surface-container-high">Jl. Merdeka No. 10, Surakarta</textarea>
                     </div>
                     <div class="md:col-span-2">
-                        <label for="cv" class="block text-sm font-medium text-gray-700 mb-1">Upload CV (PDF maks 2MB)</label>
-                        <input type="file" id="cv" name="cv" accept=".pdf" class="w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        <p class="text-xs text-gray-500 mt-1">Kosongkan jika tidak ingin mengubah file</p>
+                        <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Upload CV (PDF maks 2MB)</label>
+                        <input type="file" id="cvFile" accept=".pdf" class="w-full text-sm text-outline file:mr-2 file:py-2 file:px-4 file:rounded-full file:bg-primary file:text-white file:border-0 file:font-semibold hover:file:bg-primary/90">
+                        <p class="text-xs text-outline mt-1">Kosongkan jika tidak ingin mengubah file</p>
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 mt-8">
-                    <button type="button" id="reset-btn" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Reset</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 focus:ring-2">Simpan Perubahan</button>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" id="resetBtn" class="px-6 py-3 rounded-xl border-2 border-primary text-primary font-bold bg-white hover:bg-primary hover:text-white transition">Reset</button>
+                    <button type="submit" class="px-6 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 shadow-md transition">Simpan Perubahan</button>
                 </div>
             </form>
 
-            <hr class="my-8">
+            <hr class="my-8 border-surface-container-high">
 
-            <!-- Riwayat Pendidikan Tambahan (Create / Delete) -->
+            <!-- Riwayat Pendidikan / Pelatihan (CRUD Create, Read, Delete) -->
             <div>
-                <h3 class="text-lg font-semibold text-gray-800 mb-3">Riwayat Pendidikan / Pelatihan</h3>
-                <div id="riwayat-list" class="space-y-3 mb-4">
-                    <!-- Item riwayat statis -->
-                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded">
-                        <span>SMK Negeri 2 Surakarta (2015-2018)</span>
-                        <button class="text-red-600 hover:text-red-800 hapus-riwayat" data-id="1">Hapus</button>
-                    </div>
-                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded">
-                        <span>Pelatihan Web Accessibility (2023)</span>
-                        <button class="text-red-600 hover:text-red-800 hapus-riwayat" data-id="2">Hapus</button>
-                    </div>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-2xl text-primary">school</span>
+                    <h2 class="text-xl font-bold text-primary">Riwayat Pendidikan / Pelatihan</h2>
                 </div>
-                <div class="flex gap-2">
-                    <input type="text" id="riwayat-baru" placeholder="Tambah riwayat pendidikan/pelatihan" class="flex-1 border border-gray-300 rounded-md p-2">
-                    <button id="tambah-riwayat" class="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700">Tambah</button>
+                <div id="riwayatList" class="space-y-3 mb-4"></div>
+                <div class="flex gap-3">
+                    <input type="text" id="riwayatInput" placeholder="Tambah riwayat pendidikan atau pelatihan..." class="flex-1 p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
+                    <button id="tambahRiwayatBtn" class="bg-secondary-container text-on-secondary px-5 py-3 rounded-xl font-bold hover:bg-secondary-container/80">+ Tambah</button>
                 </div>
             </div>
 
-            <hr class="my-8">
+            <hr class="my-8 border-surface-container-high">
 
             <!-- Hapus Akun -->
-            <div class="border border-red-300 rounded-md p-4 bg-red-50">
-                <h3 class="text-lg font-semibold text-red-800">Hapus Akun</h3>
-                <p class="text-sm text-red-600 mt-1">Tindakan ini tidak dapat dibatalkan. Semua data profil dan riwayat lamaran akan dihapus secara permanen.</p>
-                <button id="hapus-akun-btn" class="mt-3 bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800">Hapus Akun Saya</button>
+            <div class="bg-red-50 rounded-xl p-5 border border-red-200">
+                <h3 class="text-lg font-bold text-error">Hapus Akun</h3>
+                <p class="text-sm text-error/80 mt-1">Tindakan ini tidak dapat dibatalkan. Semua data profil dan riwayat lamaran akan dihapus secara permanen.</p>
+                <button id="hapusAkunBtn" class="mt-3 bg-error text-white px-5 py-2 rounded-xl font-bold hover:bg-red-700">Hapus Akun Saya</button>
             </div>
         </div>
     </main>
 
+    <footer class="bg-surface-container-low py-6 text-center text-sm text-outline border-t border-surface-container mt-12">
+        © 2026 KARYA. Memberdayakan Kemampuan.
+    </footer>
+
     <script>
-        // Simulasi penyimpanan data (dalam aplikasi nyata gunakan fetch ke API)
-        let profilData = {
-            nama: "Budi Santoso",
-            email: "budi@example.com",
-            jenis_disabilitas: "Fisik (daksa)",
-            telepon: "08123456789",
-            pendidikan: "S1 Informatika",
-            alamat: "Jl. Merdeka No. 10, Surakarta"
-        };
-
-        let riwayatList = [
-            { id: 1, text: "SMK Negeri 2 Surakarta (2015-2018)" },
-            { id: 2, text: "Pelatihan Web Accessibility (2023)" }
-        ];
-
-        function showAlert(message, isError = false) {
-            const alertDiv = document.getElementById('alert');
-            alertDiv.textContent = message;
-            alertDiv.className = `mb-4 p-3 rounded-md ${isError ? 'bg-red-100 text-red-800 border border-red-300' : 'bg-green-100 text-green-800 border border-green-300'}`;
-            alertDiv.classList.remove('hidden');
-            setTimeout(() => alertDiv.classList.add('hidden'), 3000);
+        // ========== INISIALISASI DATA DEFAULT (jika belum ada) ==========
+        if (!localStorage.getItem('profilPenyandang')) {
+            const defaultProfil = {
+                nama: "Budi Santoso",
+                email: "budi@example.com",
+                jenisDisabilitas: "Fisik (daksa)",
+                telepon: "08123456789",
+                pendidikan: "S1 Informatika",
+                alamat: "Jl. Merdeka No. 10, Surakarta",
+                cv: "" // path dummy
+            };
+            localStorage.setItem('profilPenyandang', JSON.stringify(defaultProfil));
         }
 
+        if (!localStorage.getItem('riwayatPenyandang')) {
+            const defaultRiwayat = [
+                { id: 1, teks: "SMK Negeri 2 Surakarta (2015-2018)" },
+                { id: 2, teks: "Pelatihan Web Accessibility (2023)" }
+            ];
+            localStorage.setItem('riwayatPenyandang', JSON.stringify(defaultRiwayat));
+        }
+
+        // Load data
+        let profil = JSON.parse(localStorage.getItem('profilPenyandang'));
+        let riwayat = JSON.parse(localStorage.getItem('riwayatPenyandang'));
+        let nextId = riwayat.length ? Math.max(...riwayat.map(r => r.id)) + 1 : 1;
+
+        // Fungsi simpan ke localStorage
+        function saveProfil() {
+            localStorage.setItem('profilPenyandang', JSON.stringify(profil));
+        }
+        function saveRiwayat() {
+            localStorage.setItem('riwayatPenyandang', JSON.stringify(riwayat));
+        }
+
+        // Render riwayat ke UI
         function renderRiwayat() {
-            const container = document.getElementById('riwayat-list');
-            container.innerHTML = '';
-            riwayatList.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'flex items-center justify-between bg-gray-50 p-3 rounded';
-                div.innerHTML = `
-                    <span>${item.text}</span>
-                    <button class="text-red-600 hover:text-red-800 hapus-riwayat" data-id="${item.id}">Hapus</button>
+            const container = document.getElementById('riwayatList');
+            if (riwayat.length === 0) {
+                container.innerHTML = '<p class="text-outline text-sm">Belum ada riwayat. Silakan tambahkan.</p>';
+                return;
+            }
+            let html = '';
+            riwayat.forEach(item => {
+                html += `
+                    <div class="flex justify-between items-center bg-surface-container-low p-3 rounded-xl">
+                        <span>${escapeHtml(item.teks)}</span>
+                        <button class="hapusRiwayatBtn text-error font-bold" data-id="${item.id}">Hapus</button>
+                    </div>
                 `;
-                container.appendChild(div);
             });
-            // Re-attach event listener untuk tombol hapus
-            document.querySelectorAll('.hapus-riwayat').forEach(btn => {
+            container.innerHTML = html;
+            // Attach event listener ke tombol hapus
+            document.querySelectorAll('.hapusRiwayatBtn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const id = parseInt(btn.getAttribute('data-id'));
-                    riwayatList = riwayatList.filter(r => r.id !== id);
+                    riwayat = riwayat.filter(r => r.id !== id);
+                    saveRiwayat();
                     renderRiwayat();
-                    showAlert('Riwayat berhasil dihapus');
+                    showAlert('Riwayat berhasil dihapus', false);
                 });
             });
         }
 
-        // Simpan profil (Update)
-        document.getElementById('profil-form').addEventListener('submit', (e) => {
+        // Helper escape HTML
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Alert
+        function showAlert(message, isError = false) {
+            const alertDiv = document.getElementById('alert');
+            alertDiv.textContent = message;
+            alertDiv.className = `mb-6 p-3 rounded-xl ${isError ? 'bg-red-100 text-red-800 border border-red-200' : 'bg-green-100 text-green-800 border border-green-200'}`;
+            alertDiv.classList.remove('hidden');
+            setTimeout(() => alertDiv.classList.add('hidden'), 3000);
+        }
+
+        // Load data profil ke form
+        function loadProfilToForm() {
+            document.getElementById('nama').value = profil.nama;
+            document.getElementById('jenisDisabilitas').value = profil.jenisDisabilitas;
+            document.getElementById('telepon').value = profil.telepon;
+            document.getElementById('pendidikan').value = profil.pendidikan;
+            document.getElementById('alamat').value = profil.alamat;
+            // email readonly sudah diisi
+        }
+
+        // Simpan profil dari form
+        document.getElementById('profilForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            const updated = {
-                nama: document.getElementById('nama').value,
-                jenis_disabilitas: document.getElementById('jenis_disabilitas').value,
-                telepon: document.getElementById('telepon').value,
-                pendidikan: document.getElementById('pendidikan').value,
-                alamat: document.getElementById('alamat').value
-            };
-            // Simulasi update ke server
-            profilData = { ...profilData, ...updated };
-            // File upload diabaikan di demo
-            showAlert('Profil berhasil diperbarui!');
-            console.log('Data tersimpan:', profilData);
+            const nama = document.getElementById('nama').value.trim();
+            if (!nama) {
+                showAlert('Nama tidak boleh kosong', true);
+                return;
+            }
+            profil.nama = nama;
+            profil.jenisDisabilitas = document.getElementById('jenisDisabilitas').value;
+            profil.telepon = document.getElementById('telepon').value.trim();
+            profil.pendidikan = document.getElementById('pendidikan').value.trim();
+            profil.alamat = document.getElementById('alamat').value.trim();
+            // Handle file upload (simulasi, tidak disimpan ke localStorage karena kompleks)
+            const fileInput = document.getElementById('cvFile');
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                if (file.type !== 'application/pdf') {
+                    showAlert('Hanya file PDF yang diperbolehkan', true);
+                    return;
+                }
+                if (file.size > 2 * 1024 * 1024) {
+                    showAlert('Ukuran file maksimal 2MB', true);
+                    return;
+                }
+                // Simulasi upload: hanya menyimpan nama file
+                profil.cv = file.name;
+                showAlert(`File CV "${file.name}" siap diunggah (simulasi)`, false);
+            }
+            saveProfil();
+            loadProfilToForm(); // refresh form
+            showAlert('Profil berhasil diperbarui!', false);
         });
 
-        // Reset form ke nilai awal (dari profilData)
-        document.getElementById('reset-btn').addEventListener('click', () => {
-            document.getElementById('nama').value = profilData.nama;
-            document.getElementById('jenis_disabilitas').value = profilData.jenis_disabilitas;
-            document.getElementById('telepon').value = profilData.telepon;
-            document.getElementById('pendidikan').value = profilData.pendidikan;
-            document.getElementById('alamat').value = profilData.alamat;
-            document.getElementById('cv').value = ''; // reset file input
-            showAlert('Form telah direset ke data terakhir yang tersimpan');
+        // Reset form ke data terakhir yang tersimpan di localStorage
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            profil = JSON.parse(localStorage.getItem('profilPenyandang'));
+            loadProfilToForm();
+            document.getElementById('cvFile').value = '';
+            showAlert('Form telah direset ke data terakhir yang tersimpan', false);
         });
 
-        // Tambah riwayat (Create)
-        document.getElementById('tambah-riwayat').addEventListener('click', () => {
-            const input = document.getElementById('riwayat-baru');
-            const text = input.value.trim();
-            if (text === "") {
+        // Tambah riwayat
+        document.getElementById('tambahRiwayatBtn').addEventListener('click', () => {
+            const input = document.getElementById('riwayatInput');
+            const teks = input.value.trim();
+            if (teks === "") {
                 showAlert('Harap isi teks riwayat', true);
                 return;
             }
-            const newId = Date.now();
-            riwayatList.push({ id: newId, text: text });
+            riwayat.push({ id: nextId++, teks: teks });
+            saveRiwayat();
             renderRiwayat();
             input.value = '';
-            showAlert('Riwayat berhasil ditambahkan');
+            showAlert('Riwayat berhasil ditambahkan', false);
         });
 
-        // Hapus akun (Delete) dengan konfirmasi
-        document.getElementById('hapus-akun-btn').addEventListener('click', () => {
-            const confirmDelete = confirm('PERINGATAN: Semua data Anda akan dihapus permanen. Apakah Anda yakin?');
-            if (confirmDelete) {
-                // Simulasi hapus akun
-                showAlert('Akun telah dihapus. Anda akan diarahkan ke halaman utama.');
+        // Hapus akun
+        document.getElementById('hapusAkunBtn').addEventListener('click', () => {
+            if (confirm('PERINGATAN: Semua data Anda akan dihapus permanen. Apakah Anda yakin?')) {
+                // Hapus semua data terkait user ini
+                localStorage.removeItem('profilPenyandang');
+                localStorage.removeItem('riwayatPenyandang');
+                // Hapus lamaran yang terkait (opsional, bisa filter berdasarkan email)
+                let lamaran = JSON.parse(localStorage.getItem('lamaran') || '[]');
+                lamaran = lamaran.filter(l => l.email !== profil.email);
+                localStorage.setItem('lamaran', JSON.stringify(lamaran));
+                // Hapus user dari registeredUsers (jika user saat ini adalah penyandang)
+                let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+                users = users.filter(u => u.email !== profil.email);
+                localStorage.setItem('registeredUsers', JSON.stringify(users));
+                // Hapus session
+                localStorage.removeItem('user');
+                showAlert('Akun telah dihapus. Anda akan diarahkan ke halaman utama.', false);
                 setTimeout(() => {
-                    window.location.href = '/';
+                    window.location.href = 'login.html';
                 }, 2000);
             }
         });
 
-        // Inisialisasi tampilan riwayat
+        // Inisialisasi tampilan
+        loadProfilToForm();
         renderRiwayat();
+
+        // Proteksi akses: hanya penyandang disabilitas yang boleh
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        if (!currentUser || currentUser.role !== 'penyandang') {
+            alert('Akses ditolak. Halaman ini khusus untuk penyandang disabilitas.');
+            window.location.href = 'login.html';
+        }
     </script>
 </body>
 </html>
