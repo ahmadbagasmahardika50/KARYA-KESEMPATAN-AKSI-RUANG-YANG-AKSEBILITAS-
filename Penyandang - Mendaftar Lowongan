@@ -2,104 +2,58 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Cari Lowongan - KARYA</title>
+    <title>Form Pendaftaran Lowongan - KARYA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
     <style>body { font-family: 'Lexend', sans-serif; }</style>
 </head>
 <body class="bg-gray-50">
-    <nav class="bg-white shadow px-6 py-4 flex justify-between items-center">
-        <div class="text-xl font-black text-blue-900">KARYA</div>
-        <div class="space-x-4">
-            <a href="penyandang-profil.html" class="text-blue-600 hover:underline">Profil</a>
-            <a href="login.html" class="text-red-600 hover:underline">Logout</a>
-        </div>
+    <nav class="bg-white shadow px-6 py-3">
+        <a href="penyandang-lowongan.html" class="text-blue-600 hover:underline">← Kembali ke Lowongan</a>
     </nav>
-    <div class="max-w-6xl mx-auto px-6 py-8">
-        <h1 class="text-2xl font-bold text-blue-900">Cari Lowongan Kerja</h1>
-        <div class="mt-4 flex flex-wrap gap-4">
-            <input type="text" id="cari" placeholder="Kata kunci (judul, perusahaan)" class="flex-1 p-3 rounded-xl bg-white border border-gray-300">
-            <select id="filterJenis" class="p-3 rounded-xl bg-white border border-gray-300">
-                <option value="">Semua Disabilitas</option>
-                <option>Fisik</option><option>Netra</option><option>Rungu</option><option>Mental</option>
-            </select>
-            <button id="btnCari" class="bg-blue-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-800">Cari</button>
+    <div class="max-w-2xl mx-auto px-6 py-12">
+        <div class="bg-white p-8 rounded-2xl shadow-md">
+            <h1 class="text-2xl font-bold text-blue-900">Pendaftaran Lowongan</h1>
+            <p class="text-gray-600 mt-1">Lengkapi data berikut untuk melamar pekerjaan.</p>
+            <form id="form" class="mt-6">
+                <div class="mb-4">
+                    <label class="block font-bold">Nama Lengkap</label>
+                    <input type="text" class="w-full p-3 rounded-xl bg-gray-100" value="Budi Santoso" readonly>
+                </div>
+                <div class="mb-4">
+                    <label class="block font-bold">Email</label>
+                    <input type="email" class="w-full p-3 rounded-xl bg-gray-100" value="budi@example.com" readonly>
+                </div>
+                <div class="mb-4">
+                    <label class="block font-bold">Lowongan yang Dilamar</label>
+                    <input type="text" id="lowongan" class="w-full p-3 rounded-xl bg-gray-100" value="Frontend Developer" readonly>
+                </div>
+                <div class="mb-4">
+                    <label class="block font-bold">Upload CV (PDF)</label>
+                    <input type="file" accept=".pdf" class="w-full p-2">
+                    <p class="text-xs text-gray-500 mt-1">Maksimal 2MB</p>
+                </div>
+                <div class="mb-4">
+                    <label class="block font-bold">Pesan untuk Perusahaan (opsional)</label>
+                    <textarea class="w-full p-3 rounded-xl bg-gray-100" rows="3" placeholder="Tulis pesan singkat..."></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-900 text-white py-3 rounded-xl font-bold hover:bg-blue-800">Kirim Lamaran</button>
+            </form>
         </div>
-        <div id="list" class="grid md:grid-cols-2 gap-6 mt-8"></div>
     </div>
-
-    <!-- Modal Detail Lowongan -->
-    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-2xl w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">Detail Lowongan</h3>
-            <div id="modalContent"></div>
-            <div class="flex justify-end gap-2 mt-4">
-                <button id="closeModal" class="bg-gray-300 px-4 py-2 rounded">Tutup</button>
-                <button id="lamarBtn" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Lamar Sekarang</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        let lowongan = [
-            { id: 1, judul: "Frontend Developer", perusahaan: "PT Teknologi Inklusif", lokasi: "Surakarta", jenis: "Fisik", deskripsi: "Membangun antarmuka web aksesibel. WFH 2 hari/minggu." },
-            { id: 2, judul: "Admin Data Entry", perusahaan: "PT Maju Jaya", lokasi: "Jakarta", jenis: "Netra", deskripsi: "Menginput data dengan screen reader. Pelatihan disediakan." },
-            { id: 3, judul: "Customer Service", perusahaan: "Bank Inklusif", lokasi: "Bandung", jenis: "Rungu", deskripsi: "Melayani chat dan email dengan aplikasi SIBI." }
-        ];
-
-        let currentLowonganId = null;
-
-        function render(data) {
-            let html = '';
-            data.forEach(l => {
-                html += `<div class="bg-white p-5 rounded-2xl shadow-md border border-gray-200">
-                    <h3 class="text-xl font-bold text-blue-900">${l.judul}</h3>
-                    <p class="text-gray-600">${l.perusahaan} • ${l.lokasi}</p>
-                    <p class="text-gray-500 text-sm mt-1">Disabilitas: ${l.jenis}</p>
-                    <p class="mt-2 text-gray-700">${l.deskripsi.substring(0, 100)}...</p>
-                    <button class="detailBtn mt-3 bg-amber-500 text-white px-4 py-2 rounded-xl hover:bg-amber-600" data-id="${l.id}">Lihat Detail</button>
-                </div>`;
-            });
-            document.getElementById('list').innerHTML = html;
+        // Ambil parameter id dari URL untuk menampilkan judul lowongan (opsional)
+        const urlParams = new URLSearchParams(window.location.search);
+        const lowonganId = urlParams.get('id');
+        if (lowonganId) {
+            // Simulasi: bisa gunakan fetch atau data statis
+            document.getElementById('lowongan').value = `Lowongan ID ${lowonganId}`;
         }
-
-        function showDetail(id) {
-            const l = lowongan.find(l => l.id == id);
-            if (l) {
-                currentLowonganId = id;
-                document.getElementById('modalContent').innerHTML = `
-                    <p><strong>Judul:</strong> ${l.judul}</p>
-                    <p><strong>Perusahaan:</strong> ${l.perusahaan}</p>
-                    <p><strong>Lokasi:</strong> ${l.lokasi}</p>
-                    <p><strong>Disabilitas:</strong> ${l.jenis}</p>
-                    <p><strong>Deskripsi:</strong> ${l.deskripsi}</p>
-                `;
-                document.getElementById('modal').style.display = 'flex';
-            }
-        }
-
-        document.getElementById('btnCari').onclick = () => {
-            const keyword = document.getElementById('cari').value.toLowerCase();
-            const jenis = document.getElementById('filterJenis').value;
-            let filtered = lowongan.filter(l => 
-                (l.judul.toLowerCase().includes(keyword) || l.perusahaan.toLowerCase().includes(keyword)) &&
-                (jenis === "" || l.jenis === jenis)
-            );
-            render(filtered);
-        };
-        document.getElementById('list').addEventListener('click', (e) => {
-            if (e.target.classList.contains('detailBtn')) {
-                const id = e.target.getAttribute('data-id');
-                showDetail(id);
-            }
+        document.getElementById('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Lamaran berhasil dikirim! Perusahaan akan menghubungi Anda.');
+            window.location.href = 'penyandang-lowongan.html';
         });
-        document.getElementById('closeModal').onclick = () => document.getElementById('modal').style.display = 'none';
-        document.getElementById('lamarBtn').onclick = () => {
-            if (currentLowonganId) {
-                window.location.href = `penyandang-daftar.html?id=${currentLowonganId}`;
-            }
-        };
-        render(lowongan);
     </script>
 </body>
 </html>
