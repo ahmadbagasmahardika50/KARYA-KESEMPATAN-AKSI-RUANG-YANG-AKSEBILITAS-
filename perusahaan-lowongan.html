@@ -2,175 +2,104 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KARYA - Kelola Lowongan (Perusahaan)</title>
+    <title>Cari Lowongan - KARYA</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :focus {
-            outline: 2px solid #2563eb;
-            outline-offset: 2px;
-        }
-        .modal-transition {
-            transition: opacity 0.3s ease;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Lexend', sans-serif; }</style>
 </head>
-<body class="bg-gray-100 font-sans">
-
-    <!-- Header -->
-    <header class="bg-white shadow-md">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <h1 class="text-2xl font-bold text-blue-800">Sistem KARYA</h1>
-                <span class="text-sm text-gray-500">Perusahaan</span>
-            </div>
-            <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-building text-gray-500"></i>
-                    <span class="text-gray-700 font-medium">PT. Maju Bersama</span>
-                </div>
-                <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 focus:ring-2" aria-label="Logout">
-                    <i class="fas fa-sign-out-alt mr-1"></i> Logout
-                </button>
-            </div>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow px-6 py-4 flex justify-between items-center">
+        <div class="text-xl font-black text-blue-900">KARYA</div>
+        <div class="space-x-4">
+            <a href="penyandang-profil.html" class="text-blue-600 hover:underline">Profil</a>
+            <a href="login.html" class="text-red-600 hover:underline">Logout</a>
         </div>
-    </header>
-
-    <main class="container mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <!-- Header dengan Tombol Tambah -->
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h2 class="text-2xl font-semibold text-gray-800">Kelola Lowongan Pekerjaan</h2>
-                    <p class="text-gray-600 mt-1">Buat, edit, atau hapus lowongan pekerjaan perusahaan Anda</p>
-                </div>
-                <button id="btn-tambah" class="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800 focus:ring-2 flex items-center gap-2">
-                    <i class="fas fa-plus"></i> Buat Lowongan Baru
-                </button>
-            </div>
-
-            <!-- Filter dan Pencarian -->
-            <div class="flex flex-wrap gap-4 mb-6">
-                <div class="flex-1 min-w-[180px]">
-                    <label for="filter-status" class="block text-sm font-medium text-gray-700 mb-1">Filter Status</label>
-                    <select id="filter-status" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500">
-                        <option value="">Semua Status</option>
-                        <option value="aktif">Aktif</option>
-                        <option value="nonaktif">Nonaktif</option>
-                        <option value="ditutup">Ditutup</option>
-                    </select>
-                </div>
-                <div class="flex-1 min-w-[250px]">
-                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Cari Lowongan</label>
-                    <div class="relative">
-                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                        <input type="text" id="search" placeholder="Cari judul lowongan..." class="w-full border border-gray-300 rounded-md p-2 pl-10 focus:ring-blue-500">
-                    </div>
-                </div>
-                <div class="flex items-end gap-2">
-                    <button id="btn-filter" class="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800">
-                        <i class="fas fa-search mr-1"></i> Cari
-                    </button>
-                    <button id="btn-reset" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
-                        <i class="fas fa-undo mr-1"></i> Reset
-                    </button>
-                </div>
-            </div>
-
-            <!-- Tabel Lowongan -->
-            <div class="overflow-x-auto">
-                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">No</th>
-                            <th class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Judul Lowongan</th>
-                            <th class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Deskripsi</th>
-                            <th class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Status</th>
-                            <th class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Pelamar</th>
-                            <th class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Tanggal Dibuat</th>
-                            <th class="py-3 px-4 border-b text-center text-sm font-semibold text-gray-700">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body">
-                        <!-- Data akan diisi JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Paginasi -->
-            <div class="flex justify-between items-center mt-6">
-                <button id="prev-page" class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50 flex items-center gap-1" disabled>
-                    <i class="fas fa-chevron-left text-xs"></i> Sebelumnya
-                </button>
-                <span id="page-info" class="text-sm text-gray-600">Halaman 1 dari 1</span>
-                <button id="next-page" class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50 flex items-center gap-1" disabled>
-                    Selanjutnya <i class="fas fa-chevron-right text-xs"></i>
-                </button>
-            </div>
+    </nav>
+    <div class="max-w-6xl mx-auto px-6 py-8">
+        <h1 class="text-2xl font-bold text-blue-900">Cari Lowongan Kerja</h1>
+        <div class="mt-4 flex flex-wrap gap-4">
+            <input type="text" id="cari" placeholder="Kata kunci (judul, perusahaan)" class="flex-1 p-3 rounded-xl bg-white border border-gray-300">
+            <select id="filterJenis" class="p-3 rounded-xl bg-white border border-gray-300">
+                <option value="">Semua Disabilitas</option>
+                <option>Fisik</option><option>Netra</option><option>Rungu</option><option>Mental</option>
+            </select>
+            <button id="btnCari" class="bg-blue-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-800">Cari</button>
         </div>
-    </main>
-
-    <!-- Modal Tambah/Edit Lowongan -->
-    <div id="modal-lowongan" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-        <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center pb-3 border-b">
-                <h3 id="modal-title" class="text-xl font-semibold text-gray-900">Tambah Lowongan Baru</h3>
-                <button id="close-modal" class="text-gray-400 hover:text-gray-600 text-2xl focus:outline-none">&times;</button>
-            </div>
-            <form id="lowongan-form">
-                <input type="hidden" id="lowongan-id" value="">
-                <div class="mt-4 space-y-4">
-                    <div>
-                        <label for="judul" class="block text-sm font-medium text-gray-700 mb-1">Judul Lowongan <span class="text-red-500">*</span></label>
-                        <input type="text" id="judul" name="judul" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500" placeholder="Contoh: Frontend Developer">
-                    </div>
-                    <div>
-                        <label for="deskripsi" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi Pekerjaan <span class="text-red-500">*</span></label>
-                        <textarea id="deskripsi" name="deskripsi" rows="5" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500" placeholder="Jelaskan tanggung jawab, kualifikasi, dan persyaratan lowongan..."></textarea>
-                    </div>
-                    <div>
-                        <label for="kualifikasi" class="block text-sm font-medium text-gray-700 mb-1">Kualifikasi</label>
-                        <textarea id="kualifikasi" name="kualifikasi" rows="3" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500" placeholder="Kualifikasi yang dibutuhkan..."></textarea>
-                    </div>
-                    <div>
-                        <label for="status-lowongan" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select id="status-lowongan" name="status" class="w-full border border-gray-300 rounded-md p-2">
-                            <option value="aktif">Aktif</option>
-                            <option value="nonaktif">Nonaktif</option>
-                            <option value="ditutup">Ditutup</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="flex justify-end space-x-3 mt-6 pt-3 border-t">
-                    <button type="button" id="cancel-modal" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 focus:ring-2">Simpan Lowongan</button>
-                </div>
-            </form>
-        </div>
+        <div id="list" class="grid md:grid-cols-2 gap-6 mt-8"></div>
     </div>
 
     <!-- Modal Detail Lowongan -->
-    <div id="modal-detail" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center pb-3 border-b">
-                <h3 class="text-xl font-semibold text-gray-900">Detail Lowongan</h3>
-                <button id="close-detail" class="text-gray-400 hover:text-gray-600 text-2xl focus:outline-none">&times;</button>
-            </div>
-            <div id="detail-content" class="mt-4 space-y-3">
-                <!-- Isi detail akan diisi JavaScript -->
-            </div>
-            <div class="flex justify-end mt-4 pt-3 border-t">
-                <button id="close-detail-btn" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400">Tutup</button>
+    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4">Detail Lowongan</h3>
+            <div id="modalContent"></div>
+            <div class="flex justify-end gap-2 mt-4">
+                <button id="closeModal" class="bg-gray-300 px-4 py-2 rounded">Tutup</button>
+                <button id="lamarBtn" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Lamar Sekarang</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
-    <div id="modal-hapus" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-        <div class="relative top-40 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="text-center">
-                <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl mb-3"></i>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Hapus Lowongan</h3>
-                <p class="text-gray-600 mb-4">Apakah Anda yakin ingin menghapus lowongan "<span id="hapus-judul"></span>"?</p>
-                <p class="text-sm text-red-600 mb-4">T
+    <script>
+        let lowongan = [
+            { id: 1, judul: "Frontend Developer", perusahaan: "PT Teknologi Inklusif", lokasi: "Surakarta", jenis: "Fisik", deskripsi: "Membangun antarmuka web aksesibel. WFH 2 hari/minggu." },
+            { id: 2, judul: "Admin Data Entry", perusahaan: "PT Maju Jaya", lokasi: "Jakarta", jenis: "Netra", deskripsi: "Menginput data dengan screen reader. Pelatihan disediakan." },
+            { id: 3, judul: "Customer Service", perusahaan: "Bank Inklusif", lokasi: "Bandung", jenis: "Rungu", deskripsi: "Melayani chat dan email dengan aplikasi SIBI." }
+        ];
+
+        let currentLowonganId = null;
+
+        function render(data) {
+            let html = '';
+            data.forEach(l => {
+                html += `<div class="bg-white p-5 rounded-2xl shadow-md border border-gray-200">
+                    <h3 class="text-xl font-bold text-blue-900">${l.judul}</h3>
+                    <p class="text-gray-600">${l.perusahaan} • ${l.lokasi}</p>
+                    <p class="text-gray-500 text-sm mt-1">Disabilitas: ${l.jenis}</p>
+                    <p class="mt-2 text-gray-700">${l.deskripsi.substring(0, 100)}...</p>
+                    <button class="detailBtn mt-3 bg-amber-500 text-white px-4 py-2 rounded-xl hover:bg-amber-600" data-id="${l.id}">Lihat Detail</button>
+                </div>`;
+            });
+            document.getElementById('list').innerHTML = html;
+        }
+
+        function showDetail(id) {
+            const l = lowongan.find(l => l.id == id);
+            if (l) {
+                currentLowonganId = id;
+                document.getElementById('modalContent').innerHTML = `
+                    <p><strong>Judul:</strong> ${l.judul}</p>
+                    <p><strong>Perusahaan:</strong> ${l.perusahaan}</p>
+                    <p><strong>Lokasi:</strong> ${l.lokasi}</p>
+                    <p><strong>Disabilitas:</strong> ${l.jenis}</p>
+                    <p><strong>Deskripsi:</strong> ${l.deskripsi}</p>
+                `;
+                document.getElementById('modal').style.display = 'flex';
+            }
+        }
+
+        document.getElementById('btnCari').onclick = () => {
+            const keyword = document.getElementById('cari').value.toLowerCase();
+            const jenis = document.getElementById('filterJenis').value;
+            let filtered = lowongan.filter(l => 
+                (l.judul.toLowerCase().includes(keyword) || l.perusahaan.toLowerCase().includes(keyword)) &&
+                (jenis === "" || l.jenis === jenis)
+            );
+            render(filtered);
+        };
+        document.getElementById('list').addEventListener('click', (e) => {
+            if (e.target.classList.contains('detailBtn')) {
+                const id = e.target.getAttribute('data-id');
+                showDetail(id);
+            }
+        });
+        document.getElementById('closeModal').onclick = () => document.getElementById('modal').style.display = 'none';
+        document.getElementById('lamarBtn').onclick = () => {
+            if (currentLowonganId) {
+                window.location.href = `penyandang-daftar.html?id=${currentLowonganId}`;
+            }
+        };
+        render(lowongan);
+    </script>
+</body>
+</html>
