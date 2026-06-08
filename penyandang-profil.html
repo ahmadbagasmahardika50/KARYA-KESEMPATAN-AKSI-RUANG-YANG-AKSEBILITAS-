@@ -91,9 +91,14 @@
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Upload CV (PDF maks 2MB)</label>
-                        <input type="file" id="cvFile" accept=".pdf" class="w-full text-sm text-outline file:mr-2 file:py-2 file:px-4 file:rounded-full file:bg-primary file:text-white file:border-0 file:font-semibold hover:file:bg-primary/90">
-                        <p class="text-xs text-outline mt-1">Kosongkan jika tidak ingin mengubah file</p>
-                        <p id="cvFileName" class="text-xs text-primary mt-1"></p>
+                        <div class="flex flex-col gap-2">
+                            <input type="file" id="cvFile" accept=".pdf" class="w-full text-sm text-outline file:mr-2 file:py-2 file:px-4 file:rounded-full file:bg-primary file:text-white file:border-0 file:font-semibold hover:file:bg-primary/90">
+                            <div id="cvInfo" class="flex items-center gap-2 mt-1">
+                                <span id="cvFileName" class="text-xs text-primary"></span>
+                                <button type="button" id="hapusCvBtn" class="text-xs text-error hover:underline hidden">Hapus CV</button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-outline mt-1">Kosongkan jika tidak ingin mengubah file. Klik "Hapus CV" untuk menghapus file yang sudah ada.</p>
                     </div>
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
@@ -141,11 +146,9 @@
         const userEmail = currentUser.email;
         const userNama = currentUser.nama;
 
-        // Key unik untuk localStorage berdasarkan email
         const PROFIL_KEY = `profil_${userEmail}`;
         const RIWAYAT_KEY = `riwayat_${userEmail}`;
 
-        // Fungsi untuk mendapatkan data profil default
         function getDefaultProfil() {
             return {
                 nama: userNama,
@@ -158,16 +161,13 @@
             };
         }
 
-        // Load atau inisialisasi data profil dari localStorage
         let profil = localStorage.getItem(PROFIL_KEY) ? JSON.parse(localStorage.getItem(PROFIL_KEY)) : getDefaultProfil();
-        // Load atau inisialisasi riwayat dari localStorage
         let riwayat = localStorage.getItem(RIWAYAT_KEY) ? JSON.parse(localStorage.getItem(RIWAYAT_KEY)) : [
             { id: 1, teks: "SMK Negeri 2 Surakarta (2015-2018)" },
             { id: 2, teks: "Pelatihan Web Accessibility (2023)" }
         ];
         let nextId = riwayat.length ? Math.max(...riwayat.map(r => r.id)) + 1 : 1;
 
-        // Fungsi simpan ke localStorage
         function saveProfil() {
             localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
         }
@@ -175,7 +175,6 @@
             localStorage.setItem(RIWAYAT_KEY, JSON.stringify(riwayat));
         }
 
-        // Render daftar riwayat
         function renderRiwayat() {
             const container = document.getElementById('riwayatList');
             if (riwayat.length === 0) {
@@ -192,7 +191,6 @@
                 `;
             });
             container.innerHTML = html;
-            // Event listener untuk tombol hapus
             document.querySelectorAll('.hapusRiwayatBtn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const id = parseInt(btn.getAttribute('data-id'));
@@ -222,7 +220,18 @@
             setTimeout(() => alertDiv.classList.add('hidden'), 3000);
         }
 
-        // Load data profil ke form
+        function updateCvDisplay() {
+            const cvFileNameSpan = document.getElementById('cvFileName');
+            const hapusCvBtn = document.getElementById('hapusCvBtn');
+            if (profil.cv && profil.cv.trim() !== "") {
+                cvFileNameSpan.innerHTML = `CV saat ini: ${profil.cv}`;
+                hapusCvBtn.classList.remove('hidden');
+            } else {
+                cvFileNameSpan.innerHTML = 'Belum ada CV diunggah.';
+                hapusCvBtn.classList.add('hidden');
+            }
+        }
+
         function loadProfilToForm() {
             document.getElementById('nama').value = profil.nama || '';
             document.getElementById('email').value = profil.email;
@@ -230,14 +239,18 @@
             document.getElementById('telepon').value = profil.telepon || '';
             document.getElementById('pendidikan').value = profil.pendidikan || '';
             document.getElementById('alamat').value = profil.alamat || '';
-            if (profil.cv) {
-                document.getElementById('cvFileName').innerHTML = `CV saat ini: ${profil.cv}`;
-            } else {
-                document.getElementById('cvFileName').innerHTML = '';
-            }
+            updateCvDisplay();
         }
 
-        // Simpan profil dari form
+        // Hapus CV
+        document.getElementById('hapusCvBtn').addEventListener('click', () => {
+            profil.cv = "";
+            saveProfil();
+            updateCvDisplay();
+            showAlert('CV berhasil dihapus.', false);
+        });
+
+        // Simpan profil (termasuk upload CV baru)
         document.getElementById('profilForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const nama = document.getElementById('nama').value.trim();
@@ -245,14 +258,12 @@
                 showAlert('Nama tidak boleh kosong', true);
                 return;
             }
-            // Update objek profil
             profil.nama = nama;
             profil.jenisDisabilitas = document.getElementById('jenisDisabilitas').value;
             profil.telepon = document.getElementById('telepon').value.trim();
             profil.pendidikan = document.getElementById('pendidikan').value.trim();
             profil.alamat = document.getElementById('alamat').value.trim();
 
-            // Proses upload CV (simulasi simpan nama file)
             const fileInput = document.getElementById('cvFile');
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
@@ -265,15 +276,15 @@
                     return;
                 }
                 profil.cv = file.name;
-                showAlert(`File CV "${file.name}" siap diunggah (simulasi)`, false);
-                document.getElementById('cvFileName').innerHTML = `CV saat ini: ${file.name}`;
+                showAlert(`File CV "${file.name}" berhasil diunggah (simulasi).`, false);
+                fileInput.value = ''; // reset input file
             }
             saveProfil();
-            loadProfilToForm(); // refresh form (CV name ditampilkan)
+            loadProfilToForm();
             showAlert('Profil berhasil diperbarui!', false);
         });
 
-        // Reset form ke data terakhir yang tersimpan di localStorage
+        // Reset form ke data terakhir yang tersimpan
         document.getElementById('resetBtn').addEventListener('click', () => {
             profil = localStorage.getItem(PROFIL_KEY) ? JSON.parse(localStorage.getItem(PROFIL_KEY)) : getDefaultProfil();
             loadProfilToForm();
@@ -296,21 +307,17 @@
             showAlert('Riwayat berhasil ditambahkan', false);
         });
 
-        // Hapus akun beserta semua data terkait
+        // Hapus akun
         document.getElementById('hapusAkunBtn').addEventListener('click', () => {
             if (confirm('PERINGATAN: Semua data Anda akan dihapus permanen. Apakah Anda yakin?')) {
-                // Hapus data profil dan riwayat
                 localStorage.removeItem(PROFIL_KEY);
                 localStorage.removeItem(RIWAYAT_KEY);
-                // Hapus lamaran yang terkait dengan email ini
                 let lamaran = JSON.parse(localStorage.getItem('lamaran') || '[]');
                 lamaran = lamaran.filter(l => l.email !== profil.email);
                 localStorage.setItem('lamaran', JSON.stringify(lamaran));
-                // Hapus akun dari daftar registeredUsers
                 let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
                 users = users.filter(u => u.email !== profil.email);
                 localStorage.setItem('registeredUsers', JSON.stringify(users));
-                // Hapus session user
                 localStorage.removeItem('user');
                 showAlert('Akun telah dihapus. Anda akan diarahkan ke halaman login.', false);
                 setTimeout(() => {
@@ -319,7 +326,6 @@
             }
         });
 
-        // Inisialisasi halaman
         loadProfilToForm();
         renderRiwayat();
     </script>
