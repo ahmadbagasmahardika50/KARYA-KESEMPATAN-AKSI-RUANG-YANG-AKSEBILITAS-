@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Pendaftaran Lowongan - KARYA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body class="bg-surface">
+
+    <nav class="bg-white shadow px-8 py-4">
+        <div class="text-2xl font-black text-primary">KARYA</div>
+    </nav>
+
+    <div class="max-w-2xl mx-auto px-6 py-12">
+        <div class="bg-white rounded-2xl shadow p-8">
+            <h1 class="text-3xl font-black text-primary mb-2">Pendaftaran Lowongan</h1>
+            <p class="text-on-surface-variant mb-6">Lengkapi data berikut untuk melamar pekerjaan.</p>
+            <form id="formDaftar">
+                <div class="mb-4"><label>Nama Lengkap</label><input type="text" class="w-full p-3 rounded-xl bg-surface-container-high" value="Budi Santoso" readonly></div>
+                <div class="mb-4"><label>Email</label><input type="email" class="w-full p-3 rounded-xl bg-surface-container-high" value="budi@example.com" readonly></div>
+                <div class="mb-4"><label>Lowongan yang Dilamar</label><input type="text" id="lowongan" class="w-full p-3 rounded-xl bg-surface-container-high" value="Frontend Developer" readonly></div>
+                <div class="mb-4"><label>Upload CV (PDF)</label><input type="file" accept=".pdf" class="w-full p-2"></div>
+                <div class="mb-4"><label>Pesan untuk Perusahaan (opsional)</label><textarea class="w-full p-3 rounded-xl bg-surface-container-high" rows="3"></textarea></div>
+                <button type="submit" class="bg-primary text-white px-6 py-3 rounded-xl font-bold w-full">Kirim Lamaran</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('formDaftar').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Lamaran berhasil dikirim! Perusahaan akan menghubungi Anda.');
+            window.location.href = 'penyandang-lowongan.html';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar - KARYA</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#001855",
+                        "primary-container": "#002a84",
+                        secondary: "#7c5800",
+                        surface: "#fcf9f8",
+                        "on-surface": "#1b1c1c",
+                    },
+                    fontFamily: { sans: ["Lexend"] },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface">
+
+    <div class="min-h-screen flex items-center justify-center px-4 py-8">
+        <div class="bg-white rounded-3xl shadow-lg p-8 max-w-md w-full">
+            <h1 class="text-3xl font-black text-primary text-center">Daftar Akun</h1>
+            <p class="text-center text-on-surface-variant mb-6">Pilih tipe akun Anda</p>
+            <form id="registerForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-bold">Nama Lengkap</label>
+                    <input type="text" id="nama" class="w-full p-3 rounded-xl bg-surface-container-high" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-bold">Email</label>
+                    <input type="email" id="email" class="w-full p-3 rounded-xl bg-surface-container-high" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-bold">Password</label>
+                    <input type="password" id="password" class="w-full p-3 rounded-xl bg-surface-container-high" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-bold">Tipe Akun</label>
+                    <select id="role" class="w-full p-3 rounded-xl bg-surface-container-high">
+                        <option value="penyandang">Penyandang Disabilitas</option>
+                        <option value="perusahaan">Perusahaan</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-bold">Daftar</button>
+            </form>
+            <p class="text-center mt-6">Sudah punya akun? <a href="login.html" class="text-primary font-bold">Masuk</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Pendaftaran berhasil! Silakan login.');
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

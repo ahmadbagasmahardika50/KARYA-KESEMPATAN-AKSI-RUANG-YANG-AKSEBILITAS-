@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil Perusahaan - KARYA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body class="bg-surface">
+
+    <nav class="bg-white shadow px-8 py-4 flex justify-between">
+        <div class="text-2xl font-black text-primary">KARYA Perusahaan</div>
+        <a href="perusahaan-dashboard.html" class="text-primary">← Kembali</a>
+    </nav>
+
+    <div class="max-w-2xl mx-auto px-6 py-12">
+        <div class="bg-white rounded-2xl shadow p-8">
+            <h1 class="text-3xl font-black text-primary mb-6">Profil Perusahaan</h1>
+            <form id="formProfil">
+                <div class="mb-4"><label>Nama Perusahaan</label><input type="text" id="nama" class="w-full p-3 rounded-xl bg-surface-container-high" value="PT Maju Jaya"></div>
+                <div class="mb-4"><label>Email</label><input type="email" id="email" class="w-full p-3 rounded-xl bg-surface-container-high" value="info@majujaya.com"></div>
+                <div class="mb-4"><label>Telepon</label><input type="text" id="telepon" class="w-full p-3 rounded-xl bg-surface-container-high" value="0211234567"></div>
+                <div class="mb-4"><label>Alamat</label><textarea id="alamat" class="w-full p-3 rounded-xl bg-surface-container-high">Jl. Sudirman No. 1, Jakarta</textarea></div>
+                <div class="mb-4"><label>Deskripsi Perusahaan</label><textarea id="deskripsi" class="w-full p-3 rounded-xl bg-surface-container-high">Perusahaan teknologi inklusif yang membuka peluang untuk semua.</textarea></div>
+                <button type="submit" class="bg-primary text-white px-6 py-3 rounded-xl font-bold">Simpan Perubahan</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('formProfil').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Profil perusahaan berhasil diperbarui!');
+        });
+    </script>
+</body>
+</html>
