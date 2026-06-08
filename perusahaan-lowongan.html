@@ -13,35 +13,464 @@
         .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%); }
         .btn-primary { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); transition: all 0.2s ease; }
         .btn-primary:hover { transform: scale(1.02); background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); }
+        .btn-danger { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); transition: all 0.2s ease; }
+        .btn-danger:hover { transform: scale(1.02); }
         .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .card-hover:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .table-row-hover:hover { background-color: #f8fafc; transition: background 0.2s; }
+        .status-badge { transition: all 0.2s ease; }
+        .status-badge:hover { transform: scale(1.05); }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200">
 
+    <!-- Header -->
     <header class="gradient-bg shadow-lg">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <div class="bg-white/20 p-2 rounded-xl"><i class="fas fa-briefcase text-white text-2xl"></i></div>
-                <div><h1 class="text-2xl font-bold text-white">Sistem KARYA</h1><p class="text-blue-100 text-xs">Platform Lowongan Kerja Inklusif</p></div>
+                <div class="bg-white/20 p-2 rounded-xl">
+                    <i class="fas fa-briefcase text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white">Sistem KARYA</h1>
+                    <p class="text-blue-100 text-xs">Platform Lowongan Kerja Inklusif</p>
+                </div>
             </div>
             <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-3 bg-white/10 px-4 py-2 rounded-full"><i class="fas fa-building text-white"></i><span class="text-white font-medium">PT. Maju Bersama</span></div>
-                <button class="bg-white/20 text-white px-4 py-2 rounded-full hover:bg-white/30 transition-all"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
+                <div class="flex items-center space-x-3 bg-white/10 px-4 py-2 rounded-full">
+                    <i class="fas fa-building text-white"></i>
+                    <span class="text-white font-medium">PT. Maju Bersama</span>
+                </div>
+                <button class="bg-white/20 text-white px-4 py-2 rounded-full hover:bg-white/30 transition-all flex items-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
             </div>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-8">
-        <div class="flex items-center gap-2 text-sm text-gray-500 mb-6"><i class="fas fa-home"></i><span>Dashboard</span><i class="fas fa-chevron-right text-xs"></i><span class="text-gray-800 font-medium">Kelola Lowongan</span></div>
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-gray-800 font-medium">Kelola Lowongan</span>
+        </div>
 
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div class="gradient-bg px-8 py-6 flex justify-between items-center">
-                <div><h2 class="text-2xl font-bold text-white">Kelola Lowongan Pekerjaan</h2><p class="text-blue-100 mt-1">Buat, edit, atau hapus lowongan pekerjaan perusahaan Anda</p></div>
-                <button id="btn-tambah" class="bg-white text-blue-700 px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all flex items-center gap-2 shadow-lg font-medium"><i class="fas fa-plus"></i>Buat Lowongan Baru</button>
+            <!-- Header -->
+            <div class="gradient-bg px-8 py-6 flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Kelola Lowongan Pekerjaan</h2>
+                    <p class="text-blue-100 mt-1">Buat, edit, atau hapus lowongan pekerjaan perusahaan Anda</p>
+                </div>
+                <button id="btn-tambah" class="bg-white text-blue-700 px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all flex items-center gap-2 shadow-lg font-medium">
+                    <i class="fas fa-plus"></i> Buat Lowongan Baru
+                </button>
             </div>
 
             <!-- Statistik Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-5 p-6 bg-gray-50">
-                <div class="bg-white rounded-xl p-4 shadow-md flex items-center justify-between"><div><p class="text-gray-500 text-sm">Total Lowongan</p><p id="total-lowongan" class="
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-5 p-6 bg-gray-50 border-b border-gray-200">
+                <div class="bg-white rounded-xl p-4 shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Total Lowongan</p>
+                            <p id="total-lowongan" class="text-2xl font-bold text-gray-800 mt-1">0</p>
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-xl">
+                            <i class="fas fa-briefcase text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Lowongan Aktif</p>
+                            <p id="total-aktif" class="text-2xl font-bold text-green-600 mt-1">0</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-xl">
+                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Lowongan Nonaktif</p>
+                            <p id="total-nonaktif" class="text-2xl font-bold text-yellow-600 mt-1">0</p>
+                        </div>
+                        <div class="bg-yellow-100 p-3 rounded-xl">
+                            <i class="fas fa-pause-circle text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Total Pelamar</p>
+                            <p id="total-pelamar" class="text-2xl font-bold text-purple-600 mt-1">0</p>
+                        </div>
+                        <div class="bg-purple-100 p-3 rounded-xl">
+                            <i class="fas fa-users text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter dan Pencarian -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex-1 min-w-[180px]">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Filter Status</label>
+                        <select id="filter-status" class="w-full border-2 border-gray-200 rounded-xl p-2.5 focus:border-blue-400 focus:ring-2 focus:ring-blue-200">
+                            <option value="">Semua Status</option>
+                            <option value="aktif">✅ Aktif</option>
+                            <option value="nonaktif">⏸️ Nonaktif</option>
+                            <option value="ditutup">🔒 Ditutup</option>
+                        </select>
+                    </div>
+                    <div class="flex-1 min-w-[250px]">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cari Lowongan</label>
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                            <input type="text" id="search" placeholder="Cari judul lowongan..." class="w-full border-2 border-gray-200 rounded-xl p-2.5 pl-10 focus:border-blue-400 focus:ring-2 focus:ring-blue-200">
+                        </div>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button id="btn-filter" class="btn-primary text-white px-5 py-2.5 rounded-xl font-medium shadow-md flex items-center gap-2">
+                            <i class="fas fa-search"></i> Cari
+                        </button>
+                        <button id="btn-reset" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl hover:bg-gray-300 transition-all font-medium flex items-center gap-2">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Lowongan -->
+            <div class="overflow-x-auto p-6">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b-2 border-gray-200">
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">No</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Judul Lowongan</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Deskripsi</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Status</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Pelamar</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Tanggal Dibuat</th>
+                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-600">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Data akan diisi JavaScript -->
+                    </tbody>
+                </table>
+
+                <!-- Paginasi -->
+                <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+                    <button id="prev-page" class="px-4 py-2 bg-gray-100 rounded-xl disabled:opacity-50 flex items-center gap-2 hover:bg-gray-200 transition-all" disabled>
+                        <i class="fas fa-chevron-left text-xs"></i> Sebelumnya
+                    </button>
+                    <span id="page-info" class="text-sm text-gray-600">Halaman 1 dari 1</span>
+                    <button id="next-page" class="px-4 py-2 bg-gray-100 rounded-xl disabled:opacity-50 flex items-center gap-2 hover:bg-gray-200 transition-all" disabled>
+                        Selanjutnya <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Tambah/Edit Lowongan -->
+    <div id="modal-lowongan" class="fixed inset-0 bg-black bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+        <div class="relative mx-auto p-6 border-0 w-11/12 md:w-2/3 lg:w-1/2 shadow-2xl rounded-2xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 id="modal-title" class="text-xl font-bold text-gray-800">Tambah Lowongan Baru</h3>
+                <button id="close-modal" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <form id="lowongan-form">
+                <input type="hidden" id="lowongan-id" value="">
+                <div class="mt-4 space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Judul Lowongan <span class="text-red-500">*</span></label>
+                        <input type="text" id="judul" required class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-blue-400 focus:ring-2 focus:ring-blue-200" placeholder="Contoh: Frontend Developer">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi Pekerjaan <span class="text-red-500">*</span></label>
+                        <textarea id="deskripsi" rows="5" required class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-blue-400 focus:ring-2 focus:ring-blue-200" placeholder="Jelaskan tanggung jawab, kualifikasi, dan persyaratan lowongan..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Kualifikasi</label>
+                        <textarea id="kualifikasi" rows="3" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-blue-400 focus:ring-2 focus:ring-blue-200" placeholder="Kualifikasi yang dibutuhkan..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                        <select id="status-lowongan" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-blue-400">
+                            <option value="aktif">✅ Aktif</option>
+                            <option value="nonaktif">⏸️ Nonaktif</option>
+                            <option value="ditutup">🔒 Ditutup</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                    <button type="button" id="cancel-modal" class="px-5 py-2.5 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-all font-medium">Batal</button>
+                    <button type="submit" class="btn-primary px-5 py-2.5 rounded-xl text-white font-medium shadow-md">Simpan Lowongan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Detail Lowongan -->
+    <div id="modal-detail" class="fixed inset-0 bg-black bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+        <div class="relative mx-auto p-6 border-0 w-11/12 md:w-2/3 lg:w-1/2 shadow-2xl rounded-2xl bg-white">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <h3 class="text-xl font-bold text-gray-800">Detail Lowongan</h3>
+                <button id="close-detail" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <div id="detail-content" class="mt-4 space-y-3"></div>
+            <div class="flex justify-end mt-6 pt-4 border-t">
+                <button id="close-detail-btn" class="px-5 py-2.5 bg-gray-200 rounded-xl text-gray-700 hover:bg-gray-300 transition-all font-medium">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="modal-hapus" class="fixed inset-0 bg-black bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+        <div class="relative mx-auto p-6 border-0 w-96 shadow-2xl rounded-2xl bg-white text-center">
+            <div class="bg-red-100 p-4 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-4">
+                <i class="fas fa-exclamation-triangle text-red-500 text-4xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Hapus Lowongan</h3>
+            <p class="text-gray-600 mb-3">Apakah Anda yakin ingin menghapus lowongan "<span id="hapus-judul" class="font-semibold text-blue-600"></span>"?</p>
+            <p class="text-sm text-red-600 mb-6">⚠️ Tindakan ini tidak dapat dibatalkan!</p>
+            <div class="flex justify-center space-x-3">
+                <button id="confirm-hapus" class="btn-danger px-5 py-2.5 rounded-xl text-white font-medium">Hapus</button>
+                <button id="cancel-hapus" class="px-5 py-2.5 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-all font-medium">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data dummy lowongan
+        let lowonganData = [
+            { id: 1, judul: "Frontend Developer", deskripsi: "Membangun antarmuka website yang responsif dan aksesibel untuk penyandang disabilitas.", kualifikasi: "Menguasai HTML, CSS, JavaScript, React. Pengalaman minimal 1 tahun.", status: "aktif", pelamar: 5, tanggal: "2026-06-01" },
+            { id: 2, judul: "Admin Data Entry", deskripsi: "Menginput data perusahaan ke sistem dengan akurat.", kualifikasi: "Teliti, cepat mengetik, familiar dengan Excel.", status: "aktif", pelamar: 3, tanggal: "2026-06-03" },
+            { id: 3, judul: "Customer Service", deskripsi: "Melayani pertanyaan pelanggan via chat dan email.", kualifikasi: "Komunikatif, sabar, memahami bahasa isyarat dasar.", status: "nonaktif", pelamar: 2, tanggal: "2026-05-20" },
+            { id: 4, judul: "UI/UX Designer", deskripsi: "Merancang antarmuka yang ramah disabilitas.", kualifikasi: "Menguasai Figma, memahami prinsip aksesibilitas.", status: "aktif", pelamar: 7, tanggal: "2026-06-05" },
+            { id: 5, judul: "Quality Assurance", deskripsi: "Melakukan testing aplikasi dan memastikan kualitas.", kualifikasi: "Pengalaman testing web, teliti.", status: "ditutup", pelamar: 4, tanggal: "2026-05-15" },
+        ];
+
+        let currentPage = 1;
+        const rowsPerPage = 4;
+        let filteredData = [...lowonganData];
+        let deleteId = null;
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('id-ID', options);
+        }
+
+        function updateStats() {
+            const total = lowonganData.length;
+            const aktif = lowonganData.filter(l => l.status === 'aktif').length;
+            const nonaktif = lowonganData.filter(l => l.status === 'nonaktif').length;
+            const totalPelamar = lowonganData.reduce((sum, l) => sum + (l.pelamar || 0), 0);
+            document.getElementById('total-lowongan').innerText = total;
+            document.getElementById('total-aktif').innerText = aktif;
+            document.getElementById('total-nonaktif').innerText = nonaktif;
+            document.getElementById('total-pelamar').innerText = totalPelamar;
+        }
+
+        function getStatusBadge(status) {
+            switch(status) {
+                case 'aktif': return '<span class="status-badge px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold"><i class="fas fa-check-circle mr-1"></i>Aktif</span>';
+                case 'nonaktif': return '<span class="status-badge px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold"><i class="fas fa-pause-circle mr-1"></i>Nonaktif</span>';
+                case 'ditutup': return '<span class="status-badge px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold"><i class="fas fa-lock mr-1"></i>Ditutup</span>';
+                default: return '<span class="px-3 py-1 bg-gray-100 rounded-full text-xs">' + status + '</span>';
+            }
+        }
+
+        function renderTable() {
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const pageData = filteredData.slice(start, end);
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-gray-500"><i class="fas fa-inbox text-4xl mb-2 block"></i>Tidak ada data lowongan</td></tr>';
+                document.getElementById('page-info').innerText = 'Halaman 0 dari 0';
+                document.getElementById('prev-page').disabled = true;
+                document.getElementById('next-page').disabled = true;
+                return;
+            }
+
+            pageData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.className = 'table-row-hover border-b border-gray-100';
+                row.innerHTML = `
+                    <td class="py-3 px-4 text-gray-500">${start + index + 1}</td>
+                    <td class="py-3 px-4 font-semibold text-gray-800">${item.judul}</td>
+                    <td class="py-3 px-4 text-gray-600 max-w-md truncate">${item.deskripsi.substring(0, 60)}${item.deskripsi.length > 60 ? '...' : ''}</td>
+                    <td class="py-3 px-4">${getStatusBadge(item.status)}</td>
+                    <td class="py-3 px-4"><span class="inline-flex items-center gap-1 text-gray-600"><i class="fas fa-user text-gray-400"></i> ${item.pelamar || 0} orang</span></td>
+                    <td class="py-3 px-4 text-gray-500">${formatDate(item.tanggal)}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button class="text-blue-500 hover:text-blue-700 mr-2 detail-btn" data-id="${item.id}"><i class="fas fa-eye"></i></button>
+                        <button class="text-green-500 hover:text-green-700 mr-2 edit-btn" data-id="${item.id}"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-500 hover:text-red-700 delete-btn" data-id="${item.id}" data-judul="${item.judul}"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            document.getElementById('page-info').innerText = `Halaman ${currentPage} dari ${totalPages || 1}`;
+            document.getElementById('prev-page').disabled = currentPage === 1;
+            document.getElementById('next-page').disabled = currentPage === totalPages || filteredData.length === 0;
+        }
+
+        function applyFilters() {
+            const statusFilter = document.getElementById('filter-status').value;
+            const searchText = document.getElementById('search').value.toLowerCase();
+            filteredData = lowonganData.filter(item => {
+                let matchStatus = statusFilter ? item.status === statusFilter : true;
+                let matchSearch = searchText ? item.judul.toLowerCase().includes(searchText) : true;
+                return matchStatus && matchSearch;
+            });
+            currentPage = 1;
+            renderTable();
+        }
+
+        function resetFilters() {
+            document.getElementById('filter-status').value = '';
+            document.getElementById('search').value = '';
+            filteredData = [...lowonganData];
+            currentPage = 1;
+            renderTable();
+        }
+
+        function resetModalForm() {
+            document.getElementById('lowongan-id').value = '';
+            document.getElementById('judul').value = '';
+            document.getElementById('deskripsi').value = '';
+            document.getElementById('kualifikasi').value = '';
+            document.getElementById('status-lowongan').value = 'aktif';
+            document.getElementById('modal-title').innerText = 'Tambah Lowongan Baru';
+        }
+
+        function openAddModal() {
+            resetModalForm();
+            document.getElementById('modal-lowongan').classList.remove('hidden');
+        }
+
+        function openEditModal(id) {
+            const lowongan = lowonganData.find(l => l.id == id);
+            if (lowongan) {
+                document.getElementById('lowongan-id').value = lowongan.id;
+                document.getElementById('judul').value = lowongan.judul;
+                document.getElementById('deskripsi').value = lowongan.deskripsi;
+                document.getElementById('kualifikasi').value = lowongan.kualifikasi || '';
+                document.getElementById('status-lowongan').value = lowongan.status;
+                document.getElementById('modal-title').innerText = 'Edit Lowongan';
+                document.getElementById('modal-lowongan').classList.remove('hidden');
+            }
+        }
+
+        function showDetail(id) {
+            const lowongan = lowonganData.find(l => l.id == id);
+            if (lowongan) {
+                let statusHtml = '';
+                if (lowongan.status === 'aktif') statusHtml = '<span class="text-green-600 font-semibold">✅ Aktif</span>';
+                else if (lowongan.status === 'nonaktif') statusHtml = '<span class="text-yellow-600 font-semibold">⏸️ Nonaktif</span>';
+                else statusHtml = '<span class="text-red-600 font-semibold">🔒 Ditutup</span>';
+                
+                const detailContent = document.getElementById('detail-content');
+                detailContent.innerHTML = `
+                    <div class="bg-gray-50 rounded-xl p-4"><p class="text-gray-500 text-sm">Judul Lowongan</p><p class="font-semibold text-gray-800">${lowongan.judul}</p></div>
+                    <div class="bg-gray-50 rounded-xl p-4"><p class="text-gray-500 text-sm">Deskripsi</p><p class="text-gray-700">${lowongan.deskripsi}</p></div>
+                    <div class="bg-gray-50 rounded-xl p-4"><p class="text-gray-500 text-sm">Kualifikasi</p><p class="text-gray-700">${lowongan.kualifikasi || '-'}</p></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-50 rounded-xl p-4"><p class="text-gray-500 text-sm">Status</p>${statusHtml}</div>
+                        <div class="bg-gray-50 rounded-xl p-4"><p class="text-gray-500 text-sm">Jumlah Pelamar</p><p class="font-semibold text-gray-800">${lowongan.pelamar || 0} orang</p></div>
+                        <div class="bg-gray-50 rounded-xl p-4"><p class="text-gray-500 text-sm">Tanggal Dibuat</p><p class="text-gray-700">${formatDate(lowongan.tanggal)}</p></div>
+                    </div>
+                `;
+                document.getElementById('modal-detail').classList.remove('hidden');
+            }
+        }
+
+        function saveLowongan(event) {
+            event.preventDefault();
+            const id = document.getElementById('lowongan-id').value;
+            const judul = document.getElementById('judul').value;
+            const deskripsi = document.getElementById('deskripsi').value;
+            const kualifikasi = document.getElementById('kualifikasi').value;
+            const status = document.getElementById('status-lowongan').value;
+
+            if (!judul || !deskripsi) {
+                alert('Judul dan deskripsi wajib diisi!');
+                return;
+            }
+
+            if (id) {
+                const index = lowonganData.findIndex(l => l.id == id);
+                if (index !== -1) {
+                    lowonganData[index] = { ...lowonganData[index], judul, deskripsi, kualifikasi, status };
+                }
+            } else {
+                const newId = Math.max(...lowonganData.map(l => l.id), 0) + 1;
+                lowonganData.push({ id: newId, judul, deskripsi, kualifikasi, status, pelamar: 0, tanggal: new Date().toISOString().split('T')[0] });
+            }
+
+            document.getElementById('modal-lowongan').classList.add('hidden');
+            updateStats();
+            applyFilters();
+            resetModalForm();
+        }
+
+        function openDeleteModal(id, judul) {
+            deleteId = id;
+            document.getElementById('hapus-judul').innerText = judul;
+            document.getElementById('modal-hapus').classList.remove('hidden');
+        }
+
+        function confirmDelete() {
+            if (deleteId) {
+                lowonganData = lowonganData.filter(l => l.id != deleteId);
+                updateStats();
+                applyFilters();
+                document.getElementById('modal-hapus').classList.add('hidden');
+                deleteId = null;
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('btn-tambah').addEventListener('click', openAddModal);
+        document.getElementById('btn-filter').addEventListener('click', applyFilters);
+        document.getElementById('btn-reset').addEventListener('click', resetFilters);
+        document.getElementById('search').addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFilters(); });
+        document.getElementById('prev-page').addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTable(); } });
+        document.getElementById('next-page').addEventListener('click', () => { if (currentPage < Math.ceil(filteredData.length / rowsPerPage)) { currentPage++; renderTable(); } });
+        
+        document.getElementById('close-modal').addEventListener('click', () => document.getElementById('modal-lowongan').classList.add('hidden'));
+        document.getElementById('cancel-modal').addEventListener('click', () => document.getElementById('modal-lowongan').classList.add('hidden'));
+        document.getElementById('close-detail').addEventListener('click', () => document.getElementById('modal-detail').classList.add('hidden'));
+        document.getElementById('close-detail-btn').addEventListener('click', () => document.getElementById('modal-detail').classList.add('hidden'));
+        document.getElementById('cancel-hapus').addEventListener('click', () => document.getElementById('modal-hapus').classList.add('hidden'));
+        
+        document.getElementById('lowongan-form').addEventListener('submit', saveLowongan);
+        document.getElementById('confirm-hapus').addEventListener('click', confirmDelete);
+
+        document.getElementById('table-body').addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+            if (target.classList.contains('detail-btn')) showDetail(target.getAttribute('data-id'));
+            else if (target.classList.contains('edit-btn')) openEditModal(target.getAttribute('data-id'));
+            else if (target.classList.contains('delete-btn')) openDeleteModal(target.getAttribute('data-id'), target.getAttribute('data-judul'));
+        });
+
+        updateStats();
+        applyFilters();
+    </script>
+</body>
+</html>
