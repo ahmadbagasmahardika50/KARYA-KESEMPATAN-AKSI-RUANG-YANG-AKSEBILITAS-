@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"><title>Data Pelamar</title><script src="https://cdn.tailwindcss.com"></script><style>body{font-family:'Lexend',sans-serif;}</style></head>
+<body class="bg-gray-50"><nav class="bg-white shadow px-6 py-3"><a href="perusahaan-dashboard.html">← Kembali</a></nav>
+<div class="max-w-6xl mx-auto px-6 py-8"><h1 class="text-2xl font-bold">Daftar Pelamar</h1><div class="bg-white rounded shadow overflow-hidden mt-4"><table class="w-full text-left"><thead class="bg-gray-100"><tr><th class="p-3">Nama</th><th>Disabilitas</th><th>Lowongan</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tabel"></tbody></table></div></div>
+<div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center"><div class="bg-white p-6 rounded w-96"><h3 class="text-xl font-bold mb-4">Update Status</h3><div id="modalContent"></div><div class="flex justify-end gap-2 mt-4"><button id="closeModal" class="bg-gray-300 px-4 py-2 rounded">Tutup</button><button id="updateBtn" class="bg-blue-900 text-white px-4 py-2 rounded">Update</button></div></div></div>
+<script>let pelamar=JSON.parse(localStorage.getItem('lamaran')||'[{"id":1,"nama":"Budi","disabilitas":"Fisik","lowongan":"Frontend Developer","status":"Pending","email":"budi@ex.com","pendidikan":"S1"}]');
+function render(){let html=''; pelamar.forEach(p=>{let statusClass=p.status==='Pending'?'bg-yellow-100':'bg-blue-100'; html+=`<tr class="border-b"><td class="p-3">${p.nama}</td><td>${p.disabilitas}</td><td>${p.lowongan}</td><td><span class="px-2 py-1 rounded-full text-xs ${statusClass}">${p.status}</span></td><td><button class="detailBtn text-blue-600" data-id="${p.id}">Detail</button></td></tr>`;}); document.getElementById('tabel').innerHTML=html;}
+function showDetail(id){let p=pelamar.find(p=>p.id==id); if(p){document.getElementById('modalContent').innerHTML=`<p><strong>Nama:</strong> ${p.nama}</p><p><strong>Email:</strong> ${p.email}</p><p><strong>Disabilitas:</strong> ${p.disabilitas}</p><p><strong>Pendidikan:</strong> ${p.pendidikan}</p><p><strong>Lowongan:</strong> ${p.lowongan}</p><p><strong>Status:</strong> <select id="statusSelect"><option ${p.status==='Pending'?'selected':''}>Pending</option><option ${p.status==='Dalam Review'?'selected':''}>Dalam Review</option><option ${p.status==='Diterima'?'selected':''}>Diterima</option><option ${p.status==='Ditolak'?'selected':''}>Ditolak</option></select></p>`; document.getElementById('modal').style.display='flex'; document.getElementById('updateBtn').onclick=()=>{ let newStatus=document.getElementById('statusSelect').value; p.status=newStatus; localStorage.setItem('lamaran',JSON.stringify(pelamar)); render(); document.getElementById('modal').style.display='none'; alert('Status diperbarui'); };}}
+document.getElementById('tabel').addEventListener('click',(e)=>{if(e.target.classList.contains('detailBtn')){let id=e.target.getAttribute('data-id'); showDetail(id);}});
+document.getElementById('closeModal').onclick=()=>document.getElementById('modal').style.display='none';
+render();
+</script>
+</body>
+</html>
