@@ -107,9 +107,9 @@
         <div class="flex items-center space-x-4">
             <span class="text-sm text-on-surface-variant hidden md:inline">
                 <span class="material-symbols-outlined text-sm mr-1">account_circle</span>
-                Alya Yumna
+                <span id="user-name-display">Pengguna</span>
             </span>
-            <button class="bg-error/10 text-error px-3 py-1 rounded-full text-sm hover:bg-error/20 transition">
+            <button id="logoutBtn" class="bg-error/10 text-error px-3 py-1 rounded-full text-sm hover:bg-error/20 transition">
                 <span class="material-symbols-outlined text-sm mr-1">logout</span>
                 Logout
             </button>
@@ -236,12 +236,16 @@
 </footer>
 
 <script>
+    // ==================== CEK USER LOGIN ====================
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    if (!currentUser || currentUser.role !== 'penyandang') {
+        alert('Silakan login sebagai penyandang disabilitas terlebih dahulu.');
+        window.location.href = 'login.html';
+    }
+    // Tampilkan nama pengguna di navbar
+    document.getElementById('user-name-display').innerText = currentUser.nama || currentUser.email.split('@')[0];
+
     // ==================== DATA LOWONGAN DARI LOCALSTORAGE ====================
-    // Data lowongan disimpan oleh modul perusahaan dengan key 'daftarLowongan'
-    // Format setiap object:
-    // {
-    //   id, judul, perusahaan, lokasi, jenis_disabilitas, deskripsi, tgl_posting, gaji, status
-    // }
     function getLowonganFromStorage() {
         const stored = localStorage.getItem('daftarLowongan');
         if (stored) {
@@ -252,7 +256,7 @@
                 return [];
             }
         }
-        return []; // Tidak ada lowongan statis
+        return [];
     }
 
     let semuaLowongan = [];
@@ -260,14 +264,22 @@
     let currentPage = 1;
     const rowsPerPage = 6;
 
-    // Fungsi format tanggal Indonesia
     function formatDate(dateString) {
         if (!dateString) return '-';
         const options = { day: 'numeric', month: 'long', year: 'numeric' };
         return new Date(dateString).toLocaleDateString('id-ID', options);
     }
 
-    // Render daftar lowongan
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
     function renderLowongan() {
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
@@ -292,7 +304,7 @@
             card.innerHTML = `
                 <div class="flex justify-between items-start mb-3">
                     <h4 class="text-lg font-bold text-primary">${escapeHtml(lowongan.judul)}</h4>
-                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">${lowongan.status === 'dibuka' ? 'Dibuka' : 'Ditutup'}</span>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">${lowongan.status === 'Aktif' ? 'Dibuka' : 'Ditutup'}</span>
                 </div>
                 <p class="text-on-surface-variant text-sm mb-2 flex items-center">
                     <span class="material-symbols-outlined text-sm mr-1 text-outline">business</span> ${escapeHtml(lowongan.perusahaan)}
@@ -325,25 +337,15 @@
         document.getElementById('next-page').disabled = currentPage === totalPages || filteredData.length === 0;
     }
 
-    // Escape HTML untuk keamanan
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    // Filter dan pencarian
     function applyFilters() {
         const keyword = document.getElementById('search-keyword').value.toLowerCase();
         const jenisFilter = document.getElementById('filter-jenis').value;
         const lokasiFilter = document.getElementById('filter-lokasi').value;
         const sortBy = document.getElementById('sort-by').value;
         
+        // Hanya tampilkan lowongan dengan status 'Aktif'
         filteredData = semuaLowongan.filter(lowongan => {
+            if (lowongan.status !== 'Aktif') return false;
             let matchKeyword = true;
             if (keyword) {
                 matchKeyword = (lowongan.judul && lowongan.judul.toLowerCase().includes(keyword)) || 
@@ -355,7 +357,6 @@
             return matchKeyword && matchJenis && matchLokasi;
         });
         
-        // Sorting
         if (sortBy === 'terbaru') {
             filteredData.sort((a, b) => new Date(b.tgl_posting) - new Date(a.tgl_posting));
         } else {
@@ -374,13 +375,11 @@
         applyFilters();
     }
 
-    // Load data dari localStorage dan refresh
     function loadData() {
         semuaLowongan = getLowonganFromStorage();
         applyFilters();
     }
 
-    // Ketika tombol "Lihat Detail" diklik, simpan lowongan ke localStorage dan arahkan ke halaman pendaftaran
     function attachDetailEvents() {
         document.querySelectorAll('.detail-btn').forEach(btn => {
             btn.removeEventListener('click', handleDetailClick);
@@ -408,7 +407,7 @@
         if (currentPage > 1) {
             currentPage--;
             renderLowongan();
-            attachDetailEvents(); // re-attach setelah render ulang
+            attachDetailEvents();
         }
     });
     document.getElementById('next-page').addEventListener('click', () => {
@@ -423,24 +422,29 @@
         if (e.key === 'Enter') applyFilters();
     });
 
-    // Inisialisasi: load data, lalu setiap ada perubahan storage (misal dari halaman perusahaan) kita bisa reload
-    loadData();
-    
-    // Optional: mendeteksi perubahan storage dari tab lain (misal perusahaan menambah lowongan)
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('lowonganDipilih');
+        window.location.href = 'login.html';
+    });
+
+    // Deteksi perubahan storage dari tab lain
     window.addEventListener('storage', (e) => {
         if (e.key === 'daftarLowongan') {
             loadData();
         }
     });
 
-    // Karena renderLowongan dipanggil di applyFilters, kita perlu attach event setelah render
-    // Override renderLowongan untuk memanggil attachDetailEvents setelah selesai
+    // Inisialisasi
+    loadData();
+    
+    // Override renderLowongan untuk attach event
     const originalRender = renderLowongan;
     renderLowongan = function() {
         originalRender();
         attachDetailEvents();
     };
-    // Panggil sekali lagi untuk memastikan event terpasang
     renderLowongan();
 </script>
 </body>
