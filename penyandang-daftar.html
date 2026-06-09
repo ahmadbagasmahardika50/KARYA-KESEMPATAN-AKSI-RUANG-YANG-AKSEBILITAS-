@@ -33,14 +33,31 @@
     </script>
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
-        body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
+        body { 
+            font-family: 'Lexend', sans-serif; 
+            background: linear-gradient(135deg, #fcf9f8 0%, #f0f2f5 100%);
+            position: relative;
+        }
+        /* Tambahan background pattern lembut untuk semangat */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 10% 20%, rgba(0,24,85,0.02) 0%, rgba(254,183,0,0.02) 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
         :focus { outline: 2px solid #feb700; outline-offset: 2px; }
     </style>
 </head>
 <body class="bg-surface text-on-surface">
     <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-sm">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-primary">KARYA</h1>
+            <!-- Diubah menjadi "KARYA Pelamar" -->
+            <h1 class="text-xl font-bold text-primary">KARYA Pelamar</h1>
             <div class="flex items-center space-x-4">
                 <span class="text-sm text-on-surface-variant hidden md:inline">
                     <span class="material-symbols-outlined text-sm mr-1">account_circle</span>
@@ -55,7 +72,7 @@
     <div class="h-16"></div>
     <main class="container mx-auto px-4 py-8 max-w-3xl">
         <!-- Ringkasan Lowongan -->
-        <div class="bg-surface-container-lowest rounded-xl shadow-md p-6 mb-6 border border-outline-variant/30">
+        <div class="bg-surface-container-lowest rounded-xl shadow-md p-6 mb-6 border border-outline-variant/30 backdrop-blur-sm">
             <h2 class="text-xl font-bold text-primary flex items-center gap-2">
                 <span class="material-symbols-outlined">description</span> Lamaran Pekerjaan
             </h2>
