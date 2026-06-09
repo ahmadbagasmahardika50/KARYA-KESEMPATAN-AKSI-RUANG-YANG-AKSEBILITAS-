@@ -46,30 +46,24 @@
             <p class="text-gray-500">Temukan lowongan yang ramah disabilitas dengan berbagai fasilitas pendukung</p>
         </div>
 
-        <!-- Filter Section -->
+        <!-- Filter Section dengan Kategori Aksesibilitas -->
         <div class="bg-white rounded-xl shadow-md p-5 mb-6 border border-gray-100">
             <div class="flex flex-wrap gap-4 items-end">
                 <div class="flex-1 min-w-[200px]">
                     <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Kata Kunci</label>
                     <input type="text" id="cari" placeholder="Judul atau perusahaan" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#feb700] focus:border-[#feb700] outline-none">
                 </div>
+                <div class="w-48">
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Kategori Aksesibilitas</label>
+                    <select id="kategoriAkses" class="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#feb700] focus:border-[#feb700] outline-none">
+                        <option value="disabilitas">Jenis Disabilitas</option>
+                        <option value="fasilitas">Fasilitas Pendukung</option>
+                    </select>
+                </div>
                 <div class="w-64">
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Aksesibilitas</label>
-                    <select id="filterAkses" class="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#feb700] focus:border-[#feb700] outline-none">
-                        <option value="">Semua Aksesibilitas</option>
-                        <optgroup label="Jenis Disabilitas">
-                            <option value="Fisik">Disabilitas Fisik</option>
-                            <option value="Netra">Disabilitas Netra</option>
-                            <option value="Rungu">Disabilitas Rungu</option>
-                            <option value="Mental">Disabilitas Mental</option>
-                        </optgroup>
-                        <optgroup label="Fasilitas Pendukung">
-                            <option value="Kursi Roda">Kursi Roda / Akses Ramah Pengguna Kursi Roda</option>
-                            <option value="Penerjemah Bahasa Isyarat">Penerjemah Bahasa Isyarat (SIBI/BISINDO)</option>
-                            <option value="Screen Reader Friendly">Screen Reader Friendly (JAWS/NVDA)</option>
-                            <option value="Parkir Aksesibel">Parkir Aksesibel</option>
-                            <option value="Ruang Kerja Ramah Disabilitas">Ruang Kerja Ramah Disabilitas</option>
-                        </optgroup>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Pilih Opsi</label>
+                    <select id="opsiAkses" class="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#feb700] focus:border-[#feb700] outline-none">
+                        <!-- Opsi akan diisi dinamis berdasarkan kategori -->
                     </select>
                 </div>
                 <button id="btnCari" class="btn-primary px-5 py-2 rounded-lg transition flex items-center gap-1 shadow-sm">
@@ -78,7 +72,7 @@
             </div>
         </div>
 
-        <!-- Tabel Lowongan (sama) -->
+        <!-- Tabel Lowongan -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -103,7 +97,7 @@
         </div>
     </div>
 
-    <!-- Modal Riwayat Lamaran (dengan tombol Edit, Detail, Hapus) -->
+    <!-- Modal Riwayat Lamaran -->
     <div id="riwayatModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] overflow-y-auto shadow-xl">
             <div class="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
@@ -234,7 +228,7 @@
                         <button class="editLamaranBtn text-green-600 hover:text-green-800 mr-2" data-id="${l.id}">Edit</button>
                         <button class="hapusLamaranBtn text-red-600 hover:text-red-800" data-id="${l.id}">Hapus</button>
                     </td>
-                </tr>`;
+                 </tr>`;
             });
             html += `</tbody></table></div>`;
             container.innerHTML = html;
@@ -304,7 +298,7 @@
             alert('Lamaran berhasil diperbarui');
         });
 
-        // ==================== FUNGSI LOWONGAN DENGAN FILTER AKSESIBILITAS ====================
+        // ==================== FUNGSI LOWONGAN DENGAN FILTER AKSESIBILITAS (KATEGORI & OPSI) ====================
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
         function renderTable(data) {
@@ -320,26 +314,57 @@
             tbody.innerHTML = html;
         }
 
-        // Fungsi filter baru yang memeriksa aksesibilitas (jenis disabilitas atau fasilitas)
+        // Data opsi untuk kategori disabilitas dan fasilitas
+        const opsiDisabilitas = [
+            { value: "Fisik", label: "Disabilitas Fisik" },
+            { value: "Netra", label: "Disabilitas Netra" },
+            { value: "Rungu", label: "Disabilitas Rungu" },
+            { value: "Mental", label: "Disabilitas Mental" }
+        ];
+        const opsiFasilitas = [
+            { value: "Kursi Roda", label: "Kursi Roda / Akses Ramah Pengguna Kursi Roda" },
+            { value: "Penerjemah Bahasa Isyarat", label: "Penerjemah Bahasa Isyarat (SIBI/BISINDO)" },
+            { value: "Screen Reader Friendly", label: "Screen Reader Friendly (JAWS/NVDA)" },
+            { value: "Parkir Aksesibel", label: "Parkir Aksesibel" },
+            { value: "Ruang Kerja Ramah Disabilitas", label: "Ruang Kerja Ramah Disabilitas" }
+        ];
+
+        function updateOpsiSelect() {
+            const kategori = document.getElementById('kategoriAkses').value;
+            const opsiSelect = document.getElementById('opsiAkses');
+            const currentValue = opsiSelect.value;
+            opsiSelect.innerHTML = '';
+            let options = kategori === 'disabilitas' ? opsiDisabilitas : opsiFasilitas;
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                opsiSelect.appendChild(option);
+            });
+            // Jika nilai sebelumnya masih ada di options baru, pertahankan; jika tidak, pilih pertama
+            if (currentValue && options.some(opt => opt.value === currentValue)) {
+                opsiSelect.value = currentValue;
+            }
+        }
+
+        // Fungsi filter utama
         function applyFilter() {
             const keyword = document.getElementById('cari').value.toLowerCase();
-            const aksesValue = document.getElementById('filterAkses').value;
+            const kategori = document.getElementById('kategoriAkses').value;
+            const opsiValue = document.getElementById('opsiAkses').value;
+
             let filtered = semuaLowongan.filter(l => {
                 if (l.status && l.status !== 'Aktif') return false;
                 const matchKeyword = (l.judul && l.judul.toLowerCase().includes(keyword)) || (l.perusahaan && l.perusahaan.toLowerCase().includes(keyword));
                 if (!matchKeyword) return false;
-                if (!aksesValue) return true;
-                // Cek apakah lowongan memenuhi filter aksesibilitas
-                // Filter bisa berupa jenis disabilitas atau fasilitas
-                const jenis = l.jenis_disabilitas || l.jenis || '';
-                const fasilitas = l.fasilitas || []; // array string
-                // Jika aksesValue termasuk dalam opsi disabilitas
-                const disabilitasOptions = ['Fisik', 'Netra', 'Rungu', 'Mental'];
-                if (disabilitasOptions.includes(aksesValue)) {
-                    return jenis === aksesValue;
-                } else {
-                    // Cek fasilitas
-                    return fasilitas.includes(aksesValue);
+                if (!opsiValue) return true; // jika tidak ada filter akses (opsiValue kosong) -> tdk mungkin karena ada default value
+                // Filter berdasarkan kategori
+                if (kategori === 'disabilitas') {
+                    const jenis = l.jenis_disabilitas || l.jenis || '';
+                    return jenis === opsiValue;
+                } else { // fasilitas
+                    const fasilitas = l.fasilitas || [];
+                    return fasilitas.includes(opsiValue);
                 }
             });
             renderTable(filtered);
@@ -380,7 +405,11 @@
         // Event listeners
         document.getElementById('btnCari').addEventListener('click', applyFilter);
         document.getElementById('cari').addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilter(); });
-        document.getElementById('filterAkses').addEventListener('change', applyFilter);
+        document.getElementById('kategoriAkses').addEventListener('change', () => {
+            updateOpsiSelect();
+            applyFilter();
+        });
+        document.getElementById('opsiAkses').addEventListener('change', applyFilter);
         document.getElementById('tabel-lowongan').addEventListener('click', (e) => {
             if (e.target.classList.contains('detailBtn')) showDetail(parseInt(e.target.dataset.id));
         });
@@ -411,7 +440,7 @@
         closeDetailLamaranModal.addEventListener('click', () => detailLamaranModal.style.display = 'none');
         window.addEventListener('click', (e) => { if (e.target === detailLamaranModal) detailLamaranModal.style.display = 'none'; });
 
-        function loadData() { semuaLowongan = getLowongan(); applyFilter(); }
+        function loadData() { semuaLowongan = getLowongan(); updateOpsiSelect(); applyFilter(); }
         loadData();
     </script>
 </body>
