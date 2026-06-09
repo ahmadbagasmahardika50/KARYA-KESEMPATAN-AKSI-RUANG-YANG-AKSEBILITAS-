@@ -33,7 +33,8 @@
 
     <!-- Navbar Horizontal -->
     <nav class="bg-white shadow-md px-6 py-3 flex justify-between items-center border-b border-gray-200">
-        <div class="text-2xl font-black text-[#001855] tracking-tight">KARYA</div>
+        <!-- Diubah: KARYA Pelamar -->
+        <div class="text-2xl font-black text-[#001855] tracking-tight">KARYA Pelamar</div>
         <div class="flex items-center space-x-6">
             <span class="text-sm text-gray-700 hidden md:inline">Halo, <span id="user-name-display" class="font-semibold">Penyandang</span></span>
             <a href="penyandang-profil.html" class="text-[#001855] hover:text-[#feb700] transition flex items-center gap-1">
@@ -165,7 +166,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-center">
                         <button class="detailBtn text-[#001855] hover:text-[#feb700] font-medium" data-id="${l.id}">Detail</button>
                     </td>
-                </tr>`;
+                <tr>`;
             });
             tbody.innerHTML = html;
         }
