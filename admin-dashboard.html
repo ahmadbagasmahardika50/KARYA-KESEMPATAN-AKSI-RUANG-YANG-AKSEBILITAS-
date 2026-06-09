@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KARYA - Admin Dashboard</title>
+    <title>KARYA - Dashboard Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
         body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
         :focus { outline: 2px solid #feb700; outline-offset: 2px; }
+        .stat-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1); }
     </style>
     <script>
         tailwind.config = {
@@ -22,10 +24,7 @@
                         "secondary-container": "#feb700",
                         surface: "#fcf9f8",
                         "surface-container-low": "#f6f3f2",
-                        "surface-container-high": "#eae7e7",
-                        "on-surface": "#1b1c1c",
                         "on-surface-variant": "#43474f",
-                        outline: "#737780",
                         error: "#ba1a1a"
                     },
                     fontFamily: { sans: ["Lexend"] },
@@ -43,93 +42,71 @@
             <span class="material-symbols-outlined text-2xl text-primary">admin_panel_settings</span>
             <div class="text-xl font-black text-primary tracking-tighter">KARYA Admin</div>
         </div>
-        <div class="space-x-4">
-            <a href="admin-dashboard.html" class="text-primary font-bold border-b-2 border-secondary-container pb-1">Dashboard</a>
-            <a href="admin-penyandang.html" class="text-primary font-medium hover:underline">Penyandang</a>
-            <a href="admin-perusahaan.html" class="text-primary font-medium hover:underline">Perusahaan</a>
-            <a href="login.html" onclick="localStorage.removeItem('user')" class="text-error">Logout</a>
-        </div>
+        <a href="login.html" onclick="localStorage.removeItem('user')" class="text-error flex items-center gap-1">
+            <span class="material-symbols-outlined">logout</span> Logout
+        </a>
     </nav>
 
     <main class="max-w-7xl mx-auto px-6 py-12">
         <!-- Header -->
         <div class="mb-10">
             <h1 class="text-3xl font-black text-primary">Dashboard Admin</h1>
-            <p class="text-on-surface-variant mt-1">Selamat datang, Admin. Kelola platform KARYA dengan mudah.</p>
+            <p class="text-on-surface-variant mt-1">Kelola data master penyandang disabilitas dan perusahaan mitra.</p>
         </div>
 
         <!-- Statistik Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div class="bg-white rounded-2xl shadow-md border border-surface-container-high p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-outline text-sm font-semibold uppercase tracking-wider">Penyandang</p>
-                    <p id="statPenyandang" class="text-3xl font-black text-primary mt-1">0</p>
-                </div>
-                <div class="bg-primary-fixed p-3 rounded-xl">
-                    <span class="material-symbols-outlined text-3xl text-primary">people</span>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl shadow-md border border-surface-container-high p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-outline text-sm font-semibold uppercase tracking-wider">Perusahaan</p>
-                    <p id="statPerusahaan" class="text-3xl font-black text-primary mt-1">0</p>
-                </div>
-                <div class="bg-secondary-fixed p-3 rounded-xl">
-                    <span class="material-symbols-outlined text-3xl text-secondary">business</span>
+        <div class="grid md:grid-cols-3 gap-6 mb-12">
+            <div class="stat-card bg-white rounded-2xl shadow-md p-6 border-l-8 border-primary">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-outline text-sm font-semibold uppercase tracking-wider">Total Penyandang</p>
+                        <p id="statPenyandang" class="text-3xl font-bold text-primary mt-1">0</p>
+                    </div>
+                    <span class="material-symbols-outlined text-4xl text-primary">people</span>
                 </div>
             </div>
-            <div class="bg-white rounded-2xl shadow-md border border-surface-container-high p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-outline text-sm font-semibold uppercase tracking-wider">Lowongan Aktif</p>
-                    <p id="statLowongan" class="text-3xl font-black text-primary mt-1">0</p>
+            <div class="stat-card bg-white rounded-2xl shadow-md p-6 border-l-8 border-secondary">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-outline text-sm font-semibold uppercase tracking-wider">Total Perusahaan</p>
+                        <p id="statPerusahaan" class="text-3xl font-bold text-secondary mt-1">0</p>
+                    </div>
+                    <span class="material-symbols-outlined text-4xl text-secondary">business</span>
                 </div>
-                <div class="bg-primary-container/10 p-3 rounded-xl">
-                    <span class="material-symbols-outlined text-3xl text-primary-container">work</span>
+            </div>
+            <div class="stat-card bg-white rounded-2xl shadow-md p-6 border-l-8 border-primary-container">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-outline text-sm font-semibold uppercase tracking-wider">Lowongan Aktif</p>
+                        <p id="statLowongan" class="text-3xl font-bold text-primary-container mt-1">0</p>
+                    </div>
+                    <span class="material-symbols-outlined text-4xl text-primary-container">work</span>
                 </div>
             </div>
         </div>
 
-        <!-- Menu Management Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <a href="admin-penyandang.html" class="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all border border-surface-container-high overflow-hidden">
-                <div class="p-8 flex items-start gap-5">
-                    <div class="bg-primary-fixed p-4 rounded-2xl group-hover:scale-105 transition">
-                        <span class="material-symbols-outlined text-4xl text-primary">people</span>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-bold text-primary">Penyandang Disabilitas</h2>
-                        <p class="text-on-surface-variant mt-1">Tambah, edit, hapus data penyandang disabilitas.</p>
-                        <div class="mt-4 flex items-center text-primary font-semibold">
-                            <span>Kelola</span>
-                            <span class="material-symbols-outlined ml-1 group-hover:translate-x-1 transition">arrow_forward</span>
-                        </div>
-                    </div>
+        <!-- Menu Cards -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <a href="admin-penyandang.html" class="group bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition flex items-center gap-5 border border-surface-container-high">
+                <div class="bg-primary/10 p-4 rounded-2xl group-hover:bg-primary/20 transition">
+                    <span class="material-symbols-outlined text-4xl text-primary">accessible_forward</span>
                 </div>
-            </a>
-            <a href="admin-perusahaan.html" class="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all border border-surface-container-high overflow-hidden">
-                <div class="p-8 flex items-start gap-5">
-                    <div class="bg-secondary-fixed p-4 rounded-2xl group-hover:scale-105 transition">
-                        <span class="material-symbols-outlined text-4xl text-secondary">business</span>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-bold text-primary">Perusahaan Mitra</h2>
-                        <p class="text-on-surface-variant mt-1">Tambah, edit, hapus data perusahaan mitra.</p>
-                        <div class="mt-4 flex items-center text-primary font-semibold">
-                            <span>Kelola</span>
-                            <span class="material-symbols-outlined ml-1 group-hover:translate-x-1 transition">arrow_forward</span>
-                        </div>
-                    </div>
+                <div>
+                    <h2 class="text-xl font-bold text-primary">Kelola Penyandang Disabilitas</h2>
+                    <p class="text-on-surface-variant text-sm mt-1">Tambah, edit, hapus data penyandang</p>
                 </div>
+                <span class="material-symbols-outlined ml-auto text-outline group-hover:translate-x-1 transition">arrow_forward</span>
             </a>
-        </div>
-
-        <!-- Informasi Tambahan (opsional) -->
-        <div class="mt-12 bg-primary-fixed/20 rounded-2xl p-6 border border-primary-fixed/30">
-            <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-primary">info</span>
-                <h3 class="text-primary font-bold">Informasi Sistem</h3>
-            </div>
-            <p class="text-on-surface-variant mt-2 text-sm">Sistem KARYA menggunakan penyimpanan lokal (localStorage) untuk demo. Data tidak akan hilang selama browser tidak dibersihkan.</p>
+            <a href="admin-perusahaan.html" class="group bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition flex items-center gap-5 border border-surface-container-high">
+                <div class="bg-secondary/10 p-4 rounded-2xl group-hover:bg-secondary/20 transition">
+                    <span class="material-symbols-outlined text-4xl text-secondary">business</span>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-secondary">Kelola Perusahaan</h2>
+                    <p class="text-on-surface-variant text-sm mt-1">Tambah, edit, hapus data perusahaan</p>
+                </div>
+                <span class="material-symbols-outlined ml-auto text-outline group-hover:translate-x-1 transition">arrow_forward</span>
+            </a>
         </div>
     </main>
 
@@ -145,19 +122,18 @@
             window.location.href = 'login.html';
         }
 
-        // Ambil data dari localStorage untuk statistik
-        function updateStats() {
-            const penyandang = JSON.parse(localStorage.getItem('penyandang_admin') || '[]');
-            const perusahaan = JSON.parse(localStorage.getItem('perusahaan_admin') || '[]');
-            // Ambil lowongan dari global 'lowongan' (yang disimpan oleh perusahaan)
-            const lowongan = JSON.parse(localStorage.getItem('lowongan') || '[]');
-            const aktif = lowongan.filter(l => l.status === 'Aktif').length;
-            document.getElementById('statPenyandang').innerText = penyandang.length;
-            document.getElementById('statPerusahaan').innerText = perusahaan.length;
-            document.getElementById('statLowongan').innerText = aktif;
-        }
+        // Ambil data dari registeredUsers
+        const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        const penyandangCount = users.filter(u => u.role === 'penyandang').length;
+        const perusahaanCount = users.filter(u => u.role === 'perusahaan').length;
 
-        updateStats();
+        // Ambil jumlah lowongan aktif dari data lowongan (global)
+        const lowongan = JSON.parse(localStorage.getItem('lowongan') || '[]');
+        const lowonganAktif = lowongan.filter(l => l.status === 'Aktif').length;
+
+        document.getElementById('statPenyandang').innerText = penyandangCount;
+        document.getElementById('statPerusahaan').innerText = perusahaanCount;
+        document.getElementById('statLowongan').innerText = lowonganAktif;
     </script>
 </body>
 </html>
