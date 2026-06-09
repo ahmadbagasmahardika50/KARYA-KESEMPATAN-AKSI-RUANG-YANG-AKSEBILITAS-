@@ -5,7 +5,9 @@
     <title>Cari Lowongan - KARYA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Lexend', sans-serif; }</style>
+    <style>
+        body { font-family: 'Lexend', sans-serif; }
+    </style>
 </head>
 <body class="bg-gray-50">
     <nav class="bg-white shadow px-6 py-4 flex justify-between items-center">
@@ -21,7 +23,10 @@
             <input type="text" id="cari" placeholder="Kata kunci (judul, perusahaan)" class="flex-1 p-3 rounded-xl bg-white border border-gray-300">
             <select id="filterJenis" class="p-3 rounded-xl bg-white border border-gray-300">
                 <option value="">Semua Disabilitas</option>
-                <option>Fisik</option><option>Netra</option><option>Rungu</option><option>Mental</option>
+                <option>Fisik</option>
+                <option>Netra</option>
+                <option>Rungu</option>
+                <option>Mental</option>
             </select>
             <button id="btnCari" class="bg-blue-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-800">Cari</button>
         </div>
@@ -41,65 +46,136 @@
     </div>
 
     <script>
-        let lowongan = [
-            { id: 1, judul: "Frontend Developer", perusahaan: "PT Teknologi Inklusif", lokasi: "Surakarta", jenis: "Fisik", deskripsi: "Membangun antarmuka web aksesibel. WFH 2 hari/minggu." },
-            { id: 2, judul: "Admin Data Entry", perusahaan: "PT Maju Jaya", lokasi: "Jakarta", jenis: "Netra", deskripsi: "Menginput data dengan screen reader. Pelatihan disediakan." },
-            { id: 3, judul: "Customer Service", perusahaan: "Bank Inklusif", lokasi: "Bandung", jenis: "Rungu", deskripsi: "Melayani chat dan email dengan aplikasi SIBI." }
-        ];
+        // ==================== AMBIL DATA LOWONGAN DARI LOCALSTORAGE ====================
+        // Data lowongan disimpan dengan key 'daftarLowongan' oleh modul perusahaan
+        function getLowongan() {
+            const stored = localStorage.getItem('daftarLowongan');
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch(e) {
+                    console.error("Gagal parse lowongan", e);
+                    return [];
+                }
+            }
+            return []; // Tidak ada lowongan statis
+        }
 
+        let semuaLowongan = [];
         let currentLowonganId = null;
 
+        // ==================== RENDER DAFTAR LOWONGAN ====================
         function render(data) {
+            const container = document.getElementById('list');
+            if (!data.length) {
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">Belum ada lowongan tersedia. Silakan cek kembali nanti.</div>`;
+                return;
+            }
             let html = '';
             data.forEach(l => {
                 html += `<div class="bg-white p-5 rounded-2xl shadow-md border border-gray-200">
-                    <h3 class="text-xl font-bold text-blue-900">${l.judul}</h3>
-                    <p class="text-gray-600">${l.perusahaan} • ${l.lokasi}</p>
-                    <p class="text-gray-500 text-sm mt-1">Disabilitas: ${l.jenis}</p>
-                    <p class="mt-2 text-gray-700">${l.deskripsi.substring(0, 100)}...</p>
+                    <h3 class="text-xl font-bold text-blue-900">${escapeHtml(l.judul)}</h3>
+                    <p class="text-gray-600">${escapeHtml(l.perusahaan)} • ${escapeHtml(l.lokasi)}</p>
+                    <p class="text-gray-500 text-sm mt-1">Disabilitas: ${escapeHtml(l.jenis_disabilitas || l.jenis)}</p>
+                    <p class="mt-2 text-gray-700">${escapeHtml((l.deskripsi || '').substring(0, 100))}...</p>
                     <button class="detailBtn mt-3 bg-amber-500 text-white px-4 py-2 rounded-xl hover:bg-amber-600" data-id="${l.id}">Lihat Detail</button>
                 </div>`;
             });
-            document.getElementById('list').innerHTML = html;
+            container.innerHTML = html;
         }
 
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // ==================== FILTER DAN PENCARIAN ====================
+        function applyFilter() {
+            const keyword = document.getElementById('cari').value.toLowerCase();
+            const jenis = document.getElementById('filterJenis').value;
+            let filtered = semuaLowongan.filter(l => {
+                const matchKeyword = (l.judul && l.judul.toLowerCase().includes(keyword)) ||
+                                    (l.perusahaan && l.perusahaan.toLowerCase().includes(keyword));
+                const matchJenis = !jenis || (l.jenis_disabilitas === jenis || l.jenis === jenis);
+                return matchKeyword && matchJenis;
+            });
+            render(filtered);
+        }
+
+        // ==================== TAMPILKAN MODAL DETAIL ====================
         function showDetail(id) {
-            const l = lowongan.find(l => l.id == id);
-            if (l) {
+            const lowongan = semuaLowongan.find(l => l.id == id);
+            if (lowongan) {
                 currentLowonganId = id;
                 document.getElementById('modalContent').innerHTML = `
-                    <p><strong>Judul:</strong> ${l.judul}</p>
-                    <p><strong>Perusahaan:</strong> ${l.perusahaan}</p>
-                    <p><strong>Lokasi:</strong> ${l.lokasi}</p>
-                    <p><strong>Disabilitas:</strong> ${l.jenis}</p>
-                    <p><strong>Deskripsi:</strong> ${l.deskripsi}</p>
+                    <p><strong>Judul:</strong> ${escapeHtml(lowongan.judul)}</p>
+                    <p><strong>Perusahaan:</strong> ${escapeHtml(lowongan.perusahaan)}</p>
+                    <p><strong>Lokasi:</strong> ${escapeHtml(lowongan.lokasi)}</p>
+                    <p><strong>Disabilitas:</strong> ${escapeHtml(lowongan.jenis_disabilitas || lowongan.jenis)}</p>
+                    <p><strong>Deskripsi:</strong> ${escapeHtml(lowongan.deskripsi)}</p>
+                    <p><strong>Gaji:</strong> ${escapeHtml(lowongan.gaji || 'Tidak disebutkan')}</p>
+                    <p><strong>Tanggal Posting:</strong> ${lowongan.tgl_posting ? new Date(lowongan.tgl_posting).toLocaleDateString('id-ID') : '-'}</p>
                 `;
                 document.getElementById('modal').style.display = 'flex';
             }
         }
 
-        document.getElementById('btnCari').onclick = () => {
-            const keyword = document.getElementById('cari').value.toLowerCase();
-            const jenis = document.getElementById('filterJenis').value;
-            let filtered = lowongan.filter(l => 
-                (l.judul.toLowerCase().includes(keyword) || l.perusahaan.toLowerCase().includes(keyword)) &&
-                (jenis === "" || l.jenis === jenis)
-            );
-            render(filtered);
-        };
+        // ==================== LAMAR ====================
+        function lamar() {
+            if (currentLowonganId) {
+                const lowonganDipilih = semuaLowongan.find(l => l.id == currentLowonganId);
+                if (lowonganDipilih) {
+                    localStorage.setItem('lowonganDipilih', JSON.stringify(lowonganDipilih));
+                    window.location.href = 'penyandang-daftar.html';
+                } else {
+                    alert('Data lowongan tidak ditemukan');
+                }
+            }
+        }
+
+        // ==================== INIT & EVENT ====================
+        function loadData() {
+            semuaLowongan = getLowongan();
+            applyFilter();
+        }
+
+        document.getElementById('btnCari').addEventListener('click', applyFilter);
+        document.getElementById('cari').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') applyFilter();
+        });
+        document.getElementById('filterJenis').addEventListener('change', applyFilter);
         document.getElementById('list').addEventListener('click', (e) => {
             if (e.target.classList.contains('detailBtn')) {
-                const id = e.target.getAttribute('data-id');
+                const id = parseInt(e.target.getAttribute('data-id'));
                 showDetail(id);
             }
         });
-        document.getElementById('closeModal').onclick = () => document.getElementById('modal').style.display = 'none';
-        document.getElementById('lamarBtn').onclick = () => {
-            if (currentLowonganId) {
-                window.location.href = `penyandang-daftar.html?id=${currentLowonganId}`;
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('modal').style.display = 'none';
+        });
+        document.getElementById('lamarBtn').addEventListener('click', lamar);
+
+        // Tutup modal jika klik di luar konten
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('modal');
+            if (e.target === modal) {
+                modal.style.display = 'none';
             }
-        };
-        render(lowongan);
+        });
+
+        // Deteksi perubahan storage dari tab lain (misal perusahaan menambah lowongan)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'daftarLowongan') {
+                loadData();
+            }
+        });
+
+        loadData();
     </script>
 </body>
 </html>
