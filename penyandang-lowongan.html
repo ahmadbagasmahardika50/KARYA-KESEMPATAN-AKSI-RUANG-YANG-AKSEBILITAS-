@@ -115,7 +115,7 @@
         </div>
     </div>
 
-    <!-- Modal Riwayat Lamaran (tanpa tombol hapus) -->
+    <!-- Modal Riwayat Lamaran (dengan tombol hapus, tanpa update status) -->
     <div id="riwayatModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] overflow-y-auto shadow-xl">
             <div class="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
@@ -125,9 +125,7 @@
                 <button id="closeRiwayatModal" class="text-gray-500 hover:text-gray-700">&times;</button>
             </div>
             <div class="p-4">
-                <div id="daftarLamaranContainer">
-                    <!-- Daftar lamaran akan diisi JS -->
-                </div>
+                <div id="daftarLamaranContainer"></div>
             </div>
         </div>
     </div>
@@ -168,17 +166,14 @@
             return allLamaran.filter(l => l.pelamarEmail === userEmail);
         }
 
-        function updateStatusLamaran(id, statusBaru) {
+        function hapusLamaran(id) {
             let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
-            const index = allLamaran.findIndex(l => l.pelamarEmail === userEmail && l.id === id);
-            if (index !== -1) {
-                allLamaran[index].status = statusBaru;
-                localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
-                renderRiwayatLamaran();
-            }
+            allLamaran = allLamaran.filter(l => !(l.pelamarEmail === userEmail && l.id === id));
+            localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
+            renderRiwayatLamaran(); // refresh modal
         }
 
-        // Render daftar lamaran (tanpa tombol hapus)
+        // Render daftar lamaran (tombol Detail + Hapus, tanpa update status)
         function renderRiwayatLamaran() {
             const lamaranUser = getLamaranUser();
             const container = document.getElementById('daftarLamaranContainer');
@@ -212,15 +207,9 @@
                     <td class="px-4 py-2"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${statusText}</span></td>
                     <td class="px-4 py-2 text-center">
                         <button class="detailLamaranBtn text-blue-600 hover:text-blue-800 mr-2" data-id="${l.id}">Detail</button>
-                        <select class="updateStatusSelect ml-2 text-sm border rounded p-1" data-id="${l.id}">
-                            <option value="pending" ${l.status === 'pending' ? 'selected' : ''}>Menunggu</option>
-                            <option value="diproses" ${l.status === 'diproses' ? 'selected' : ''}>Diproses</option>
-                            <option value="interview" ${l.status === 'interview' ? 'selected' : ''}>Interview</option>
-                            <option value="diterima" ${l.status === 'diterima' ? 'selected' : ''}>Diterima</option>
-                            <option value="ditolak" ${l.status === 'ditolak' ? 'selected' : ''}>Ditolak</option>
-                        </select>
+                        <button class="hapusLamaranBtn text-red-600 hover:text-red-800" data-id="${l.id}">Hapus</button>
                     </td>
-                </tr>`;
+                 </tr>`;
             });
             html += `</tbody></table></div>`;
             container.innerHTML = html;
@@ -233,12 +222,13 @@
                     if (lamaran) showDetailLamaran(lamaran);
                 });
             });
-            // Event listeners untuk update status
-            document.querySelectorAll('.updateStatusSelect').forEach(select => {
-                select.addEventListener('change', (e) => {
-                    const id = parseInt(select.getAttribute('data-id'));
-                    const newStatus = select.value;
-                    updateStatusLamaran(id, newStatus);
+            // Event listeners untuk tombol hapus
+            document.querySelectorAll('.hapusLamaranBtn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(btn.getAttribute('data-id'));
+                    if (confirm('Hapus lamaran ini? Tindakan tidak dapat dibatalkan.')) {
+                        hapusLamaran(id);
+                    }
                 });
             });
         }
@@ -285,7 +275,7 @@
                     <td class="px-6 py-4">${escapeHtml(l.jenis_disabilitas || l.jenis)}</td>
                     <td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusBadge}">${escapeHtml(l.status || 'Aktif')}</span></td>
                     <td class="px-6 py-4 text-center"><button class="detailBtn text-[#001855] hover:text-[#feb700] font-medium" data-id="${l.id}">Detail</button></td>
-                </tr>`;
+                 </tr>`;
             });
             tbody.innerHTML = html;
         }
