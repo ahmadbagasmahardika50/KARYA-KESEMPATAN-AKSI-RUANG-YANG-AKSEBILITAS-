@@ -90,7 +90,6 @@
                     <tbody id="tabelPerusahaan"></tbody>
                 </table>
             </div>
-            <!-- Pagination -->
             <div class="flex justify-between items-center p-4 border-t border-surface-container-high bg-surface-container-low">
                 <button id="prevPage" class="px-4 py-2 bg-white rounded-xl border border-surface-container-high disabled:opacity-50">Sebelumnya</button>
                 <span id="pageInfo" class="text-sm text-outline">Halaman 1</span>
@@ -99,7 +98,7 @@
         </div>
     </main>
 
-    <!-- Modal Form Tambah/Edit Perusahaan -->
+    <!-- Modal Form Tambah/Edit -->
     <div id="modalForm" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-surface-container-high">
             <div class="flex justify-between items-center p-5 border-b border-surface-container-high">
@@ -135,7 +134,7 @@
         <div class="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
             <span class="material-symbols-outlined text-5xl text-error">warning</span>
             <h3 class="text-xl font-bold text-error mt-2">Hapus Perusahaan?</h3>
-            <p class="text-on-surface-variant mt-2">Data perusahaan akan dihapus permanen. Semua lowongan dan pelamar yang terkait juga akan hilang.</p>
+            <p class="text-on-surface-variant mt-2">Data perusahaan akan dihapus permanen. Semua lowongan dan pelamar terkait juga hilang.</p>
             <div class="flex justify-center gap-3 mt-6">
                 <button id="cancelDeleteBtn" class="px-4 py-2 bg-surface-container-high rounded-xl">Batal</button>
                 <button id="confirmDeleteBtn" class="px-4 py-2 bg-error text-white rounded-xl font-bold">Hapus</button>
@@ -148,73 +147,59 @@
     </footer>
 
     <script>
-        // ========== PROTEKSI: HANYA ADMIN ==========
+        // ========== PROTEKSI ==========
         const currentUser = JSON.parse(localStorage.getItem('user'));
         if (!currentUser || currentUser.role !== 'admin') {
-            alert('Akses ditolak. Halaman ini khusus untuk admin.');
+            alert('Akses ditolak. Halaman khusus admin.');
             window.location.href = 'login.html';
         }
 
-        // Key untuk menyimpan data perusahaan admin (master)
-        const PERUSAHAAN_KEY = 'data_perusahaan_admin';
-
-        // Fungsi untuk menyinkronkan data perusahaan dari registeredUsers (akun yang mendaftar sendiri) ke master admin
+        // ========== SINKRONISASI DARI REGISTERED USERS ==========
         function syncFromRegisteredUsers() {
             let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-            let perusahaanMaster = localStorage.getItem(PERUSAHAAN_KEY) ? JSON.parse(localStorage.getItem(PERUSAHAAN_KEY)) : [];
-            
-            // Ambil semua user dengan role perusahaan
+            let master = JSON.parse(localStorage.getItem('data_perusahaan_admin') || '[]');
             const perusahaanUsers = users.filter(u => u.role === 'perusahaan');
-            
-            // Untuk setiap user perusahaan, jika belum ada di master, tambahkan
             let changed = false;
+            // Tambah/update dari registeredUsers
             perusahaanUsers.forEach(user => {
-                if (!perusahaanMaster.some(p => p.email === user.email)) {
-                    perusahaanMaster.push({
+                const existing = master.find(p => p.email === user.email);
+                if (!existing) {
+                    master.push({
                         id: Date.now() + Math.random(),
                         nama: user.nama,
                         email: user.email,
                         telepon: ''
                     });
                     changed = true;
-                } else {
-                    // Update nama jika berbeda
-                    const existing = perusahaanMaster.find(p => p.email === user.email);
-                    if (existing && existing.nama !== user.nama) {
-                        existing.nama = user.nama;
-                        changed = true;
-                    }
+                } else if (existing.nama !== user.nama) {
+                    existing.nama = user.nama;
+                    changed = true;
                 }
             });
-            
-            // Hapus dari master jika tidak ada di registeredUsers
-            const perusahaanEmails = perusahaanUsers.map(u => u.email);
-            const beforeLength = perusahaanMaster.length;
-            perusahaanMaster = perusahaanMaster.filter(p => perusahaanEmails.includes(p.email));
-            if (perusahaanMaster.length !== beforeLength) changed = true;
-            
+            // Hapus dari master yang tidak ada di registeredUsers
+            const emails = perusahaanUsers.map(u => u.email);
+            const before = master.length;
+            master = master.filter(p => emails.includes(p.email));
+            if (master.length !== before) changed = true;
             if (changed) {
-                // Urutkan berdasarkan id
-                perusahaanMaster.sort((a,b) => a.id - b.id);
-                localStorage.setItem(PERUSAHAAN_KEY, JSON.stringify(perusahaanMaster));
+                master.sort((a,b) => a.id - b.id);
+                localStorage.setItem('data_perusahaan_admin', JSON.stringify(master));
             }
-            return perusahaanMaster;
+            return master;
         }
 
-        // Load data perusahaan (master) dan sinkronisasi
         let perusahaan = syncFromRegisteredUsers();
         let nextId = perusahaan.length ? Math.max(...perusahaan.map(p => p.id)) + 1 : 1;
 
-        // State filter dan pagination
         let filteredData = [...perusahaan];
         let currentPage = 1;
         const rowsPerPage = 5;
 
-        // Fungsi simpan ke localStorage (master) dan sinkronkan kembali ke registeredUsers
+        // Simpan ke localStorage dan sinkron ke registeredUsers
         function saveToLocal() {
-            localStorage.setItem(PERUSAHAAN_KEY, JSON.stringify(perusahaan));
-            // Sinkronkan ke registeredUsers
+            localStorage.setItem('data_perusahaan_admin', JSON.stringify(perusahaan));
             let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            // Hapus semua perusahaan yang tidak ada di master
             users = users.filter(u => u.role !== 'perusahaan' || perusahaan.some(p => p.email === u.email));
             perusahaan.forEach(p => {
                 if (!users.some(u => u.email === p.email)) {
@@ -232,60 +217,46 @@
             localStorage.setItem('registeredUsers', JSON.stringify(users));
         }
 
-        // Render tabel
+        function escapeHtml(str) { return (str || '').replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+
         function renderTable() {
-            const start = (currentPage - 1) * rowsPerPage;
-            const pageData = filteredData.slice(start, start + rowsPerPage);
+            const start = (currentPage-1)*rowsPerPage;
+            const pageData = filteredData.slice(start, start+rowsPerPage);
             const tbody = document.getElementById('tabelPerusahaan');
             if (pageData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-outline">Belum ada data perusahaan. Klik "Tambah Perusahaan" untuk menambahkan.</td></tr>';
-                document.getElementById('pageInfo').innerText = 'Halaman 0 dari 0';
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-outline">Belum ada data perusahaan</td></tr>';
+                document.getElementById('pageInfo').innerText = 'Halaman 0';
                 document.getElementById('prevPage').disabled = true;
                 document.getElementById('nextPage').disabled = true;
                 return;
             }
             let html = '';
             pageData.forEach(p => {
-                html += `
-                    <tr class="border-b border-surface-container-high hover:bg-surface-container-low transition">
-                        <td class="p-4 font-medium">${escapeHtml(p.nama)}</td>
-                        <td class="p-4">${escapeHtml(p.email)}</td>
-                        <td class="p-4">${escapeHtml(p.telepon || '-')}</td>
-                        <td class="p-4 text-center">
-                            <button class="editBtn text-primary font-bold hover:underline mr-3" data-id="${p.id}">Edit</button>
-                            <button class="deleteBtn text-error font-bold hover:underline" data-id="${p.id}">Hapus</button>
-                        </td>
-                    </tr>
-                `;
+                html += `<tr class="border-b hover:bg-surface-container-low">
+                    <td class="p-4">${escapeHtml(p.nama)}</td>
+                    <td class="p-4">${escapeHtml(p.email)}</td>
+                    <td class="p-4">${escapeHtml(p.telepon || '-')}</td>
+                    <td class="p-4 text-center">
+                        <button class="editBtn text-primary font-bold mr-3" data-id="${p.id}">Edit</button>
+                        <button class="deleteBtn text-error font-bold" data-id="${p.id}">Hapus</button>
+                    </td>
+                </tr>`;
             });
             tbody.innerHTML = html;
-            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-            document.getElementById('pageInfo').innerText = `Halaman ${currentPage} dari ${totalPages || 1}`;
-            document.getElementById('prevPage').disabled = currentPage === 1;
-            document.getElementById('nextPage').disabled = currentPage === totalPages;
+            const total = Math.ceil(filteredData.length/rowsPerPage);
+            document.getElementById('pageInfo').innerText = `Halaman ${currentPage} dari ${total||1}`;
+            document.getElementById('prevPage').disabled = currentPage===1;
+            document.getElementById('nextPage').disabled = currentPage===total;
         }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-
-        // Filter
         function applyFilter() {
             const keyword = document.getElementById('searchInput').value.toLowerCase();
-            filteredData = perusahaan.filter(p => 
-                p.nama.toLowerCase().includes(keyword) || p.email.toLowerCase().includes(keyword)
-            );
+            filteredData = perusahaan.filter(p => p.nama.toLowerCase().includes(keyword) || p.email.toLowerCase().includes(keyword));
             currentPage = 1;
             renderTable();
         }
 
-        // Modal Form
+        // ========== MODAL FORM ==========
         const modalForm = document.getElementById('modalForm');
         const form = document.getElementById('perusahaanForm');
         const modalTitle = document.getElementById('modalTitle');
@@ -294,8 +265,8 @@
         const emailInput = document.getElementById('email');
         const teleponInput = document.getElementById('telepon');
 
-        function openModal(edit = false, data = null) {
-            if (edit && data) {
+        function openModal(editMode = false, data = null) {
+            if (editMode && data) {
                 modalTitle.innerHTML = '<span class="material-symbols-outlined">edit</span> Edit Perusahaan';
                 editId.value = data.id;
                 namaInput.value = data.nama;
@@ -315,7 +286,6 @@
             modalForm.style.display = 'none';
         }
 
-        // Submit form
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const id = editId.value;
@@ -324,18 +294,11 @@
                 email: emailInput.value.trim(),
                 telepon: teleponInput.value.trim()
             };
-            if (!newData.nama || !newData.email) {
-                alert('Nama dan Email harus diisi');
-                return;
-            }
-            // Validasi email unik
-            if (!id && perusahaan.some(p => p.email === newData.email)) {
-                alert('Email sudah terdaftar!');
-                return;
-            }
+            if (!newData.nama || !newData.email) { alert('Nama dan Email wajib diisi'); return; }
+            if (!id && perusahaan.some(p => p.email === newData.email)) { alert('Email sudah terdaftar!'); return; }
             if (id) {
-                const index = perusahaan.findIndex(p => p.id == id);
-                if (index !== -1) perusahaan[index] = { id: parseInt(id), ...newData };
+                const idx = perusahaan.findIndex(p => p.id == id);
+                if (idx !== -1) perusahaan[idx] = { id: parseInt(id), ...newData };
             } else {
                 perusahaan.push({ id: nextId++, ...newData });
             }
@@ -344,7 +307,7 @@
             closeModal();
         });
 
-        // Hapus perusahaan
+        // ========== HAPUS ==========
         let deleteId = null;
         const deleteModal = document.getElementById('deleteModal');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
@@ -361,20 +324,19 @@
         }
         confirmDeleteBtn.addEventListener('click', () => {
             if (deleteId) {
-                const perusahaanDihapus = perusahaan.find(p => p.id == deleteId);
-                if (perusahaanDihapus) {
+                const del = perusahaan.find(p => p.id == deleteId);
+                if (del) {
                     perusahaan = perusahaan.filter(p => p.id != deleteId);
-                    // Hapus lowongan terkait
+                    // hapus lowongan terkait
                     let allLowongan = JSON.parse(localStorage.getItem('lowongan') || '[]');
-                    allLowongan = allLowongan.filter(l => l.perusahaan !== perusahaanDihapus.nama);
+                    allLowongan = allLowongan.filter(l => l.perusahaan !== del.nama);
                     localStorage.setItem('lowongan', JSON.stringify(allLowongan));
-                    // Hapus dari registeredUsers
+                    // hapus dari registeredUsers
                     let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-                    users = users.filter(u => u.email !== perusahaanDihapus.email);
+                    users = users.filter(u => u.email !== del.email);
                     localStorage.setItem('registeredUsers', JSON.stringify(users));
-                    // Hapus profil perusahaan
-                    const profilKey = `profil_perusahaan_${perusahaanDihapus.email}`;
-                    localStorage.removeItem(profilKey);
+                    // hapus profil perusahaan
+                    localStorage.removeItem(`profil_perusahaan_${del.email}`);
                     saveToLocal();
                     applyFilter();
                 }
@@ -383,45 +345,37 @@
         });
         cancelDeleteBtn.addEventListener('click', closeDeleteModal);
 
-        // Event listener untuk tombol edit/hapus di tabel
+        // ========== EVENT LISTENER TABEL (DELEGASI) ==========
         document.getElementById('tabelPerusahaan').addEventListener('click', (e) => {
-            if (e.target.classList.contains('editBtn')) {
-                const id = parseInt(e.target.getAttribute('data-id'));
+            const btn = e.target.closest('.editBtn, .deleteBtn');
+            if (!btn) return;
+            const id = parseInt(btn.getAttribute('data-id'));
+            if (btn.classList.contains('editBtn')) {
                 const p = perusahaan.find(p => p.id === id);
                 if (p) openModal(true, p);
-            }
-            if (e.target.classList.contains('deleteBtn')) {
-                const id = parseInt(e.target.getAttribute('data-id'));
+            } else if (btn.classList.contains('deleteBtn')) {
                 openDeleteModal(id);
             }
         });
 
         // Pagination
-        document.getElementById('prevPage').addEventListener('click', () => {
-            if (currentPage > 1) { currentPage--; renderTable(); }
-        });
-        document.getElementById('nextPage').addEventListener('click', () => {
-            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-            if (currentPage < totalPages) { currentPage++; renderTable(); }
-        });
+        document.getElementById('prevPage').addEventListener('click', () => { if (currentPage>1) { currentPage--; renderTable(); } });
+        document.getElementById('nextPage').addEventListener('click', () => { if (currentPage < Math.ceil(filteredData.length/rowsPerPage)) { currentPage++; renderTable(); } });
 
-        // Filter event
+        // Filter
         document.getElementById('filterBtn').addEventListener('click', applyFilter);
         document.getElementById('searchInput').addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFilter(); });
 
-        // Tombol tambah dan modal close
+        // Tombol tambah & modal close
         document.getElementById('tambahBtn').addEventListener('click', () => openModal(false));
         document.getElementById('closeModal').addEventListener('click', closeModal);
         document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
 
-        window.onclick = (e) => {
-            if (e.target === modalForm) closeModal();
-            if (e.target === deleteModal) closeDeleteModal();
-        };
+        window.onclick = (e) => { if (e.target === modalForm) closeModal(); if (e.target === deleteModal) closeDeleteModal(); };
 
-        // Inisialisasi ulang sinkronisasi
+        // Inisialisasi
         perusahaan = syncFromRegisteredUsers();
-        nextId = perusahaan.length ? Math.max(...perusahaan.map(p => p.id)) + 1 : 1;
+        nextId = perusahaan.length ? Math.max(...perusahaan.map(p=>p.id))+1 : 1;
         applyFilter();
     </script>
 </body>
