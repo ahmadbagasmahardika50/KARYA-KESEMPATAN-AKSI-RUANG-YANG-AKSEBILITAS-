@@ -91,7 +91,7 @@
                             <th class="p-4 font-bold text-primary">Disabilitas</th>
                             <th class="p-4 font-bold text-primary">Status</th>
                             <th class="p-4 font-bold text-primary text-center">Aksi</th>
-                        </tr>
+                         </tr>
                     </thead>
                     <tbody id="tabelLowongan">
                         <!-- Data akan diisi JavaScript -->
@@ -140,6 +140,10 @@
                     <textarea id="deskripsi" rows="3" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></textarea>
                 </div>
                 <div>
+                    <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Gaji (opsional)</label>
+                    <input type="text" id="gaji" placeholder="Contoh: Rp 4.000.000 - Rp 5.000.000" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
+                </div>
+                <div>
                     <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Status</label>
                     <select id="status" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
                         <option value="Aktif">Aktif</option>
@@ -181,11 +185,22 @@
         const companyEmail = currentUser.email;
         const companyName = currentUser.nama || "Perusahaan";
 
-        // Key untuk menyimpan lowongan perusahaan ini
-        const LOWONGAN_KEY = `lowongan_${companyEmail}`;
+        // KEY GLOBAL untuk semua lowongan dari semua perusahaan (digunakan oleh halaman pencarian penyandang)
+        const GLOBAL_LOWONGAN_KEY = 'daftarLowongan';
 
-        // Load data lowongan dari localStorage, atau buat default jika kosong
-        let lowongan = localStorage.getItem(LOWONGAN_KEY) ? JSON.parse(localStorage.getItem(LOWONGAN_KEY)) : [];
+        // Fungsi untuk mengambil semua lowongan dari localStorage
+        function getAllLowongan() {
+            const stored = localStorage.getItem(GLOBAL_LOWONGAN_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        // Fungsi menyimpan semua lowongan ke localStorage
+        function saveAllLowongan(data) {
+            localStorage.setItem(GLOBAL_LOWONGAN_KEY, JSON.stringify(data));
+        }
+
+        // Ambil lowongan milik perusahaan ini dari global
+        let lowongan = getAllLowongan().filter(l => l.perusahaan === companyName);
         let nextId = lowongan.length ? Math.max(...lowongan.map(l => l.id)) + 1 : 1;
 
         // State untuk filter dan pagination
@@ -193,29 +208,22 @@
         let currentPage = 1;
         const rowsPerPage = 5;
 
-        // Fungsi simpan ke localStorage (juga sinkronkan ke global lowongan untuk pencarian penyandang)
-        function saveToLocal() {
-            localStorage.setItem(LOWONGAN_KEY, JSON.stringify(lowongan));
-            // Update juga global lowongan (untuk ditampilkan di halaman pencarian penyandang)
-            // Ambil semua lowongan dari semua perusahaan? Kita simpan di key global 'lowongan' untuk akses penyandang.
-            let allLowongan = JSON.parse(localStorage.getItem('lowongan') || '[]');
-            // Hapus lowongan perusahaan ini dari global, lalu tambahkan yang baru
-            allLowongan = allLowongan.filter(l => l.perusahaan !== companyName);
-            lowongan.forEach(l => {
-                allLowongan.push({
-                    id: l.id,
-                    judul: l.judul,
-                    perusahaan: companyName,
-                    lokasi: l.lokasi,
-                    jenis: l.jenis,
-                    deskripsi: l.deskripsi,
-                    status: l.status
-                });
-            });
-            localStorage.setItem('lowongan', JSON.stringify(allLowongan));
+        // Helper: dapatkan tanggal hari ini dalam format YYYY-MM-DD
+        function getTodayDate() {
+            return new Date().toISOString().split('T')[0];
         }
 
-        // Render tabel
+        // Simpan perubahan lowongan (update global)
+        function syncToGlobal() {
+            let all = getAllLowongan();
+            // Hapus semua lowongan milik perusahaan ini
+            all = all.filter(l => l.perusahaan !== companyName);
+            // Tambahkan lowongan terbaru dari perusahaan ini
+            all.push(...lowongan);
+            saveAllLowongan(all);
+        }
+
+        // Render tabel untuk perusahaan
         function renderTable() {
             const start = (currentPage - 1) * rowsPerPage;
             const pageData = filteredData.slice(start, start + rowsPerPage);
@@ -234,7 +242,7 @@
                     <tr class="border-b border-surface-container-high hover:bg-surface-container-low transition">
                         <td class="p-4 font-medium">${escapeHtml(l.judul)}</td>
                         <td class="p-4">${escapeHtml(l.lokasi)}</td>
-                        <td class="p-4">${escapeHtml(l.jenis)}</td>
+                        <td class="p-4">${escapeHtml(l.jenis_disabilitas)}</td>
                         <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${l.status}</span></td>
                         <td class="p-4 text-center">
                             <button class="editBtn text-primary font-bold hover:underline mr-3" data-id="${l.id}">Edit</button>
@@ -282,6 +290,7 @@
         const lokasiInput = document.getElementById('lokasi');
         const jenisSelect = document.getElementById('jenis');
         const deskripsiTextarea = document.getElementById('deskripsi');
+        const gajiInput = document.getElementById('gaji');
         const statusSelect = document.getElementById('status');
 
         function openModal(edit = false, data = null) {
@@ -290,14 +299,16 @@
                 editId.value = data.id;
                 judulInput.value = data.judul;
                 lokasiInput.value = data.lokasi;
-                jenisSelect.value = data.jenis;
+                jenisSelect.value = data.jenis_disabilitas;
                 deskripsiTextarea.value = data.deskripsi;
+                gajiInput.value = data.gaji || '';
                 statusSelect.value = data.status;
             } else {
                 modalTitle.innerHTML = '<span class="material-symbols-outlined">add</span> Tambah Lowongan';
                 editId.value = '';
                 form.reset();
                 statusSelect.value = 'Aktif';
+                gajiInput.value = '';
             }
             modalForm.classList.remove('hidden');
             modalForm.style.display = 'flex';
@@ -312,26 +323,33 @@
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const id = editId.value;
-            const newData = {
+            const now = getTodayDate();
+            const newLowongan = {
+                id: id ? parseInt(id) : nextId++,
                 judul: judulInput.value.trim(),
+                perusahaan: companyName,
                 lokasi: lokasiInput.value.trim(),
-                jenis: jenisSelect.value,
+                jenis_disabilitas: jenisSelect.value,
                 deskripsi: deskripsiTextarea.value.trim(),
+                gaji: gajiInput.value.trim() || "Tidak disebutkan",
+                tgl_posting: now,
                 status: statusSelect.value
             };
-            if (!newData.judul || !newData.lokasi || !newData.deskripsi) {
+            if (!newLowongan.judul || !newLowongan.lokasi || !newLowongan.deskripsi) {
                 alert('Harap isi semua field yang diperlukan');
                 return;
             }
             if (id) {
                 // Edit
                 const index = lowongan.findIndex(l => l.id == id);
-                if (index !== -1) lowongan[index] = { id: parseInt(id), ...newData };
+                if (index !== -1) lowongan[index] = newLowongan;
             } else {
                 // Tambah
-                lowongan.push({ id: nextId++, ...newData });
+                lowongan.push(newLowongan);
             }
-            saveToLocal();
+            syncToGlobal();
+            // Refresh data lowongan dari global untuk memastikan konsisten
+            lowongan = getAllLowongan().filter(l => l.perusahaan === companyName);
             applyFilters();
             closeModal();
         });
@@ -354,7 +372,7 @@
         confirmDeleteBtn.addEventListener('click', () => {
             if (deleteId) {
                 lowongan = lowongan.filter(l => l.id != deleteId);
-                saveToLocal();
+                syncToGlobal();
                 applyFilters();
                 closeDeleteModal();
             }
