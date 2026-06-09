@@ -55,7 +55,7 @@
         <div class="flex justify-between items-center mb-8">
             <div>
                 <h1 class="text-3xl font-black text-primary">Kelola Perusahaan</h1>
-                <p class="text-on-surface-variant mt-1">Tambah, edit, atau hapus data perusahaan mitra.</p>
+                <p class="text-on-surface-variant mt-1">Kelola data perusahaan mitra (termasuk yang mendaftar sendiri).</p>
             </div>
             <button id="tambahBtn" class="bg-primary text-white px-5 py-3 rounded-xl font-bold hover:bg-primary/90 shadow-md flex items-center gap-2">
                 <span class="material-symbols-outlined">add</span> Tambah Perusahaan
@@ -155,11 +155,54 @@
             window.location.href = 'login.html';
         }
 
-        // Key untuk menyimpan data perusahaan
+        // Key untuk menyimpan data perusahaan admin (master)
         const PERUSAHAAN_KEY = 'data_perusahaan_admin';
 
-        // Load data perusahaan dari localStorage
-        let perusahaan = localStorage.getItem(PERUSAHAAN_KEY) ? JSON.parse(localStorage.getItem(PERUSAHAAN_KEY)) : [];
+        // Fungsi untuk menyinkronkan data perusahaan dari registeredUsers (akun yang mendaftar sendiri) ke master admin
+        function syncFromRegisteredUsers() {
+            let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            let perusahaanMaster = localStorage.getItem(PERUSAHAAN_KEY) ? JSON.parse(localStorage.getItem(PERUSAHAAN_KEY)) : [];
+            
+            // Ambil semua user dengan role perusahaan
+            const perusahaanUsers = users.filter(u => u.role === 'perusahaan');
+            
+            // Untuk setiap user perusahaan, jika belum ada di master, tambahkan
+            let changed = false;
+            perusahaanUsers.forEach(user => {
+                if (!perusahaanMaster.some(p => p.email === user.email)) {
+                    perusahaanMaster.push({
+                        id: Date.now() + Math.random(),
+                        nama: user.nama,
+                        email: user.email,
+                        telepon: ''
+                    });
+                    changed = true;
+                } else {
+                    // Update nama jika berbeda
+                    const existing = perusahaanMaster.find(p => p.email === user.email);
+                    if (existing && existing.nama !== user.nama) {
+                        existing.nama = user.nama;
+                        changed = true;
+                    }
+                }
+            });
+            
+            // Hapus dari master jika tidak ada di registeredUsers
+            const perusahaanEmails = perusahaanUsers.map(u => u.email);
+            const beforeLength = perusahaanMaster.length;
+            perusahaanMaster = perusahaanMaster.filter(p => perusahaanEmails.includes(p.email));
+            if (perusahaanMaster.length !== beforeLength) changed = true;
+            
+            if (changed) {
+                // Urutkan berdasarkan id
+                perusahaanMaster.sort((a,b) => a.id - b.id);
+                localStorage.setItem(PERUSAHAAN_KEY, JSON.stringify(perusahaanMaster));
+            }
+            return perusahaanMaster;
+        }
+
+        // Load data perusahaan (master) dan sinkronisasi
+        let perusahaan = syncFromRegisteredUsers();
         let nextId = perusahaan.length ? Math.max(...perusahaan.map(p => p.id)) + 1 : 1;
 
         // State filter dan pagination
@@ -167,23 +210,21 @@
         let currentPage = 1;
         const rowsPerPage = 5;
 
-        // Fungsi simpan ke localStorage
+        // Fungsi simpan ke localStorage (master) dan sinkronkan kembali ke registeredUsers
         function saveToLocal() {
             localStorage.setItem(PERUSAHAAN_KEY, JSON.stringify(perusahaan));
-            // Juga update data perusahaan di 'registeredUsers' agar bisa login
+            // Sinkronkan ke registeredUsers
             let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-            // Hapus semua perusahaan yang sudah tidak ada atau update
             users = users.filter(u => u.role !== 'perusahaan' || perusahaan.some(p => p.email === u.email));
             perusahaan.forEach(p => {
                 if (!users.some(u => u.email === p.email)) {
                     users.push({
                         nama: p.nama,
                         email: p.email,
-                        password: "perusahaan", // default password
+                        password: "perusahaan",
                         role: "perusahaan"
                     });
                 } else {
-                    // update nama jika perlu
                     const idx = users.findIndex(u => u.email === p.email);
                     if (idx !== -1) users[idx].nama = p.nama;
                 }
@@ -287,17 +328,15 @@
                 alert('Nama dan Email harus diisi');
                 return;
             }
-            // Validasi email unik (kecuali untuk edit dengan email yang sama)
+            // Validasi email unik
             if (!id && perusahaan.some(p => p.email === newData.email)) {
                 alert('Email sudah terdaftar!');
                 return;
             }
             if (id) {
-                // Edit
                 const index = perusahaan.findIndex(p => p.id == id);
                 if (index !== -1) perusahaan[index] = { id: parseInt(id), ...newData };
             } else {
-                // Tambah
                 perusahaan.push({ id: nextId++, ...newData });
             }
             saveToLocal();
@@ -305,7 +344,7 @@
             closeModal();
         });
 
-        // Hapus perusahaan dengan konfirmasi (juga hapus lowongan terkait)
+        // Hapus perusahaan
         let deleteId = null;
         const deleteModal = document.getElementById('deleteModal');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
@@ -324,20 +363,19 @@
             if (deleteId) {
                 const perusahaanDihapus = perusahaan.find(p => p.id == deleteId);
                 if (perusahaanDihapus) {
-                    // Hapus perusahaan
                     perusahaan = perusahaan.filter(p => p.id != deleteId);
-                    // Hapus lowongan yang terkait dengan perusahaan ini (dari global lowongan)
+                    // Hapus lowongan terkait
                     let allLowongan = JSON.parse(localStorage.getItem('lowongan') || '[]');
                     allLowongan = allLowongan.filter(l => l.perusahaan !== perusahaanDihapus.nama);
                     localStorage.setItem('lowongan', JSON.stringify(allLowongan));
-                    // Hapus akun perusahaan dari registeredUsers
+                    // Hapus dari registeredUsers
                     let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
                     users = users.filter(u => u.email !== perusahaanDihapus.email);
                     localStorage.setItem('registeredUsers', JSON.stringify(users));
-                    // Hapus data profil perusahaan jika ada
+                    // Hapus profil perusahaan
                     const profilKey = `profil_perusahaan_${perusahaanDihapus.email}`;
                     localStorage.removeItem(profilKey);
-                    saveToLocal(); // menyimpan perubahan perusahaan
+                    saveToLocal();
                     applyFilter();
                 }
                 closeDeleteModal();
@@ -376,13 +414,14 @@
         document.getElementById('closeModal').addEventListener('click', closeModal);
         document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
 
-        // Tutup modal jika klik di luar
         window.onclick = (e) => {
             if (e.target === modalForm) closeModal();
             if (e.target === deleteModal) closeDeleteModal();
         };
 
-        // Inisialisasi
+        // Inisialisasi ulang sinkronisasi
+        perusahaan = syncFromRegisteredUsers();
+        nextId = perusahaan.length ? Math.max(...perusahaan.map(p => p.id)) + 1 : 1;
         applyFilter();
     </script>
 </body>
