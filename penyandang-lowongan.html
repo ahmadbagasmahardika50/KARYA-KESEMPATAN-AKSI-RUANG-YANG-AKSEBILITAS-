@@ -42,7 +42,7 @@
         <div class="text-2xl font-black text-[#001855] tracking-tight">KARYA Pelamar</div>
         <div class="flex items-center space-x-6">
             <span class="text-sm text-gray-700 hidden md:inline">Halo, <span id="user-name-display" class="font-semibold">Penyandang</span></span>
-            <!-- Tambahan: Lamaran Saya -->
+            <!-- Lamaran Saya -->
             <a href="#" id="riwayatBtn" class="text-[#001855] hover:text-[#feb700] transition flex items-center gap-1">
                 <span class="material-symbols-outlined text-base">history</span> Lamaran Saya
             </a>
@@ -55,7 +55,7 @@
         </div>
     </nav>
 
-    <!-- Main Content (sama seperti sebelumnya) -->
+    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-8">
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-[#001855]">Cari Lowongan Kerja</h1>
@@ -103,7 +103,7 @@
         </div>
     </main>
 
-    <!-- Modal Detail Lowongan (sama) -->
+    <!-- Modal Detail Lowongan -->
     <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-2xl w-full max-w-md shadow-xl p-6">
             <h3 class="text-xl font-bold text-[#001855] mb-4">Detail Lowongan</h3>
@@ -115,7 +115,7 @@
         </div>
     </div>
 
-    <!-- Modal Riwayat Lamaran (baru) -->
+    <!-- Modal Riwayat Lamaran (tanpa tombol hapus) -->
     <div id="riwayatModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] overflow-y-auto shadow-xl">
             <div class="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
@@ -132,7 +132,7 @@
         </div>
     </div>
 
-    <!-- Modal Detail Lamaran (untuk melihat detail lamaran yang sudah dikirim) -->
+    <!-- Modal Detail Lamaran -->
     <div id="detailLamaranModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-2xl w-full max-w-md shadow-xl p-6">
             <h3 class="text-xl font-bold text-[#001855] mb-4">Detail Lamaran</h3>
@@ -168,20 +168,6 @@
             return allLamaran.filter(l => l.pelamarEmail === userEmail);
         }
 
-        function simpanLamaranUser(lamaran) {
-            let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
-            allLamaran = allLamaran.filter(l => !(l.pelamarEmail === userEmail && l.id === lamaran.id));
-            allLamaran.push(lamaran);
-            localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
-        }
-
-        function hapusLamaran(id) {
-            let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
-            allLamaran = allLamaran.filter(l => !(l.pelamarEmail === userEmail && l.id === id));
-            localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
-            renderRiwayatLamaran(); // refresh modal jika terbuka
-        }
-
         function updateStatusLamaran(id, statusBaru) {
             let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
             const index = allLamaran.findIndex(l => l.pelamarEmail === userEmail && l.id === id);
@@ -192,7 +178,7 @@
             }
         }
 
-        // Render daftar lamaran di modal
+        // Render daftar lamaran (tanpa tombol hapus)
         function renderRiwayatLamaran() {
             const lamaranUser = getLamaranUser();
             const container = document.getElementById('daftarLamaranContainer');
@@ -226,7 +212,6 @@
                     <td class="px-4 py-2"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${statusText}</span></td>
                     <td class="px-4 py-2 text-center">
                         <button class="detailLamaranBtn text-blue-600 hover:text-blue-800 mr-2" data-id="${l.id}">Detail</button>
-                        <button class="hapusLamaranBtn text-red-600 hover:text-red-800" data-id="${l.id}">Hapus</button>
                         <select class="updateStatusSelect ml-2 text-sm border rounded p-1" data-id="${l.id}">
                             <option value="pending" ${l.status === 'pending' ? 'selected' : ''}>Menunggu</option>
                             <option value="diproses" ${l.status === 'diproses' ? 'selected' : ''}>Diproses</option>
@@ -240,7 +225,7 @@
             html += `</tbody></table></div>`;
             container.innerHTML = html;
 
-            // Attach event listeners untuk tombol detail, hapus, dan update status
+            // Event listeners untuk tombol detail
             document.querySelectorAll('.detailLamaranBtn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const id = parseInt(btn.getAttribute('data-id'));
@@ -248,14 +233,7 @@
                     if (lamaran) showDetailLamaran(lamaran);
                 });
             });
-            document.querySelectorAll('.hapusLamaranBtn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = parseInt(btn.getAttribute('data-id'));
-                    if (confirm('Hapus lamaran ini? Tindakan tidak dapat dibatalkan.')) {
-                        hapusLamaran(id);
-                    }
-                });
-            });
+            // Event listeners untuk update status
             document.querySelectorAll('.updateStatusSelect').forEach(select => {
                 select.addEventListener('change', (e) => {
                     const id = parseInt(select.getAttribute('data-id'));
