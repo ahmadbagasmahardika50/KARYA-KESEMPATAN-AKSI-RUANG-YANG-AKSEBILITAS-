@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KARYA - Data Pelamar (Perusahaan)</title>
-    <!-- Tailwind CSS -->
+    <title>KARYA - Data Pelamar</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Lexend & Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
-        body { font-family: 'Lexend', sans-serif; background-color: #fcf9f8; }
+        body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
         :focus { outline: 2px solid #feb700; outline-offset: 2px; }
-        .card-hover:hover { transform: translateY(-2px); transition: all 0.2s; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 50; }
+        .modal-content { background: white; border-radius: 1rem; width: 90%; max-width: 480px; padding: 1.5rem; }
     </style>
     <script>
         tailwind.config = {
@@ -40,142 +39,138 @@
 </head>
 <body class="bg-surface text-on-surface">
 
-    <!-- Navbar KARYA -->
-    <nav class="fixed top-0 w-full z-50 bg-white shadow-md">
-        <div class="flex justify-between items-center px-6 md:px-8 py-4 max-w-screen-2xl mx-auto">
-            <div class="text-2xl font-black text-primary tracking-tighter">KARYA</div>
-            <div class="hidden md:flex items-center gap-8">
-                <a href="#" class="text-slate-600 font-medium hover:text-primary transition">Lowongan</a>
-                <a href="#" class="text-slate-600 font-medium hover:text-primary transition">Komunitas</a>
-                <a href="#" class="text-slate-600 font-medium hover:text-primary transition">Sumber Daya</a>
-            </div>
-            <div class="flex items-center gap-4">
-                <button class="p-2 hover:bg-surface-container-high rounded-full transition">
-                    <span class="material-symbols-outlined text-primary">contrast</span>
-                </button>
-                <button class="p-2 hover:bg-surface-container-high rounded-full transition">
-                    <span class="material-symbols-outlined text-primary">format_size</span>
-                </button>
-                <div class="flex items-center gap-2 bg-surface-container-low rounded-full pl-3 pr-2 py-1">
-                    <span class="material-symbols-outlined text-primary">business</span>
-                    <span class="text-sm font-medium text-on-surface">PT. Maju Jaya</span>
-                </div>
-            </div>
+    <!-- Navbar KARYA Perusahaan -->
+    <nav class="bg-white shadow-md py-4 px-6 md:px-12 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-2xl text-primary">business</span>
+            <div class="text-xl font-black text-primary tracking-tighter">KARYA Perusahaan</div>
+        </div>
+        <div class="space-x-4">
+            <a href="perusahaan-dashboard.html" class="text-primary font-medium hover:underline">Dashboard</a>
+            <a href="perusahaan-lowongan.html" class="text-primary font-medium hover:underline">Lowongan</a>
+            <a href="perusahaan-pelamar.html" class="text-primary font-bold border-b-2 border-secondary-container pb-1">Pelamar</a>
+            <a href="perusahaan-profil.html" class="text-primary font-medium hover:underline">Profil</a>
+            <a href="login.html" onclick="localStorage.removeItem('user')" class="text-error">Logout</a>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="pt-28 pb-12 px-4 md:px-8 max-w-7xl mx-auto">
-        <div class="bg-white rounded-2xl shadow-md border border-surface-container-high p-6 md:p-8">
-            <!-- Header -->
-            <div class="mb-8">
-                <div class="flex items-center gap-3 mb-2">
-                    <span class="material-symbols-outlined text-3xl text-primary">groups</span>
-                    <h1 class="text-3xl font-black text-primary tracking-tight">Data Pelamar</h1>
-                </div>
-                <p class="text-on-surface-variant">Kelola dan pantau pelamar yang mendaftar pada lowongan perusahaan Anda.</p>
-            </div>
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-primary">Data Pelamar</h1>
+            <p class="text-on-surface-variant mt-1">Lihat dan update status lamaran yang masuk untuk lowongan perusahaan Anda.</p>
+        </div>
 
-            <!-- Filter Bar -->
-            <div class="flex flex-col md:flex-row flex-wrap gap-4 mb-8">
-                <div class="flex-1 min-w-[180px]">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Filter Lowongan</label>
-                    <select id="filter-lowongan" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary focus:ring-0 transition">
-                        <option value="">Semua Lowongan</option>
-                        <option value="1">Frontend Developer (Fisik)</option>
-                        <option value="2">Admin Data Entry (Netra)</option>
-                        <option value="3">Customer Service (Rungu)</option>
-                    </select>
-                </div>
-                <div class="flex-1 min-w-[180px]">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Status Lamaran</label>
-                    <select id="filter-status" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition">
-                        <option value="">Semua Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="review">Dalam Review</option>
-                        <option value="interview">Undang Interview</option>
-                        <option value="accepted">Diterima</option>
-                        <option value="rejected">Ditolak</option>
-                    </select>
-                </div>
-                <div class="flex-1 min-w-[200px]">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Cari Nama / Email</label>
-                    <input type="text" id="search" placeholder="Ketik keyword..." class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition">
-                </div>
-                <div class="flex items-end">
-                    <button id="btn-filter" class="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-primary/90 shadow-md transition flex items-center gap-2">
-                        <span class="material-symbols-outlined text-lg">search</span> Terapkan Filter
-                    </button>
-                </div>
+        <!-- Filter & Pencarian -->
+        <div class="flex flex-wrap gap-4 mb-6">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-xs font-bold text-outline uppercase tracking-wider mb-1">Cari Nama / Email</label>
+                <input type="text" id="searchInput" placeholder="Ketik nama atau email..." class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition">
             </div>
+            <div class="w-48">
+                <label class="block text-xs font-bold text-outline uppercase tracking-wider mb-1">Filter Status</label>
+                <select id="statusFilter" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
+                    <option value="all">Semua</option>
+                    <option value="pending">Pending</option>
+                    <option value="review">Dalam Review</option>
+                    <option value="interview">Undang Interview</option>
+                    <option value="accepted">Diterima</option>
+                    <option value="rejected">Ditolak</option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button id="filterBtn" class="bg-primary text-white px-5 py-3 rounded-xl font-bold hover:bg-primary/90 shadow-md flex items-center gap-2">
+                    <span class="material-symbols-outlined">filter_list</span> Filter
+                </button>
+            </div>
+        </div>
 
-            <!-- Tabel Pelamar -->
+        <!-- Tabel Pelamar -->
+        <div class="bg-white rounded-2xl shadow-md border border-surface-container-high overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-surface-container-high rounded-xl">
+                <table class="w-full text-left">
+                    <thead class="bg-surface-container-high">
                         <tr class="border-b border-surface-container">
-                            <th class="p-4 text-sm font-bold text-primary">Nama Pelamar</th>
-                            <th class="p-4 text-sm font-bold text-primary">Jenis Disabilitas</th>
-                            <th class="p-4 text-sm font-bold text-primary">Lowongan</th>
-                            <th class="p-4 text-sm font-bold text-primary">Tanggal Lamar</th>
-                            <th class="p-4 text-sm font-bold text-primary">Status</th>
-                            <th class="p-4 text-sm font-bold text-primary text-center">Aksi</th>
+                            <th class="p-4 font-bold text-primary">Nama</th>
+                            <th class="p-4 font-bold text-primary">Jenis Disabilitas</th>
+                            <th class="p-4 font-bold text-primary">Lowongan</th>
+                            <th class="p-4 font-bold text-primary">Tanggal Lamar</th>
+                            <th class="p-4 font-bold text-primary">Status</th>
+                            <th class="p-4 font-bold text-primary text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="table-body"></tbody>
+                    <tbody id="tabelPelamar"></tbody>
                 </table>
             </div>
-
-            <!-- Pagination -->
-            <div class="flex justify-between items-center mt-8">
-                <button id="prev-page" class="px-4 py-2 bg-surface-container-high rounded-xl disabled:opacity-50 hover:bg-surface-container transition">Sebelumnya</button>
-                <span id="page-info" class="text-sm text-outline">Halaman 1 dari 1</span>
-                <button id="next-page" class="px-4 py-2 bg-surface-container-high rounded-xl disabled:opacity-50 hover:bg-surface-container transition">Selanjutnya</button>
+            <div class="flex justify-between items-center p-4 border-t border-surface-container-high bg-surface-container-low">
+                <button id="prevPage" class="px-4 py-2 bg-white rounded-xl border border-surface-container-high disabled:opacity-50">Sebelumnya</button>
+                <span id="pageInfo" class="text-sm text-outline">Halaman 1</span>
+                <button id="nextPage" class="px-4 py-2 bg-white rounded-xl border border-surface-container-high disabled:opacity-50">Selanjutnya</button>
             </div>
         </div>
     </main>
 
-    <!-- Modal Detail Pelamar (Solid) -->
-    <div id="detail-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-surface-container-high">
-            <div class="flex justify-between items-center p-5 border-b border-surface-container-high">
+    <!-- Modal Detail & Update Status -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold text-primary flex items-center gap-2">
                     <span class="material-symbols-outlined">assignment_ind</span> Detail Pelamar
                 </h3>
-                <button id="close-modal" class="text-outline hover:text-primary text-2xl leading-none">&times;</button>
+                <button id="closeDetailModal" class="text-outline hover:text-primary text-2xl">&times;</button>
             </div>
-            <div id="modal-content" class="p-5 space-y-3 text-on-surface-variant"></div>
-            <div class="flex justify-end gap-3 p-5 border-t border-surface-container-high">
-                <button id="update-status-btn" class="bg-secondary-container text-on-secondary px-5 py-2 rounded-xl font-bold hover:bg-secondary-container/80 transition">Update Status</button>
-                <button id="close-modal-btn" class="bg-surface-container-high px-5 py-2 rounded-xl hover:bg-surface-container transition">Tutup</button>
+            <div id="modalContent" class="space-y-3 text-on-surface-variant"></div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="updateStatusBtn" class="px-4 py-2 bg-secondary-container text-on-secondary rounded-xl font-bold">Update Status</button>
+                <button id="closeDetailFooterBtn" class="px-4 py-2 bg-surface-container-high rounded-xl">Tutup</button>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-surface-container-low w-full py-8 px-6 mt-12 border-t border-surface-container">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-outline">
-            <div>© 2026 KARYA. Memberdayakan Kemampuan.</div>
-            <div class="flex gap-6">
-                <a href="#" class="hover:text-primary transition">Pernyataan Aksesibilitas</a>
-                <a href="#" class="hover:text-primary transition">Forum Komunitas</a>
-                <a href="#" class="hover:text-primary transition">Kebijakan Privasi</a>
-            </div>
-        </div>
+    <footer class="bg-surface-container-low py-6 text-center text-sm text-outline border-t border-surface-container mt-12">
+        © 2026 KARYA. Memberdayakan Kemampuan.
     </footer>
 
     <script>
-        // Data dummy (sama seperti sebelumnya)
-        let pelamarData = [
-            { id: 1, nama: "Budi Santoso", disabilitas: "Fisik (daksa)", lowongan: "Frontend Developer", tglLamaran: "2026-06-01", status: "pending", email: "budi@example.com", pendidikan: "S1 Informatika", cvLink: "#" },
-            { id: 2, nama: "Siti Aminah", disabilitas: "Netra", lowongan: "Admin Data Entry", tglLamaran: "2026-06-03", status: "review", email: "siti@example.com", pendidikan: "D3 Administrasi", cvLink: "#" },
-            { id: 3, nama: "Agus Prasetyo", disabilitas: "Rungu", lowongan: "Customer Service", tglLamaran: "2026-06-05", status: "interview", email: "agus@example.com", pendidikan: "S1 Psikologi", cvLink: "#" },
-            { id: 4, nama: "Dewi Lestari", disabilitas: "Fisik (daksa)", lowongan: "Frontend Developer", tglLamaran: "2026-06-07", status: "accepted", email: "dewi@example.com", pendidikan: "S1 Sistem Informasi", cvLink: "#" },
-        ];
+        // ========== PROTEKSI AKSES: HANYA PERUSAHAAN ==========
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        if (!currentUser || currentUser.role !== 'perusahaan') {
+            alert('Akses ditolak. Halaman ini khusus untuk perusahaan.');
+            window.location.href = 'login.html';
+        }
 
+        // Nama perusahaan yang sedang login (digunakan untuk filter lamaran)
+        const perusahaanNama = currentUser.nama || "Perusahaan";
+
+        // Ambil data lamaran dari localStorage
+        let allLamaran = JSON.parse(localStorage.getItem('lamaran') || '[]');
+
+        // Filter lamaran yang ditujukan ke perusahaan ini
+        // Asumsikan setiap lamaran memiliki field `perusahaan` (nama perusahaan tujuan)
+        let pelamar = allLamaran.filter(l => l.perusahaan === perusahaanNama);
+
+        // Jika belum ada data lamaran, tambahkan contoh (opsional)
+        if (pelamar.length === 0) {
+            const contoh = [
+                { id: 101, nama: "Budi Santoso", email: "budi@example.com", disabilitas: "Fisik (daksa)", lowongan: "Frontend Developer", tglLamaran: "2026-06-01", status: "pending", pendidikan: "S1 Informatika", perusahaan: perusahaanNama },
+                { id: 102, nama: "Siti Aminah", email: "siti@example.com", disabilitas: "Netra", lowongan: "Admin Data Entry", tglLamaran: "2026-06-03", status: "review", pendidikan: "D3 Administrasi", perusahaan: perusahaanNama },
+                { id: 103, nama: "Agus Prasetyo", email: "agus@example.com", disabilitas: "Rungu", lowongan: "Customer Service", tglLamaran: "2026-06-05", status: "interview", pendidikan: "S1 Psikologi", perusahaan: perusahaanNama }
+            ];
+            pelamar = contoh;
+            // Simpan juga ke global lamaran jika belum ada
+            if (allLamaran.length === 0) {
+                localStorage.setItem('lamaran', JSON.stringify(contoh));
+            }
+        }
+
+        let filtered = [...pelamar];
         let currentPage = 1;
-        const rowsPerPage = 3;
-        let filteredData = [...pelamarData];
+        const rowsPerPage = 5;
+        let currentDetailId = null;
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        }
 
         function getStatusClass(status) {
             switch(status) {
@@ -188,122 +183,138 @@
             }
         }
 
+        function statusToIndonesian(status) {
+            const map = {
+                'pending': 'Pending',
+                'review': 'Dalam Review',
+                'interview': 'Undang Interview',
+                'accepted': 'Diterima',
+                'rejected': 'Ditolak'
+            };
+            return map[status] || status;
+        }
+
         function renderTable() {
             const start = (currentPage - 1) * rowsPerPage;
-            const pageData = filteredData.slice(start, start + rowsPerPage);
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = '';
+            const pageData = filtered.slice(start, start + rowsPerPage);
+            const tbody = document.getElementById('tabelPelamar');
             if (pageData.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-outline">Tidak ada data pelamar</td></tr>';
-                document.getElementById('page-info').innerText = 'Halaman 0 dari 0';
-                document.getElementById('prev-page').disabled = true;
-                document.getElementById('next-page').disabled = true;
+                document.getElementById('pageInfo').innerText = 'Halaman 0';
+                document.getElementById('prevPage').disabled = true;
+                document.getElementById('nextPage').disabled = true;
                 return;
             }
+            let html = '';
             pageData.forEach(p => {
-                const row = document.createElement('tr');
-                row.className = 'border-b border-surface-container-high hover:bg-surface-container-low transition';
-                row.innerHTML = `
-                    <td class="py-3 px-4 font-medium">${p.nama}</td>
-                    <td class="py-3 px-4">${p.disabilitas}</td>
-                    <td class="py-3 px-4">${p.lowongan}</td>
-                    <td class="py-3 px-4">${p.tglLamaran}</td>
-                    <td class="py-3 px-4"><span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusClass(p.status)}">${p.status}</span></td>
-                    <td class="py-3 px-4 text-center">
-                        <button class="detail-btn text-primary font-bold hover:underline mr-3" data-id="${p.id}">Detail</button>
-                        <button class="update-status-btn text-secondary font-bold hover:underline" data-id="${p.id}">Update Status</button>
+                html += `<tr class="border-b border-surface-container-high hover:bg-surface-container-low">
+                    <td class="p-4">${escapeHtml(p.nama)}</td>
+                    <td class="p-4">${escapeHtml(p.disabilitas || '-')}</td>
+                    <td class="p-4">${escapeHtml(p.lowongan)}</td>
+                    <td class="p-4">${escapeHtml(p.tglLamaran || '-')}</td>
+                    <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${getStatusClass(p.status)}">${statusToIndonesian(p.status)}</span></td>
+                    <td class="p-4 text-center">
+                        <button class="detailBtn text-primary font-bold hover:underline" data-id="${p.id}">Detail</button>
                     </td>
-                `;
-                tbody.appendChild(row);
+                </tr>`;
             });
-            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-            document.getElementById('page-info').innerText = `Halaman ${currentPage} dari ${totalPages || 1}`;
-            document.getElementById('prev-page').disabled = currentPage === 1;
-            document.getElementById('next-page').disabled = currentPage === totalPages || filteredData.length === 0;
+            tbody.innerHTML = html;
+            const totalPages = Math.ceil(filtered.length / rowsPerPage);
+            document.getElementById('pageInfo').innerText = `Halaman ${currentPage} dari ${totalPages || 1}`;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
         }
 
         function applyFilters() {
-            const lowonganFilter = document.getElementById('filter-lowongan').value;
-            const statusFilter = document.getElementById('filter-status').value;
-            const searchText = document.getElementById('search').value.toLowerCase();
-            filteredData = pelamarData.filter(p => {
-                let matchLowongan = true;
-                if (lowonganFilter === '1') matchLowongan = p.lowongan === 'Frontend Developer';
-                else if (lowonganFilter === '2') matchLowongan = p.lowongan === 'Admin Data Entry';
-                else if (lowonganFilter === '3') matchLowongan = p.lowongan === 'Customer Service';
-                let matchStatus = statusFilter ? p.status === statusFilter : true;
-                let matchSearch = searchText ? p.nama.toLowerCase().includes(searchText) || p.email.toLowerCase().includes(searchText) : true;
-                return matchLowongan && matchStatus && matchSearch;
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            filtered = pelamar.filter(p => {
+                const matchKeyword = p.nama.toLowerCase().includes(keyword) || (p.email && p.email.toLowerCase().includes(keyword));
+                const matchStatus = status === 'all' || p.status === status;
+                return matchKeyword && matchStatus;
             });
             currentPage = 1;
             renderTable();
         }
 
-        function showDetailModal(id) {
-            const p = pelamarData.find(p => p.id == id);
+        // Modal detail & update
+        const modal = document.getElementById('detailModal');
+        function showDetail(id) {
+            const p = pelamar.find(p => p.id == id);
             if (!p) return;
-            const modal = document.getElementById('detail-modal');
-            const modalContent = document.getElementById('modal-content');
-            modalContent.innerHTML = `
-                <div class="space-y-2">
-                    <p><strong class="text-primary">Nama:</strong> ${p.nama}</p>
-                    <p><strong class="text-primary">Email:</strong> ${p.email}</p>
-                    <p><strong class="text-primary">Disabilitas:</strong> ${p.disabilitas}</p>
-                    <p><strong class="text-primary">Pendidikan:</strong> ${p.pendidikan}</p>
-                    <p><strong class="text-primary">Lowongan:</strong> ${p.lowongan}</p>
-                    <p><strong class="text-primary">Tanggal Lamar:</strong> ${p.tglLamaran}</p>
-                    <p><strong class="text-primary">Status:</strong> 
-                        <select id="status-select" class="mt-1 p-2 border border-outline-variant rounded-lg bg-white">
-                            <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>Pending</option>
-                            <option value="review" ${p.status === 'review' ? 'selected' : ''}>Dalam Review</option>
-                            <option value="interview" ${p.status === 'interview' ? 'selected' : ''}>Undang Interview</option>
-                            <option value="accepted" ${p.status === 'accepted' ? 'selected' : ''}>Diterima</option>
-                            <option value="rejected" ${p.status === 'rejected' ? 'selected' : ''}>Ditolak</option>
-                        </select>
-                    </p>
-                    <p><strong class="text-primary">CV:</strong> <a href="${p.cvLink}" target="_blank" class="text-secondary underline">Lihat CV</a></p>
-                </div>
+            currentDetailId = id;
+            const content = document.getElementById('modalContent');
+            content.innerHTML = `
+                <p><strong class="text-primary">Nama:</strong> ${escapeHtml(p.nama)}</p>
+                <p><strong class="text-primary">Email:</strong> ${escapeHtml(p.email || '-')}</p>
+                <p><strong class="text-primary">Disabilitas:</strong> ${escapeHtml(p.disabilitas || '-')}</p>
+                <p><strong class="text-primary">Pendidikan:</strong> ${escapeHtml(p.pendidikan || '-')}</p>
+                <p><strong class="text-primary">Lowongan:</strong> ${escapeHtml(p.lowongan)}</p>
+                <p><strong class="text-primary">Tanggal Lamar:</strong> ${escapeHtml(p.tglLamaran || '-')}</p>
+                <p><strong class="text-primary">Status:</strong> 
+                    <select id="statusSelect" class="mt-1 p-2 border border-outline-variant rounded-lg bg-white">
+                        <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="review" ${p.status === 'review' ? 'selected' : ''}>Dalam Review</option>
+                        <option value="interview" ${p.status === 'interview' ? 'selected' : ''}>Undang Interview</option>
+                        <option value="accepted" ${p.status === 'accepted' ? 'selected' : ''}>Diterima</option>
+                        <option value="rejected" ${p.status === 'rejected' ? 'selected' : ''}>Ditolak</option>
+                    </select>
+                </p>
             `;
-            modal.classList.remove('hidden');
             modal.style.display = 'flex';
-            modal.setAttribute('data-current-id', id);
         }
 
-        function updateStatusFromModal() {
-            const modal = document.getElementById('detail-modal');
-            const pelamarId = modal.getAttribute('data-current-id');
-            const newStatus = document.getElementById('status-select').value;
-            if (pelamarId) {
-                const index = pelamarData.findIndex(p => p.id == pelamarId);
-                if (index !== -1) {
-                    pelamarData[index].status = newStatus;
-                    applyFilters();
+        function updateStatus() {
+            if (!currentDetailId) return;
+            const newStatus = document.getElementById('statusSelect').value;
+            // Update di array pelamar
+            const idx = pelamar.findIndex(p => p.id == currentDetailId);
+            if (idx !== -1) {
+                pelamar[idx].status = newStatus;
+                // Update juga di localStorage 'lamaran' global
+                let allLamaranGlobal = JSON.parse(localStorage.getItem('lamaran') || '[]');
+                const globalIdx = allLamaranGlobal.findIndex(l => l.id == currentDetailId);
+                if (globalIdx !== -1) {
+                    allLamaranGlobal[globalIdx].status = newStatus;
+                    localStorage.setItem('lamaran', JSON.stringify(allLamaranGlobal));
+                } else {
+                    // Jika tidak ditemukan, simpan ulang semua
+                    localStorage.setItem('lamaran', JSON.stringify(pelamar));
                 }
+                // Refresh filter dan tabel
+                applyFilters();
             }
-            modal.classList.add('hidden');
+            modal.style.display = 'none';
+        }
+
+        function closeModal() {
             modal.style.display = 'none';
         }
 
         // Event listeners
-        document.getElementById('btn-filter').addEventListener('click', applyFilters);
-        document.getElementById('prev-page').addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTable(); } });
-        document.getElementById('next-page').addEventListener('click', () => { if (currentPage < Math.ceil(filteredData.length / rowsPerPage)) { currentPage++; renderTable(); } });
-        document.getElementById('close-modal').addEventListener('click', () => {
-            document.getElementById('detail-modal').classList.add('hidden');
-            document.getElementById('detail-modal').style.display = 'none';
-        });
-        document.getElementById('close-modal-btn').addEventListener('click', () => {
-            document.getElementById('detail-modal').classList.add('hidden');
-            document.getElementById('detail-modal').style.display = 'none';
-        });
-        document.getElementById('update-status-btn').addEventListener('click', updateStatusFromModal);
+        document.getElementById('filterBtn').addEventListener('click', applyFilters);
+        document.getElementById('searchInput').addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFilters(); });
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
 
-        document.getElementById('table-body').addEventListener('click', (e) => {
-            if (e.target.classList.contains('detail-btn') || e.target.classList.contains('update-status-btn')) {
-                const id = e.target.getAttribute('data-id');
-                showDetailModal(id);
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) { currentPage--; renderTable(); }
+        });
+        document.getElementById('nextPage').addEventListener('click', () => {
+            const total = Math.ceil(filtered.length / rowsPerPage);
+            if (currentPage < total) { currentPage++; renderTable(); }
+        });
+
+        document.getElementById('tabelPelamar').addEventListener('click', (e) => {
+            if (e.target.classList.contains('detailBtn')) {
+                const id = parseInt(e.target.getAttribute('data-id'));
+                showDetail(id);
             }
         });
+        document.getElementById('closeDetailModal').addEventListener('click', closeModal);
+        document.getElementById('closeDetailFooterBtn').addEventListener('click', closeModal);
+        document.getElementById('updateStatusBtn').addEventListener('click', updateStatus);
+
+        window.onclick = (e) => { if (e.target === modal) closeModal(); };
 
         applyFilters();
     </script>
