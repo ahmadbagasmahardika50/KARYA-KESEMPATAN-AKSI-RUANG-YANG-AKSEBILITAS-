@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KARYA - Cari Lowongan</title>
+    <title>KARYA - Kelola Lowongan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
@@ -41,64 +41,128 @@
     <nav class="bg-white shadow-md py-4 px-6 md:px-12 flex justify-between items-center">
         <div class="text-2xl font-black text-primary tracking-tighter">KARYA</div>
         <div class="space-x-4">
-            <a href="penyandang-lowongan.html" class="text-primary font-bold border-b-2 border-secondary-container pb-1">Cari Lowongan</a>
-            <a href="penyandang-profil.html" class="text-primary font-medium hover:underline">Profil</a>
+            <a href="perusahaan-dashboard.html" class="text-primary font-medium hover:underline">Dashboard</a>
+            <a href="perusahaan-lowongan.html" class="text-primary font-bold border-b-2 border-secondary-container pb-1">Kelola Lowongan</a>
+            <a href="perusahaan-profil.html" class="text-primary font-medium hover:underline">Profil</a>
             <a href="login.html" onclick="localStorage.removeItem('user')" class="text-error">Logout</a>
         </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto px-6 py-12">
-        <h1 class="text-3xl font-black text-primary">Cari Lowongan Kerja</h1>
-        <p class="text-on-surface-variant mt-2">Temukan lowongan yang sesuai dengan kebutuhan dan kemampuan Anda.</p>
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-black text-primary">Kelola Lowongan</h1>
+                <p class="text-on-surface-variant mt-1">Tambah, edit, atau hapus lowongan pekerjaan perusahaan Anda.</p>
+            </div>
+            <button id="tambahBtn" class="bg-primary text-white px-5 py-3 rounded-xl font-bold hover:bg-primary/90 shadow-md flex items-center gap-2">
+                <span class="material-symbols-outlined">add</span> Tambah Lowongan
+            </button>
+        </div>
 
         <!-- Filter & Pencarian -->
-        <div class="flex flex-wrap gap-4 mt-8">
+        <div class="flex flex-wrap gap-4 mb-6">
             <div class="flex-1 min-w-[200px]">
-                <label class="block text-xs font-bold text-outline uppercase tracking-wider mb-1">Kata Kunci</label>
-                <input type="text" id="cari" placeholder="Judul atau nama perusahaan..." class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition">
+                <label class="block text-xs font-bold text-outline uppercase tracking-wider mb-1">Cari Judul</label>
+                <input type="text" id="searchInput" placeholder="Cari berdasarkan judul..." class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition">
             </div>
             <div class="w-48">
-                <label class="block text-xs font-bold text-outline uppercase tracking-wider mb-1">Jenis Disabilitas</label>
-                <select id="filterJenis" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
-                    <option value="">Semua</option>
-                    <option value="Fisik">Fisik</option>
-                    <option value="Netra">Netra</option>
-                    <option value="Rungu">Rungu</option>
-                    <option value="Mental">Mental</option>
+                <label class="block text-xs font-bold text-outline uppercase tracking-wider mb-1">Filter Status</label>
+                <select id="statusFilter" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
+                    <option value="all">Semua</option>
+                    <option value="Aktif">Aktif</option>
+                    <option value="Tutup">Tutup</option>
                 </select>
             </div>
             <div class="flex items-end">
-                <button id="btnCari" class="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-primary/90 shadow-md flex items-center gap-2">
-                    <span class="material-symbols-outlined text-lg">search</span> Cari
+                <button id="filterBtn" class="bg-primary text-white px-5 py-3 rounded-xl font-bold hover:bg-primary/90 shadow-md flex items-center gap-2">
+                    <span class="material-symbols-outlined">filter_list</span> Filter
                 </button>
             </div>
         </div>
 
-        <!-- Hasil Pencarian (Grid) -->
-        <div id="list" class="grid md:grid-cols-2 gap-6 mt-10"></div>
-
-        <!-- Pesan jika tidak ada lowongan -->
-        <div id="emptyMessage" class="hidden text-center py-12 text-outline">
-            <span class="material-symbols-outlined text-5xl">search_off</span>
-            <p class="mt-2">Tidak ada lowongan yang ditemukan.</p>
+        <!-- Tabel Lowongan -->
+        <div class="bg-white rounded-2xl shadow-md border border-surface-container-high overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-surface-container-high">
+                        <tr class="border-b border-surface-container">
+                            <th class="p-4 font-bold text-primary">Judul</th>
+                            <th class="p-4 font-bold text-primary">Lokasi</th>
+                            <th class="p-4 font-bold text-primary">Disabilitas</th>
+                            <th class="p-4 font-bold text-primary">Status</th>
+                            <th class="p-4 font-bold text-primary text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelLowongan">
+                        <!-- Data akan diisi JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination -->
+            <div class="flex justify-between items-center p-4 border-t border-surface-container-high bg-surface-container-low">
+                <button id="prevPage" class="px-4 py-2 bg-white rounded-xl border border-surface-container-high disabled:opacity-50">Sebelumnya</button>
+                <span id="pageInfo" class="text-sm text-outline">Halaman 1</span>
+                <button id="nextPage" class="px-4 py-2 bg-white rounded-xl border border-surface-container-high disabled:opacity-50">Selanjutnya</button>
+            </div>
         </div>
     </main>
 
-    <!-- Modal Detail Lowongan -->
-    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+    <!-- Modal Form Tambah/Edit Lowongan -->
+    <div id="modalForm" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-surface-container-high">
             <div class="flex justify-between items-center p-5 border-b border-surface-container-high">
-                <h3 class="text-xl font-bold text-primary flex items-center gap-2">
-                    <span class="material-symbols-outlined">work</span> Detail Lowongan
+                <h3 id="modalTitle" class="text-xl font-bold text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined">work</span> Form Lowongan
                 </h3>
                 <button id="closeModal" class="text-outline hover:text-primary text-2xl leading-none">&times;</button>
             </div>
-            <div id="modalContent" class="p-5 space-y-3 text-on-surface-variant"></div>
-            <div class="flex justify-end gap-3 p-5 border-t border-surface-container-high">
-                <button id="closeModalBtn" class="px-4 py-2 bg-surface-container-high rounded-xl hover:bg-surface-container transition">Tutup</button>
-                <button id="lamarBtn" class="px-4 py-2 bg-secondary-container text-on-secondary rounded-xl font-bold hover:bg-secondary-container/80 transition flex items-center gap-1">
-                    <span class="material-symbols-outlined text-base">send</span> Lamar Sekarang
-                </button>
+            <form id="lowonganForm" class="p-5 space-y-4">
+                <input type="hidden" id="editId">
+                <div>
+                    <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Judul Lowongan</label>
+                    <input type="text" id="judul" required class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Lokasi</label>
+                    <input type="text" id="lokasi" required class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Jenis Disabilitas</label>
+                    <select id="jenis" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
+                        <option value="Fisik">Fisik</option>
+                        <option value="Netra">Netra</option>
+                        <option value="Rungu">Rungu</option>
+                        <option value="Mental">Mental</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Deskripsi Lowongan</label>
+                    <textarea id="deskripsi" rows="3" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-outline uppercase tracking-wider mb-1">Status</label>
+                    <select id="status" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
+                        <option value="Aktif">Aktif</option>
+                        <option value="Tutup">Tutup</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" id="cancelModalBtn" class="px-4 py-2 bg-surface-container-high rounded-xl hover:bg-surface-container transition">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 shadow-md">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
+            <span class="material-symbols-outlined text-5xl text-error">warning</span>
+            <h3 class="text-xl font-bold text-error mt-2">Hapus Lowongan?</h3>
+            <p class="text-on-surface-variant mt-2">Data lowongan akan dihapus permanen. Yakin ingin melanjutkan?</p>
+            <div class="flex justify-center gap-3 mt-6">
+                <button id="cancelDeleteBtn" class="px-4 py-2 bg-surface-container-high rounded-xl">Batal</button>
+                <button id="confirmDeleteBtn" class="px-4 py-2 bg-error text-white rounded-xl font-bold">Hapus</button>
             </div>
         </div>
     </div>
@@ -108,51 +172,82 @@
     </footer>
 
     <script>
-        // Ambil data lowongan dari localStorage (yang dikelola perusahaan)
-        // Jika belum ada, gunakan data default
-        let lowongan = JSON.parse(localStorage.getItem('lowongan') || '[]');
-        if (lowongan.length === 0) {
-            // Data default jika belum ada lowongan
-            lowongan = [
-                { id: 1, judul: "Frontend Developer", perusahaan: "PT Teknologi Inklusif", lokasi: "Surakarta", jenis: "Fisik", deskripsi: "Membangun antarmuka web yang aksesibel. WFH 2 hari/minggu. Ramah kursi roda.", status: "Aktif" },
-                { id: 2, judul: "Admin Data Entry", perusahaan: "PT Maju Jaya", lokasi: "Jakarta", jenis: "Netra", deskripsi: "Menginput data dengan screen reader. Pelatihan disediakan. Lingkungan kerja inklusif.", status: "Aktif" },
-                { id: 3, judul: "Customer Service", perusahaan: "Bank Inklusif", lokasi: "Bandung", jenis: "Rungu", deskripsi: "Melayani chat dan email dengan aplikasi SIBI. Tersedia interpreter.", status: "Aktif" }
-            ];
-            localStorage.setItem('lowongan', JSON.stringify(lowongan));
+        // ========== AMBIL DATA USER YANG LOGIN ==========
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        if (!currentUser || currentUser.role !== 'perusahaan') {
+            alert('Akses ditolak. Halaman ini khusus untuk perusahaan.');
+            window.location.href = 'login.html';
+        }
+        const companyEmail = currentUser.email;
+        const companyName = currentUser.nama || "Perusahaan";
+
+        // Key untuk menyimpan lowongan perusahaan ini
+        const LOWONGAN_KEY = `lowongan_${companyEmail}`;
+
+        // Load data lowongan dari localStorage, atau buat default jika kosong
+        let lowongan = localStorage.getItem(LOWONGAN_KEY) ? JSON.parse(localStorage.getItem(LOWONGAN_KEY)) : [];
+        let nextId = lowongan.length ? Math.max(...lowongan.map(l => l.id)) + 1 : 1;
+
+        // State untuk filter dan pagination
+        let filteredData = [...lowongan];
+        let currentPage = 1;
+        const rowsPerPage = 5;
+
+        // Fungsi simpan ke localStorage (juga sinkronkan ke global lowongan untuk pencarian penyandang)
+        function saveToLocal() {
+            localStorage.setItem(LOWONGAN_KEY, JSON.stringify(lowongan));
+            // Update juga global lowongan (untuk ditampilkan di halaman pencarian penyandang)
+            // Ambil semua lowongan dari semua perusahaan? Kita simpan di key global 'lowongan' untuk akses penyandang.
+            let allLowongan = JSON.parse(localStorage.getItem('lowongan') || '[]');
+            // Hapus lowongan perusahaan ini dari global, lalu tambahkan yang baru
+            allLowongan = allLowongan.filter(l => l.perusahaan !== companyName);
+            lowongan.forEach(l => {
+                allLowongan.push({
+                    id: l.id,
+                    judul: l.judul,
+                    perusahaan: companyName,
+                    lokasi: l.lokasi,
+                    jenis: l.jenis,
+                    deskripsi: l.deskripsi,
+                    status: l.status
+                });
+            });
+            localStorage.setItem('lowongan', JSON.stringify(allLowongan));
         }
 
-        let currentLowonganId = null;
-
-        // Render daftar lowongan
-        function render(data) {
-            const container = document.getElementById('list');
-            const emptyMsg = document.getElementById('emptyMessage');
-            if (!data || data.length === 0) {
-                container.innerHTML = '';
-                emptyMsg.classList.remove('hidden');
+        // Render tabel
+        function renderTable() {
+            const start = (currentPage - 1) * rowsPerPage;
+            const pageData = filteredData.slice(start, start + rowsPerPage);
+            const tbody = document.getElementById('tabelLowongan');
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-outline">Belum ada lowongan. Klik "Tambah Lowongan" untuk menambahkan.</td></tr>';
+                document.getElementById('pageInfo').innerText = 'Halaman 0 dari 0';
+                document.getElementById('prevPage').disabled = true;
+                document.getElementById('nextPage').disabled = true;
                 return;
             }
-            emptyMsg.classList.add('hidden');
             let html = '';
-            data.forEach(l => {
-                // Hanya tampilkan lowongan dengan status 'Aktif'
-                if (l.status !== 'Aktif') return;
+            pageData.forEach(l => {
+                const statusClass = l.status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
                 html += `
-                    <div class="bg-white p-6 rounded-2xl shadow-md border border-surface-container-high hover:shadow-lg transition">
-                        <h3 class="text-xl font-bold text-primary">${escapeHtml(l.judul)}</h3>
-                        <p class="text-on-surface-variant mt-1">${escapeHtml(l.perusahaan)} • ${escapeHtml(l.lokasi)}</p>
-                        <div class="flex items-center gap-1 mt-2">
-                            <span class="material-symbols-outlined text-sm text-secondary">accessibility_new</span>
-                            <span class="text-sm text-outline">Disabilitas: ${escapeHtml(l.jenis)}</span>
-                        </div>
-                        <p class="mt-3 text-on-surface-variant line-clamp-2">${escapeHtml(l.deskripsi.substring(0, 120))}${l.deskripsi.length > 120 ? '...' : ''}</p>
-                        <button class="detailBtn mt-4 bg-secondary-container text-on-secondary px-4 py-2 rounded-xl font-bold hover:bg-secondary-container/80 transition w-full flex items-center justify-center gap-2" data-id="${l.id}">
-                            <span class="material-symbols-outlined text-base">visibility</span> Lihat Detail
-                        </button>
-                    </div>
+                    <tr class="border-b border-surface-container-high hover:bg-surface-container-low transition">
+                        <td class="p-4 font-medium">${escapeHtml(l.judul)}</td>
+                        <td class="p-4">${escapeHtml(l.lokasi)}</td>
+                        <td class="p-4">${escapeHtml(l.jenis)}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${l.status}</span></td>
+                        <td class="p-4 text-center">
+                            <button class="editBtn text-primary font-bold hover:underline mr-3" data-id="${l.id}">Edit</button>
+                            <button class="deleteBtn text-error font-bold hover:underline" data-id="${l.id}">Hapus</button>
+                        </td>
+                    </tr>
                 `;
             });
-            container.innerHTML = html;
+            tbody.innerHTML = html;
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            document.getElementById('pageInfo').innerText = `Halaman ${currentPage} dari ${totalPages || 1}`;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
         }
 
         function escapeHtml(str) {
@@ -165,72 +260,147 @@
             });
         }
 
-        // Show modal detail
-        function showDetail(id) {
-            const l = lowongan.find(l => l.id == id);
-            if (l) {
-                currentLowonganId = id;
-                const modalContent = document.getElementById('modalContent');
-                modalContent.innerHTML = `
-                    <div class="space-y-2">
-                        <p><strong class="text-primary">Judul:</strong> ${escapeHtml(l.judul)}</p>
-                        <p><strong class="text-primary">Perusahaan:</strong> ${escapeHtml(l.perusahaan)}</p>
-                        <p><strong class="text-primary">Lokasi:</strong> ${escapeHtml(l.lokasi)}</p>
-                        <p><strong class="text-primary">Disabilitas:</strong> ${escapeHtml(l.jenis)}</p>
-                        <p><strong class="text-primary">Deskripsi:</strong><br>${escapeHtml(l.deskripsi)}</p>
-                    </div>
-                `;
-                document.getElementById('modal').style.display = 'flex';
-            }
-        }
-
         // Filter dan pencarian
-        function applyFilter() {
-            const keyword = document.getElementById('cari').value.toLowerCase();
-            const jenis = document.getElementById('filterJenis').value;
-            let filtered = lowongan.filter(l => {
-                if (l.status !== 'Aktif') return false;
-                const matchKeyword = l.judul.toLowerCase().includes(keyword) || l.perusahaan.toLowerCase().includes(keyword);
-                const matchJenis = jenis === '' || l.jenis === jenis;
-                return matchKeyword && matchJenis;
+        function applyFilters() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const statusVal = document.getElementById('statusFilter').value;
+            filteredData = lowongan.filter(l => {
+                const matchKeyword = l.judul.toLowerCase().includes(keyword);
+                const matchStatus = statusVal === 'all' || l.status === statusVal;
+                return matchKeyword && matchStatus;
             });
-            render(filtered);
+            currentPage = 1;
+            renderTable();
         }
 
-        // Event listeners
-        document.getElementById('btnCari').addEventListener('click', applyFilter);
-        document.getElementById('cari').addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilter(); });
-        document.getElementById('filterJenis').addEventListener('change', applyFilter);
-        
-        document.getElementById('list').addEventListener('click', (e) => {
-            if (e.target.classList.contains('detailBtn') || e.target.closest('.detailBtn')) {
-                const btn = e.target.closest('.detailBtn');
-                const id = btn.getAttribute('data-id');
-                showDetail(id);
+        // Modal form
+        const modalForm = document.getElementById('modalForm');
+        const form = document.getElementById('lowonganForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const editId = document.getElementById('editId');
+        const judulInput = document.getElementById('judul');
+        const lokasiInput = document.getElementById('lokasi');
+        const jenisSelect = document.getElementById('jenis');
+        const deskripsiTextarea = document.getElementById('deskripsi');
+        const statusSelect = document.getElementById('status');
+
+        function openModal(edit = false, data = null) {
+            if (edit && data) {
+                modalTitle.innerHTML = '<span class="material-symbols-outlined">edit</span> Edit Lowongan';
+                editId.value = data.id;
+                judulInput.value = data.judul;
+                lokasiInput.value = data.lokasi;
+                jenisSelect.value = data.jenis;
+                deskripsiTextarea.value = data.deskripsi;
+                statusSelect.value = data.status;
+            } else {
+                modalTitle.innerHTML = '<span class="material-symbols-outlined">add</span> Tambah Lowongan';
+                editId.value = '';
+                form.reset();
+                statusSelect.value = 'Aktif';
+            }
+            modalForm.classList.remove('hidden');
+            modalForm.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modalForm.classList.add('hidden');
+            modalForm.style.display = 'none';
+        }
+
+        // Simpan (Create/Update)
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = editId.value;
+            const newData = {
+                judul: judulInput.value.trim(),
+                lokasi: lokasiInput.value.trim(),
+                jenis: jenisSelect.value,
+                deskripsi: deskripsiTextarea.value.trim(),
+                status: statusSelect.value
+            };
+            if (!newData.judul || !newData.lokasi || !newData.deskripsi) {
+                alert('Harap isi semua field yang diperlukan');
+                return;
+            }
+            if (id) {
+                // Edit
+                const index = lowongan.findIndex(l => l.id == id);
+                if (index !== -1) lowongan[index] = { id: parseInt(id), ...newData };
+            } else {
+                // Tambah
+                lowongan.push({ id: nextId++, ...newData });
+            }
+            saveToLocal();
+            applyFilters();
+            closeModal();
+        });
+
+        // Hapus lowongan dengan konfirmasi
+        let deleteId = null;
+        const deleteModal = document.getElementById('deleteModal');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        function openDeleteModal(id) {
+            deleteId = id;
+            deleteModal.classList.remove('hidden');
+            deleteModal.style.display = 'flex';
+        }
+        function closeDeleteModal() {
+            deleteModal.classList.add('hidden');
+            deleteModal.style.display = 'none';
+            deleteId = null;
+        }
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (deleteId) {
+                lowongan = lowongan.filter(l => l.id != deleteId);
+                saveToLocal();
+                applyFilters();
+                closeDeleteModal();
             }
         });
-        
-        function closeModalHandler() {
-            document.getElementById('modal').style.display = 'none';
-        }
-        document.getElementById('closeModal').addEventListener('click', closeModalHandler);
-        document.getElementById('closeModalBtn').addEventListener('click', closeModalHandler);
-        
-        document.getElementById('lamarBtn').addEventListener('click', () => {
-            if (currentLowonganId) {
-                window.location.href = `penyandang-daftar.html?id=${currentLowonganId}`;
+        cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+
+        // Event listener untuk tombol edit/hapus di tabel (delegasi)
+        document.getElementById('tabelLowongan').addEventListener('click', (e) => {
+            if (e.target.classList.contains('editBtn')) {
+                const id = parseInt(e.target.getAttribute('data-id'));
+                const low = lowongan.find(l => l.id === id);
+                if (low) openModal(true, low);
+            }
+            if (e.target.classList.contains('deleteBtn')) {
+                const id = parseInt(e.target.getAttribute('data-id'));
+                openDeleteModal(id);
             }
         });
 
-        // Inisialisasi halaman
-        render(lowongan.filter(l => l.status === 'Aktif'));
+        // Pagination
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) { currentPage--; renderTable(); }
+        });
+        document.getElementById('nextPage').addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            if (currentPage < totalPages) { currentPage++; renderTable(); }
+        });
 
-        // Proteksi akses: hanya role penyandang yang boleh
-        const currentUser = JSON.parse(localStorage.getItem('user'));
-        if (!currentUser || currentUser.role !== 'penyandang') {
-            alert('Akses ditolak. Halaman ini khusus untuk penyandang disabilitas.');
-            window.location.href = 'login.html';
-        }
+        // Filter event
+        document.getElementById('filterBtn').addEventListener('click', applyFilters);
+        document.getElementById('searchInput').addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFilters(); });
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+        // Tombol tambah
+        document.getElementById('tambahBtn').addEventListener('click', () => openModal(false));
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
+
+        // Tutup modal jika klik di luar (opsional)
+        window.onclick = (e) => {
+            if (e.target === modalForm) closeModal();
+            if (e.target === deleteModal) closeDeleteModal();
+        };
+
+        // Inisialisasi
+        applyFilters();
     </script>
 </body>
 </html>
