@@ -138,30 +138,16 @@
             window.location.href = 'login.html';
         }
 
-        // Nama perusahaan yang sedang login (digunakan untuk filter lamaran)
+        // Nama perusahaan yang sedang login
         const perusahaanNama = currentUser.nama || "Perusahaan";
 
-        // Ambil data lamaran dari localStorage
-        let allLamaran = JSON.parse(localStorage.getItem('lamaran') || '[]');
+        // Ambil data lamaran dari localStorage yang disimpan oleh penyandang (key 'daftarLamaran')
+        let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
 
-        // Filter lamaran yang ditujukan ke perusahaan ini
-        // Asumsikan setiap lamaran memiliki field `perusahaan` (nama perusahaan tujuan)
+        // Filter lamaran yang ditujukan ke perusahaan ini (field 'perusahaan' harus cocok)
         let pelamar = allLamaran.filter(l => l.perusahaan === perusahaanNama);
 
-        // Jika belum ada data lamaran, tambahkan contoh (opsional)
-        if (pelamar.length === 0) {
-            const contoh = [
-                { id: 101, nama: "Budi Santoso", email: "budi@example.com", disabilitas: "Fisik (daksa)", lowongan: "Frontend Developer", tglLamaran: "2026-06-01", status: "pending", pendidikan: "S1 Informatika", perusahaan: perusahaanNama },
-                { id: 102, nama: "Siti Aminah", email: "siti@example.com", disabilitas: "Netra", lowongan: "Admin Data Entry", tglLamaran: "2026-06-03", status: "review", pendidikan: "D3 Administrasi", perusahaan: perusahaanNama },
-                { id: 103, nama: "Agus Prasetyo", email: "agus@example.com", disabilitas: "Rungu", lowongan: "Customer Service", tglLamaran: "2026-06-05", status: "interview", pendidikan: "S1 Psikologi", perusahaan: perusahaanNama }
-            ];
-            pelamar = contoh;
-            // Simpan juga ke global lamaran jika belum ada
-            if (allLamaran.length === 0) {
-                localStorage.setItem('lamaran', JSON.stringify(contoh));
-            }
-        }
-
+        // Jika belum ada data, tampilkan pesan kosong
         let filtered = [...pelamar];
         let currentPage = 1;
         const rowsPerPage = 5;
@@ -208,9 +194,9 @@
             let html = '';
             pageData.forEach(p => {
                 html += `<tr class="border-b border-surface-container-high hover:bg-surface-container-low">
-                    <td class="p-4">${escapeHtml(p.nama)}</td>
-                    <td class="p-4">${escapeHtml(p.disabilitas || '-')}</td>
-                    <td class="p-4">${escapeHtml(p.lowongan)}</td>
+                    <td class="p-4">${escapeHtml(p.pelamarNama || p.nama)}</td>
+                    <td class="p-4">${escapeHtml(p.jenisDisabilitas || '-')}</td>
+                    <td class="p-4">${escapeHtml(p.judulLowongan)}</td>
                     <td class="p-4">${escapeHtml(p.tglLamaran || '-')}</td>
                     <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${getStatusClass(p.status)}">${statusToIndonesian(p.status)}</span></td>
                     <td class="p-4 text-center">
@@ -229,7 +215,9 @@
             const keyword = document.getElementById('searchInput').value.toLowerCase();
             const status = document.getElementById('statusFilter').value;
             filtered = pelamar.filter(p => {
-                const matchKeyword = p.nama.toLowerCase().includes(keyword) || (p.email && p.email.toLowerCase().includes(keyword));
+                const nama = (p.pelamarNama || p.nama || '').toLowerCase();
+                const email = (p.pelamarEmail || p.email || '').toLowerCase();
+                const matchKeyword = nama.includes(keyword) || email.includes(keyword);
                 const matchStatus = status === 'all' || p.status === status;
                 return matchKeyword && matchStatus;
             });
@@ -245,11 +233,14 @@
             currentDetailId = id;
             const content = document.getElementById('modalContent');
             content.innerHTML = `
-                <p><strong class="text-primary">Nama:</strong> ${escapeHtml(p.nama)}</p>
-                <p><strong class="text-primary">Email:</strong> ${escapeHtml(p.email || '-')}</p>
-                <p><strong class="text-primary">Disabilitas:</strong> ${escapeHtml(p.disabilitas || '-')}</p>
+                <p><strong class="text-primary">Nama:</strong> ${escapeHtml(p.pelamarNama || p.nama)}</p>
+                <p><strong class="text-primary">Email:</strong> ${escapeHtml(p.pelamarEmail || p.email || '-')}</p>
+                <p><strong class="text-primary">Telepon:</strong> ${escapeHtml(p.telepon || '-')}</p>
+                <p><strong class="text-primary">Disabilitas:</strong> ${escapeHtml(p.jenisDisabilitas || '-')}</p>
                 <p><strong class="text-primary">Pendidikan:</strong> ${escapeHtml(p.pendidikan || '-')}</p>
-                <p><strong class="text-primary">Lowongan:</strong> ${escapeHtml(p.lowongan)}</p>
+                <p><strong class="text-primary">Pengalaman:</strong> ${escapeHtml(p.pengalaman || '-')}</p>
+                <p><strong class="text-primary">Alamat:</strong> ${escapeHtml(p.alamat || '-')}</p>
+                <p><strong class="text-primary">Lowongan:</strong> ${escapeHtml(p.judulLowongan)}</p>
                 <p><strong class="text-primary">Tanggal Lamar:</strong> ${escapeHtml(p.tglLamaran || '-')}</p>
                 <p><strong class="text-primary">Status:</strong> 
                     <select id="statusSelect" class="mt-1 p-2 border border-outline-variant rounded-lg bg-white">
@@ -267,21 +258,19 @@
         function updateStatus() {
             if (!currentDetailId) return;
             const newStatus = document.getElementById('statusSelect').value;
-            // Update di array pelamar
             const idx = pelamar.findIndex(p => p.id == currentDetailId);
             if (idx !== -1) {
                 pelamar[idx].status = newStatus;
-                // Update juga di localStorage 'lamaran' global
-                let allLamaranGlobal = JSON.parse(localStorage.getItem('lamaran') || '[]');
+                // Update juga di localStorage 'daftarLamaran'
+                let allLamaranGlobal = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
                 const globalIdx = allLamaranGlobal.findIndex(l => l.id == currentDetailId);
                 if (globalIdx !== -1) {
                     allLamaranGlobal[globalIdx].status = newStatus;
-                    localStorage.setItem('lamaran', JSON.stringify(allLamaranGlobal));
-                } else {
-                    // Jika tidak ditemukan, simpan ulang semua
-                    localStorage.setItem('lamaran', JSON.stringify(pelamar));
+                    localStorage.setItem('daftarLamaran', JSON.stringify(allLamaranGlobal));
                 }
-                // Refresh filter dan tabel
+                // Refresh data pelamar (ambil ulang dari localStorage)
+                allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
+                pelamar = allLamaran.filter(l => l.perusahaan === perusahaanNama);
                 applyFilters();
             }
             modal.style.display = 'none';
