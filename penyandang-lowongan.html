@@ -2,159 +2,229 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Cari Lowongan - KARYA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KARYA - Pendaftaran Lowongan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "error": "#ba1a1a",
+                        "on-surface": "#1b1c1c",
+                        "on-primary": "#ffffff",
+                        "surface": "#fcf9f8",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#eae7e7",
+                        "outline": "#737780",
+                        "outline-variant": "#c3c6d1",
+                        "primary": "#001855",
+                        "secondary": "#7c5800",
+                        "secondary-container": "#feb700",
+                        "on-surface-variant": "#43474f",
+                    },
+                    borderRadius: { xl: "0.75rem", "2xl": "1rem" },
+                    fontFamily: { sans: ["Lexend"] },
+                },
+            },
+        }
+    </script>
     <style>
-        body { font-family: 'Lexend', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
+        :focus { outline: 2px solid #feb700; outline-offset: 2px; }
     </style>
 </head>
-<body class="bg-gray-50">
-    <nav class="bg-white shadow px-6 py-4 flex justify-between items-center">
-        <div class="text-xl font-black text-blue-900">KARYA</div>
-        <div class="space-x-4">
-            <a href="penyandang-profil.html" class="text-blue-600 hover:underline">Profil</a>
-            <a href="login.html" class="text-red-600 hover:underline">Logout</a>
-        </div>
-    </nav>
-    <div class="max-w-6xl mx-auto px-6 py-8">
-        <h1 class="text-2xl font-bold text-blue-900">Cari Lowongan Kerja</h1>
-        <div class="mt-4 flex flex-wrap gap-4">
-            <input type="text" id="cari" placeholder="Kata kunci (judul, perusahaan)" class="flex-1 p-3 rounded-xl bg-white border border-gray-300">
-            <select id="filterJenis" class="p-3 rounded-xl bg-white border border-gray-300">
-                <option value="">Semua Disabilitas</option>
-                <option>Fisik</option>
-                <option>Netra</option>
-                <option>Rungu</option>
-                <option>Mental</option>
-            </select>
-            <button id="btnCari" class="bg-blue-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-800">Cari</button>
-        </div>
-        <div id="list" class="grid md:grid-cols-2 gap-6 mt-8"></div>
-    </div>
-
-    <!-- Modal Detail Lowongan -->
-    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-2xl w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">Detail Lowongan</h3>
-            <div id="modalContent"></div>
-            <div class="flex justify-end gap-2 mt-4">
-                <button id="closeModal" class="bg-gray-300 px-4 py-2 rounded">Tutup</button>
-                <button id="lamarBtn" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Lamar Sekarang</button>
+<body class="bg-surface text-on-surface">
+    <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-sm">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-primary">KARYA</h1>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-on-surface-variant hidden md:inline">
+                    <span class="material-symbols-outlined text-sm mr-1">account_circle</span>
+                    <span id="user-name">Penyandang</span>
+                </span>
+                <button id="logoutBtn" class="bg-error/10 text-error px-3 py-1 rounded-full text-sm hover:bg-error/20 transition">
+                    <span class="material-symbols-outlined text-sm mr-1">logout</span> Logout
+                </button>
             </div>
         </div>
+    </nav>
+    <div class="h-16"></div>
+    <main class="container mx-auto px-4 py-8 max-w-3xl">
+        <!-- Ringkasan Lowongan -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-md p-6 mb-6 border border-outline-variant/30">
+            <h2 class="text-xl font-bold text-primary flex items-center gap-2">
+                <span class="material-symbols-outlined">description</span> Lamaran Pekerjaan
+            </h2>
+            <div id="ringkasanLowongan" class="mt-3 p-4 bg-surface-container-high rounded-lg">
+                <p class="text-outline">Memuat data lowongan...</p>
+            </div>
+        </div>
+
+        <!-- Form Pendaftaran -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-md p-6 border border-outline-variant/30">
+            <h2 class="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">edit_note</span> Isi Data Diri
+            </h2>
+            <form id="formPendaftaran">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">Nama Lengkap <span class="text-error">*</span></label>
+                        <input type="text" id="nama" required class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition"></div>
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">Email <span class="text-error">*</span></label>
+                        <input type="email" id="email" required class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></div>
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">Nomor Telepon</label>
+                        <input type="tel" id="telepon" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></div>
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">Jenis Disabilitas</label>
+                        <input type="text" id="jenisDisabilitas" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></div>
+                    <div class="md:col-span-2"><label class="block text-sm font-medium text-on-surface-variant mb-1">Alamat</label>
+                        <textarea id="alamat" rows="2" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></textarea></div>
+                    <div class="md:col-span-2"><label class="block text-sm font-medium text-on-surface-variant mb-1">Pendidikan Terakhir</label>
+                        <input type="text" id="pendidikan" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></div>
+                    <div class="md:col-span-2"><label class="block text-sm font-medium text-on-surface-variant mb-1">Pengalaman Kerja</label>
+                        <textarea id="pengalaman" rows="3" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary" placeholder="Ceritakan pengalaman kerja Anda (jika ada)"></textarea></div>
+                </div>
+
+                <h3 class="text-lg font-semibold text-primary mt-6 mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined">attach_file</span> Dokumen Pendukung
+                </h3>
+                <div class="space-y-4">
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">CV / Resume <span class="text-error">*</span></label>
+                        <input type="file" id="cv" accept=".pdf,.doc,.docx" required class="w-full text-sm file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-sm file:bg-primary-container file:text-on-primary-container hover:file:bg-primary-container/80">
+                        <p class="text-xs text-outline mt-1">Format PDF, DOC, DOCX (maks 2MB)</p></div>
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">Ijazah / Sertifikat (opsional)</label>
+                        <input type="file" id="ijazah" accept=".pdf,.jpg,.png" class="w-full text-sm file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-sm file:bg-primary-container file:text-on-primary-container hover:file:bg-primary-container/80"></div>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-8">
+                    <button type="button" id="batalBtn" class="px-5 py-2 border border-outline-variant rounded-xl text-on-surface-variant hover:bg-surface-container transition">Batal</button>
+                    <button type="submit" class="bg-primary text-on-primary px-6 py-2 rounded-xl font-bold hover:bg-primary/90 shadow-md flex items-center gap-2">
+                        <span class="material-symbols-outlined">send</span> Kirim Lamaran
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <div id="successModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-surface-container-lowest rounded-2xl p-6 max-w-sm text-center shadow-2xl">
+            <span class="material-symbols-outlined text-5xl text-green-600">check_circle</span>
+            <h3 class="text-xl font-bold text-primary mt-2">Pendaftaran Berhasil!</h3>
+            <p class="text-on-surface-variant mt-2">Lamaran Anda telah terkirim. Perusahaan akan menghubungi Anda melalui email.</p>
+            <button id="tutupModalBtn" class="mt-4 bg-primary text-on-primary px-5 py-2 rounded-xl font-bold">Kembali ke Pencarian</button>
+        </div>
     </div>
 
+    <footer class="mt-12 py-6 text-center text-sm text-outline border-t border-outline-variant/30">
+        © 2026 Sistem KARYA - Kesempatan Aksi Ruang Yang Aksesibel
+    </footer>
+
     <script>
-        function getLowongan() {
-            const stored = localStorage.getItem('daftarLowongan');
-            if (stored) {
-                try { return JSON.parse(stored); } catch(e) { return []; }
-            }
-            return [];
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        if (!currentUser || currentUser.role !== 'penyandang') {
+            alert('Silakan login sebagai penyandang disabilitas terlebih dahulu.');
+            window.location.href = 'login.html';
+        }
+        document.getElementById('user-name').innerText = currentUser.nama || currentUser.email.split('@')[0];
+
+        let lowonganDipilih = null;
+        const storedLowongan = localStorage.getItem('lowonganDipilih');
+        if (!storedLowongan) {
+            alert('Tidak ada lowongan yang dipilih. Silakan cari lowongan terlebih dahulu.');
+            window.location.href = 'penyandang-lowongan.html';
+        } else {
+            try { lowonganDipilih = JSON.parse(storedLowongan); } catch(e) { window.location.href = 'penyandang-lowongan.html'; }
         }
 
-        let semuaLowongan = [];
-        let currentLowonganId = null;
+        const ringkasanDiv = document.getElementById('ringkasanLowongan');
+        if (lowonganDipilih) {
+            ringkasanDiv.innerHTML = `
+                <p class="font-bold text-primary">${escapeHtml(lowonganDipilih.judul)}</p>
+                <p class="text-sm text-on-surface-variant mt-1">${escapeHtml(lowonganDipilih.perusahaan)} • ${escapeHtml(lowonganDipilih.lokasi)}</p>
+                <p class="text-sm text-on-surface-variant">Disabilitas: ${escapeHtml(lowonganDipilih.jenis_disabilitas)}</p>
+                <p class="text-sm text-on-surface-variant">Gaji: ${escapeHtml(lowonganDipilih.gaji || 'Tidak disebutkan')}</p>
+                <p class="text-sm text-outline mt-2">${escapeHtml(lowonganDipilih.deskripsi)}</p>
+            `;
+        }
 
-        function render(data) {
-            const container = document.getElementById('list');
-            if (!data.length) {
-                container.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">Belum ada lowongan tersedia. Silakan cek kembali nanti.</div>`;
-                return;
-            }
-            let html = '';
-            data.forEach(l => {
-                html += `<div class="bg-white p-5 rounded-2xl shadow-md border border-gray-200">
-                    <h3 class="text-xl font-bold text-blue-900">${escapeHtml(l.judul)}</h3>
-                    <p class="text-gray-600">${escapeHtml(l.perusahaan)} • ${escapeHtml(l.lokasi)}</p>
-                    <p class="text-gray-500 text-sm mt-1">Disabilitas: ${escapeHtml(l.jenis_disabilitas || l.jenis)}</p>
-                    <p class="mt-2 text-gray-700">${escapeHtml((l.deskripsi || '').substring(0, 100))}...</p>
-                    <button class="detailBtn mt-3 bg-amber-500 text-white px-4 py-2 rounded-xl hover:bg-amber-600" data-id="${l.id}">Lihat Detail</button>
-                </div>`;
+        function loadUserProfile() {
+            const defaultProfile = { nama: currentUser.nama || "", email: currentUser.email, telepon: "", jenis_disabilitas: "", alamat: "", pendidikan: "", pengalaman: "" };
+            const stored = localStorage.getItem('userProfil');
+            return stored ? { ...defaultProfile, ...JSON.parse(stored) } : defaultProfile;
+        }
+        function saveUserProfile(profile) { localStorage.setItem('userProfil', JSON.stringify(profile)); }
+
+        const profil = loadUserProfile();
+        document.getElementById('nama').value = profil.nama;
+        document.getElementById('email').value = profil.email;
+        document.getElementById('telepon').value = profil.telepon;
+        document.getElementById('jenisDisabilitas').value = profil.jenis_disabilitas;
+        document.getElementById('alamat').value = profil.alamat;
+        document.getElementById('pendidikan').value = profil.pendidikan;
+        document.getElementById('pengalaman').value = profil.pengalaman;
+
+        function updateProfileFromForm() {
+            saveUserProfile({
+                nama: document.getElementById('nama').value,
+                email: document.getElementById('email').value,
+                telepon: document.getElementById('telepon').value,
+                jenis_disabilitas: document.getElementById('jenisDisabilitas').value,
+                alamat: document.getElementById('alamat').value,
+                pendidikan: document.getElementById('pendidikan').value,
+                pengalaman: document.getElementById('pengalaman').value
             });
-            container.innerHTML = html;
         }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
+        function simpanLamaran() {
+            const cvFile = document.getElementById('cv').files[0];
+            if (!cvFile) { alert('CV / Resume wajib diunggah.'); return false; }
+            updateProfileFromForm();
+            const lamaran = {
+                id: Date.now(),
+                lowonganId: lowonganDipilih.id,
+                judulLowongan: lowonganDipilih.judul,
+                perusahaan: lowonganDipilih.perusahaan,
+                pelamarNama: document.getElementById('nama').value,
+                pelamarEmail: document.getElementById('email').value,
+                telepon: document.getElementById('telepon').value,
+                jenisDisabilitas: document.getElementById('jenisDisabilitas').value,
+                alamat: document.getElementById('alamat').value,
+                pendidikan: document.getElementById('pendidikan').value,
+                pengalaman: document.getElementById('pengalaman').value,
+                cvFileName: cvFile.name,
+                ijazahFileName: document.getElementById('ijazah').files[0]?.name || null,
+                tglLamaran: new Date().toISOString().split('T')[0],
+                status: 'pending'
+            };
+            let daftarLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
+            daftarLamaran.push(lamaran);
+            localStorage.setItem('daftarLamaran', JSON.stringify(daftarLamaran));
+            localStorage.removeItem('lowonganDipilih');
+            return true;
         }
 
-        function applyFilter() {
-            const keyword = document.getElementById('cari').value.toLowerCase();
-            const jenis = document.getElementById('filterJenis').value;
-            let filtered = semuaLowongan.filter(l => {
-                if (l.status !== 'Aktif') return false;
-                const matchKeyword = (l.judul && l.judul.toLowerCase().includes(keyword)) ||
-                                    (l.perusahaan && l.perusahaan.toLowerCase().includes(keyword));
-                const matchJenis = !jenis || (l.jenis_disabilitas === jenis || l.jenis === jenis);
-                return matchKeyword && matchJenis;
-            });
-            render(filtered);
-        }
-
-        function showDetail(id) {
-            const lowongan = semuaLowongan.find(l => l.id == id);
-            if (lowongan) {
-                currentLowonganId = id;
-                document.getElementById('modalContent').innerHTML = `
-                    <p><strong>Judul:</strong> ${escapeHtml(lowongan.judul)}</p>
-                    <p><strong>Perusahaan:</strong> ${escapeHtml(lowongan.perusahaan)}</p>
-                    <p><strong>Lokasi:</strong> ${escapeHtml(lowongan.lokasi)}</p>
-                    <p><strong>Disabilitas:</strong> ${escapeHtml(lowongan.jenis_disabilitas || lowongan.jenis)}</p>
-                    <p><strong>Deskripsi:</strong> ${escapeHtml(lowongan.deskripsi)}</p>
-                    <p><strong>Gaji:</strong> ${escapeHtml(lowongan.gaji || 'Tidak disebutkan')}</p>
-                    <p><strong>Tanggal Posting:</strong> ${lowongan.tgl_posting ? new Date(lowongan.tgl_posting).toLocaleDateString('id-ID') : '-'}</p>
-                `;
-                document.getElementById('modal').style.display = 'flex';
-            }
-        }
-
-        function lamar() {
-            if (currentLowonganId) {
-                const lowonganDipilih = semuaLowongan.find(l => l.id == currentLowonganId);
-                if (lowonganDipilih) {
-                    localStorage.setItem('lowonganDipilih', JSON.stringify(lowonganDipilih));
-                    window.location.href = 'penyandang-daftar.html';
-                } else {
-                    alert('Data lowongan tidak ditemukan');
-                }
-            }
-        }
-
-        function loadData() {
-            semuaLowongan = getLowongan();
-            applyFilter();
-        }
-
-        document.getElementById('btnCari').addEventListener('click', applyFilter);
-        document.getElementById('cari').addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilter(); });
-        document.getElementById('filterJenis').addEventListener('change', applyFilter);
-        document.getElementById('list').addEventListener('click', (e) => {
-            if (e.target.classList.contains('detailBtn')) {
-                const id = parseInt(e.target.getAttribute('data-id'));
-                showDetail(id);
+        document.getElementById('formPendaftaran').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (simpanLamaran()) {
+                document.getElementById('successModal').classList.remove('hidden');
+                document.getElementById('successModal').style.display = 'flex';
             }
         });
-        document.getElementById('closeModal').addEventListener('click', () => {
-            document.getElementById('modal').style.display = 'none';
+        document.getElementById('batalBtn').addEventListener('click', () => {
+            if (confirm('Batalkan pendaftaran? Perubahan tidak akan disimpan.')) window.location.href = 'penyandang-lowongan.html';
         });
-        document.getElementById('lamarBtn').addEventListener('click', lamar);
-        window.addEventListener('click', (e) => {
-            if (e.target === document.getElementById('modal')) {
-                document.getElementById('modal').style.display = 'none';
-            }
+        document.getElementById('tutupModalBtn').addEventListener('click', () => {
+            window.location.href = 'penyandang-lowongan.html';
         });
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'daftarLowongan') loadData();
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('user');
+            localStorage.removeItem('lowonganDipilih');
+            window.location.href = 'login.html';
         });
-        loadData();
+
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
     </script>
 </body>
 </html>
