@@ -11,7 +11,7 @@
         body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
         :focus { outline: 2px solid #feb700; outline-offset: 2px; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 50; }
-        .modal-content { background: white; border-radius: 1rem; width: 90%; max-width: 480px; padding: 1.5rem; }
+        .modal-content { background: white; border-radius: 1rem; width: 90%; max-width: 520px; padding: 1.5rem; }
     </style>
     <script>
         tailwind.config = {
@@ -57,7 +57,7 @@
     <main class="max-w-7xl mx-auto px-6 py-10">
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-primary">Data Pelamar</h1>
-            <p class="text-on-surface-variant mt-1">Lihat dan update status lamaran yang masuk untuk lowongan perusahaan Anda.</p>
+            <p class="text-on-surface-variant mt-1">Lihat dan kelola lamaran yang masuk untuk lowongan perusahaan Anda.</p>
         </div>
 
         <!-- Filter & Pencarian -->
@@ -91,7 +91,7 @@
                     <thead class="bg-surface-container-high">
                         <tr class="border-b border-surface-container">
                             <th class="p-4 font-bold text-primary">Nama</th>
-                            <th class="p-4 font-bold text-primary">Jenis Disabilitas</th>
+                            <th class="p-4 font-bold text-primary">Disabilitas</th>
                             <th class="p-4 font-bold text-primary">Lowongan</th>
                             <th class="p-4 font-bold text-primary">Tanggal Lamar</th>
                             <th class="p-4 font-bold text-primary">Status</th>
@@ -109,7 +109,7 @@
         </div>
     </main>
 
-    <!-- Modal Detail & Update Status -->
+    <!-- Modal Detail & Update Status + Catatan Internal + Hapus -->
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
@@ -118,10 +118,38 @@
                 </h3>
                 <button id="closeDetailModal" class="text-outline hover:text-primary text-2xl">&times;</button>
             </div>
-            <div id="modalContent" class="space-y-3 text-on-surface-variant"></div>
+            <div id="modalContent" class="space-y-3 text-on-surface-variant max-h-96 overflow-y-auto"></div>
             <div class="flex justify-end gap-3 mt-6">
-                <button id="updateStatusBtn" class="px-4 py-2 bg-secondary-container text-on-secondary rounded-xl font-bold">Update Status</button>
-                <button id="closeDetailFooterBtn" class="px-4 py-2 bg-surface-container-high rounded-xl">Tutup</button>
+                <button id="deleteLamaranBtn" class="px-4 py-2 bg-error text-white rounded-xl font-bold hover:bg-red-700 transition">Hapus Lamaran</button>
+                <button id="updateStatusBtn" class="px-4 py-2 bg-secondary-container text-on-secondary rounded-xl font-bold hover:bg-secondary-container/80 transition">Update Status</button>
+                <button id="closeDetailFooterBtn" class="px-4 py-2 bg-surface-container-high rounded-xl hover:bg-surface-container transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="confirmDeleteModal" class="modal">
+        <div class="modal-content text-center">
+            <span class="material-symbols-outlined text-5xl text-error">warning</span>
+            <h3 class="text-xl font-bold text-error mt-2">Hapus Lamaran?</h3>
+            <p class="text-on-surface-variant mt-2">Lamaran ini akan dihapus permanen. Tindakan tidak dapat dibatalkan.</p>
+            <div class="flex justify-center gap-3 mt-6">
+                <button id="cancelConfirmBtn" class="px-4 py-2 bg-surface-container-high rounded-xl">Batal</button>
+                <button id="confirmDeleteYesBtn" class="px-4 py-2 bg-error text-white rounded-xl font-bold">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Catatan Internal -->
+    <div id="editCatatanModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">edit_note</span> Edit Catatan Internal
+            </h3>
+            <textarea id="catatanInternalText" rows="4" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary" placeholder="Tulis catatan internal untuk pelamar ini..."></textarea>
+            <div class="flex justify-end gap-3 mt-4">
+                <button id="cancelEditCatatanBtn" class="px-4 py-2 bg-surface-container-high rounded-xl">Batal</button>
+                <button id="saveEditCatatanBtn" class="px-4 py-2 bg-primary text-white rounded-xl font-bold">Simpan Catatan</button>
             </div>
         </div>
     </div>
@@ -137,52 +165,35 @@
             alert('Akses ditolak. Halaman ini khusus untuk perusahaan.');
             window.location.href = 'login.html';
         }
-
-        // Nama perusahaan yang sedang login
         const perusahaanNama = currentUser.nama || "Perusahaan";
 
-        // Ambil data lamaran dari localStorage yang disimpan oleh penyandang (key 'daftarLamaran')
+        // Data lamaran dari localStorage (key 'daftarLamaran' dari penyandang)
         let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
-
-        // Filter lamaran yang ditujukan ke perusahaan ini (field 'perusahaan' harus cocok)
         let pelamar = allLamaran.filter(l => l.perusahaan === perusahaanNama);
-
-        // Jika belum ada data, tampilkan pesan kosong
         let filtered = [...pelamar];
         let currentPage = 1;
         const rowsPerPage = 5;
-        let currentDetailId = null;
+        let currentLamaran = null;
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
-        }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
 
         function getStatusClass(status) {
-            switch(status) {
-                case 'pending': return 'bg-yellow-100 text-yellow-800';
-                case 'review': return 'bg-blue-100 text-blue-800';
-                case 'interview': return 'bg-purple-100 text-purple-800';
-                case 'accepted': return 'bg-green-100 text-green-800';
-                case 'rejected': return 'bg-red-100 text-red-800';
-                default: return 'bg-gray-100';
-            }
+            const map = { pending:'bg-yellow-100 text-yellow-800', review:'bg-blue-100 text-blue-800', interview:'bg-purple-100 text-purple-800', accepted:'bg-green-100 text-green-800', rejected:'bg-red-100 text-red-800' };
+            return map[status] || 'bg-gray-100';
         }
-
         function statusToIndonesian(status) {
-            const map = {
-                'pending': 'Pending',
-                'review': 'Dalam Review',
-                'interview': 'Undang Interview',
-                'accepted': 'Diterima',
-                'rejected': 'Ditolak'
-            };
+            const map = { pending:'Pending', review:'Dalam Review', interview:'Undang Interview', accepted:'Diterima', rejected:'Ditolak' };
             return map[status] || status;
         }
 
+        function saveToLocalStorage() {
+            localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
+            pelamar = allLamaran.filter(l => l.perusahaan === perusahaanNama);
+        }
+
         function renderTable() {
-            const start = (currentPage - 1) * rowsPerPage;
-            const pageData = filtered.slice(start, start + rowsPerPage);
+            const start = (currentPage-1)*rowsPerPage;
+            const pageData = filtered.slice(start, start+rowsPerPage);
             const tbody = document.getElementById('tabelPelamar');
             if (pageData.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-outline">Tidak ada data pelamar</td></tr>';
@@ -205,10 +216,10 @@
                 </tr>`;
             });
             tbody.innerHTML = html;
-            const totalPages = Math.ceil(filtered.length / rowsPerPage);
-            document.getElementById('pageInfo').innerText = `Halaman ${currentPage} dari ${totalPages || 1}`;
-            document.getElementById('prevPage').disabled = currentPage === 1;
-            document.getElementById('nextPage').disabled = currentPage === totalPages;
+            const totalPages = Math.ceil(filtered.length/rowsPerPage);
+            document.getElementById('pageInfo').innerText = `Halaman ${currentPage} dari ${totalPages||1}`;
+            document.getElementById('prevPage').disabled = currentPage===1;
+            document.getElementById('nextPage').disabled = currentPage===totalPages;
         }
 
         function applyFilters() {
@@ -225,85 +236,143 @@
             renderTable();
         }
 
-        // Modal detail & update
-        const modal = document.getElementById('detailModal');
+        // Modal Detail
+        const detailModal = document.getElementById('detailModal');
+        const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+        const editCatatanModal = document.getElementById('editCatatanModal');
+
         function showDetail(id) {
-            const p = pelamar.find(p => p.id == id);
-            if (!p) return;
-            currentDetailId = id;
+            currentLamaran = pelamar.find(p => p.id == id);
+            if (!currentLamaran) return;
+            const catatan = currentLamaran.catatanInternal || '';
             const content = document.getElementById('modalContent');
             content.innerHTML = `
-                <p><strong class="text-primary">Nama:</strong> ${escapeHtml(p.pelamarNama || p.nama)}</p>
-                <p><strong class="text-primary">Email:</strong> ${escapeHtml(p.pelamarEmail || p.email || '-')}</p>
-                <p><strong class="text-primary">Telepon:</strong> ${escapeHtml(p.telepon || '-')}</p>
-                <p><strong class="text-primary">Disabilitas:</strong> ${escapeHtml(p.jenisDisabilitas || '-')}</p>
-                <p><strong class="text-primary">Pendidikan:</strong> ${escapeHtml(p.pendidikan || '-')}</p>
-                <p><strong class="text-primary">Pengalaman:</strong> ${escapeHtml(p.pengalaman || '-')}</p>
-                <p><strong class="text-primary">Alamat:</strong> ${escapeHtml(p.alamat || '-')}</p>
-                <p><strong class="text-primary">Lowongan:</strong> ${escapeHtml(p.judulLowongan)}</p>
-                <p><strong class="text-primary">Tanggal Lamar:</strong> ${escapeHtml(p.tglLamaran || '-')}</p>
+                <p><strong class="text-primary">Nama:</strong> ${escapeHtml(currentLamaran.pelamarNama || currentLamaran.nama)}</p>
+                <p><strong class="text-primary">Email:</strong> ${escapeHtml(currentLamaran.pelamarEmail || currentLamaran.email || '-')}</p>
+                <p><strong class="text-primary">Telepon:</strong> ${escapeHtml(currentLamaran.telepon || '-')}</p>
+                <p><strong class="text-primary">Disabilitas:</strong> ${escapeHtml(currentLamaran.jenisDisabilitas || '-')}</p>
+                <p><strong class="text-primary">Pendidikan:</strong> ${escapeHtml(currentLamaran.pendidikan || '-')}</p>
+                <p><strong class="text-primary">Pengalaman:</strong> ${escapeHtml(currentLamaran.pengalaman || '-')}</p>
+                <p><strong class="text-primary">Alamat:</strong> ${escapeHtml(currentLamaran.alamat || '-')}</p>
+                <p><strong class="text-primary">Lowongan:</strong> ${escapeHtml(currentLamaran.judulLowongan)}</p>
+                <p><strong class="text-primary">Tanggal Lamar:</strong> ${escapeHtml(currentLamaran.tglLamaran || '-')}</p>
                 <p><strong class="text-primary">Status:</strong> 
                     <select id="statusSelect" class="mt-1 p-2 border border-outline-variant rounded-lg bg-white">
-                        <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>Pending</option>
-                        <option value="review" ${p.status === 'review' ? 'selected' : ''}>Dalam Review</option>
-                        <option value="interview" ${p.status === 'interview' ? 'selected' : ''}>Undang Interview</option>
-                        <option value="accepted" ${p.status === 'accepted' ? 'selected' : ''}>Diterima</option>
-                        <option value="rejected" ${p.status === 'rejected' ? 'selected' : ''}>Ditolak</option>
+                        <option value="pending" ${currentLamaran.status === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="review" ${currentLamaran.status === 'review' ? 'selected' : ''}>Dalam Review</option>
+                        <option value="interview" ${currentLamaran.status === 'interview' ? 'selected' : ''}>Undang Interview</option>
+                        <option value="accepted" ${currentLamaran.status === 'accepted' ? 'selected' : ''}>Diterima</option>
+                        <option value="rejected" ${currentLamaran.status === 'rejected' ? 'selected' : ''}>Ditolak</option>
                     </select>
                 </p>
+                <div class="border-t border-surface-container-high pt-3 mt-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <strong class="text-primary">Catatan Internal:</strong>
+                        <button id="editCatatanBtn" class="text-xs text-secondary font-bold hover:underline flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">edit</span> Edit
+                        </button>
+                    </div>
+                    <div id="catatanDisplay" class="p-3 bg-surface-container-low rounded-lg text-sm ${catatan ? '' : 'text-outline italic'}">
+                        ${catatan ? escapeHtml(catatan) : 'Belum ada catatan. Klik "Edit" untuk menambahkan catatan internal.'}
+                    </div>
+                </div>
             `;
-            modal.style.display = 'flex';
+            detailModal.style.display = 'flex';
+            // Attach event listener untuk tombol edit catatan setelah konten dimuat
+            document.getElementById('editCatatanBtn').onclick = () => {
+                openEditCatatan(currentLamaran.id, currentLamaran.catatanInternal || '');
+            };
         }
 
         function updateStatus() {
-            if (!currentDetailId) return;
+            if (!currentLamaran) return;
             const newStatus = document.getElementById('statusSelect').value;
-            const idx = pelamar.findIndex(p => p.id == currentDetailId);
-            if (idx !== -1) {
-                pelamar[idx].status = newStatus;
-                // Update juga di localStorage 'daftarLamaran'
-                let allLamaranGlobal = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
-                const globalIdx = allLamaranGlobal.findIndex(l => l.id == currentDetailId);
-                if (globalIdx !== -1) {
-                    allLamaranGlobal[globalIdx].status = newStatus;
-                    localStorage.setItem('daftarLamaran', JSON.stringify(allLamaranGlobal));
+            if (currentLamaran.status === newStatus) {
+                detailModal.style.display = 'none';
+                return;
+            }
+            currentLamaran.status = newStatus;
+            const idxGlobal = allLamaran.findIndex(l => l.id === currentLamaran.id);
+            if (idxGlobal !== -1) allLamaran[idxGlobal].status = newStatus;
+            saveToLocalStorage();
+            applyFilters();
+            detailModal.style.display = 'none';
+        }
+
+        // Catatan Internal (Create & Update)
+        function openEditCatatan(id, currentText) {
+            editCatatanModal.style.display = 'flex';
+            document.getElementById('catatanInternalText').value = currentText;
+            editCatatanModal.setAttribute('data-lamaran-id', id);
+        }
+
+        function saveCatatanInternal() {
+            const id = editCatatanModal.getAttribute('data-lamaran-id');
+            const newCatatan = document.getElementById('catatanInternalText').value.trim();
+            const lamaran = allLamaran.find(l => l.id == id);
+            if (lamaran) {
+                lamaran.catatanInternal = newCatatan;
+                saveToLocalStorage();
+                if (currentLamaran && currentLamaran.id == id) {
+                    currentLamaran.catatanInternal = newCatatan;
+                    showDetail(id); // refresh modal detail
                 }
-                // Refresh data pelamar (ambil ulang dari localStorage)
-                allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
-                pelamar = allLamaran.filter(l => l.perusahaan === perusahaanNama);
                 applyFilters();
             }
-            modal.style.display = 'none';
+            editCatatanModal.style.display = 'none';
         }
 
-        function closeModal() {
-            modal.style.display = 'none';
+        // Hapus Lamaran (Delete)
+        let lamaranIdToDelete = null;
+        function openDeleteConfirmation(id) {
+            lamaranIdToDelete = id;
+            confirmDeleteModal.style.display = 'flex';
+        }
+        function deleteLamaran() {
+            if (lamaranIdToDelete) {
+                allLamaran = allLamaran.filter(l => l.id != lamaranIdToDelete);
+                saveToLocalStorage();
+                applyFilters();
+                if (currentLamaran && currentLamaran.id == lamaranIdToDelete) {
+                    detailModal.style.display = 'none';
+                    currentLamaran = null;
+                }
+                lamaranIdToDelete = null;
+                confirmDeleteModal.style.display = 'none';
+            }
         }
 
-        // Event listeners
+        // Event Listeners
         document.getElementById('filterBtn').addEventListener('click', applyFilters);
-        document.getElementById('searchInput').addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFilters(); });
+        document.getElementById('searchInput').addEventListener('keyup', e => { if (e.key === 'Enter') applyFilters(); });
         document.getElementById('statusFilter').addEventListener('change', applyFilters);
+        document.getElementById('prevPage').addEventListener('click', () => { if (currentPage>1) { currentPage--; renderTable(); } });
+        document.getElementById('nextPage').addEventListener('click', () => { const total = Math.ceil(filtered.length/rowsPerPage); if (currentPage<total) { currentPage++; renderTable(); } });
 
-        document.getElementById('prevPage').addEventListener('click', () => {
-            if (currentPage > 1) { currentPage--; renderTable(); }
-        });
-        document.getElementById('nextPage').addEventListener('click', () => {
-            const total = Math.ceil(filtered.length / rowsPerPage);
-            if (currentPage < total) { currentPage++; renderTable(); }
-        });
-
-        document.getElementById('tabelPelamar').addEventListener('click', (e) => {
+        document.getElementById('tabelPelamar').addEventListener('click', e => {
             if (e.target.classList.contains('detailBtn')) {
                 const id = parseInt(e.target.getAttribute('data-id'));
                 showDetail(id);
             }
         });
-        document.getElementById('closeDetailModal').addEventListener('click', closeModal);
-        document.getElementById('closeDetailFooterBtn').addEventListener('click', closeModal);
+        document.getElementById('closeDetailModal').addEventListener('click', () => detailModal.style.display = 'none');
+        document.getElementById('closeDetailFooterBtn').addEventListener('click', () => detailModal.style.display = 'none');
         document.getElementById('updateStatusBtn').addEventListener('click', updateStatus);
+        document.getElementById('deleteLamaranBtn').addEventListener('click', () => {
+            if (currentLamaran) openDeleteConfirmation(currentLamaran.id);
+        });
 
-        window.onclick = (e) => { if (e.target === modal) closeModal(); };
+        document.getElementById('confirmDeleteYesBtn').addEventListener('click', deleteLamaran);
+        document.getElementById('cancelConfirmBtn').addEventListener('click', () => confirmDeleteModal.style.display = 'none');
+
+        document.getElementById('saveEditCatatanBtn').addEventListener('click', saveCatatanInternal);
+        document.getElementById('cancelEditCatatanBtn').addEventListener('click', () => editCatatanModal.style.display = 'none');
+
+        window.onclick = e => {
+            if (e.target === detailModal) detailModal.style.display = 'none';
+            if (e.target === confirmDeleteModal) confirmDeleteModal.style.display = 'none';
+            if (e.target === editCatatanModal) editCatatanModal.style.display = 'none';
+        };
 
         applyFilters();
     </script>
