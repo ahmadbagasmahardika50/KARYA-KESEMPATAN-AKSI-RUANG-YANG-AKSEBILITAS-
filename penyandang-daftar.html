@@ -269,7 +269,7 @@
 </main>
 
 <script>
-    // Fungsi untuk mengambil data profil dari localStorage, jika kosong gunakan default
+    // ==================== PROFIL (localStorage) ====================
     function loadUserProfile() {
         const defaultProfile = {
             nama: "Alya Yumna Atiqoh Wibowo",
@@ -282,22 +282,26 @@
         };
         const stored = localStorage.getItem('userProfil');
         if (stored) {
-            try {
-                return JSON.parse(stored);
-            } catch(e) { return defaultProfile; }
+            try { return JSON.parse(stored); }
+            catch(e) { return defaultProfile; }
         }
         return defaultProfile;
     }
 
-    // Fungsi menyimpan profil ke localStorage
     function saveUserProfile(profile) {
         localStorage.setItem('userProfil', JSON.stringify(profile));
     }
 
+    // ==================== LOWONGAN (dari localStorage) ====================
+    // Lowongan yang dipilih harus sudah disimpan dengan key 'lowonganDipilih'
+    // oleh halaman pencarian (penyandang-cari-lowongan.html) saat user klik "Lihat Detail".
+    // Format object lowongan yang diharapkan:
+    // {
+    //   id, judul, perusahaan, lokasi, jenis_disabilitas, deskripsi, tgl_posting, gaji
+    // }
     let lowonganDipilih = null;
     let currentStep = 1;
 
-    // Langsung ambil lowongan dari localStorage (tanpa array besar)
     function loadLowonganDetail() {
         const stored = localStorage.getItem('lowonganDipilih');
         if (!stored) {
@@ -307,10 +311,9 @@
         }
         try {
             lowonganDipilih = JSON.parse(stored);
-            // Tampilkan detail lowongan
             const container = document.getElementById('detail-lowongan');
             container.innerHTML = `
-                <h3 class="text-lg font-bold text-on-surface mb-2">${lowonganDipilih.judul || lowonganDipilih.title || 'Lowongan'}</h3>
+                <h3 class="text-lg font-bold text-on-surface mb-2">${lowonganDipilih.judul || 'Lowongan'}</h3>
                 <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">business</span>${lowonganDipilih.perusahaan || '-'}</p>
                 <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">location_on</span>${lowonganDipilih.lokasi || '-'}</p>
                 <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">accessible</span>Disabilitas: ${lowonganDipilih.jenis_disabilitas || '-'}</p>
@@ -327,6 +330,7 @@
         }
     }
 
+    // ==================== STEP UI ====================
     function updateStepUI(step) {
         for (let i = 1; i <= 4; i++) {
             const indicator = document.getElementById(`step${i}-indicator`);
@@ -351,7 +355,7 @@
         }
     }
 
-    // Isi data diri dari profil yang tersimpan di localStorage
+    // ==================== DATA DIRI ====================
     function fillDataDiriFromProfile() {
         const profile = loadUserProfile();
         document.getElementById('nama').value = profile.nama || '';
@@ -363,7 +367,6 @@
         document.getElementById('pengalaman').value = profile.pengalaman || '';
     }
 
-    // Simpan data diri ke localStorage (update profil)
     function saveDataDiriToProfile() {
         const updatedProfile = {
             nama: document.getElementById('nama').value,
@@ -377,7 +380,7 @@
         saveUserProfile(updatedProfile);
     }
 
-    // Tampilkan konfirmasi data
+    // ==================== KONFIRMASI ====================
     function showKonfirmasi() {
         const dataDiri = {
             nama: document.getElementById('nama').value,
@@ -395,7 +398,7 @@
         };
         const konfirmasiDiv = document.getElementById('konfirmasi-data');
         konfirmasiDiv.innerHTML = `
-            <h3 class="font-semibold text-on-surface mb-2">Lowongan: ${lowonganDipilih.judul || lowonganDipilih.title}</h3>
+            <h3 class="font-semibold text-on-surface mb-2">Lowongan: ${lowonganDipilih.judul}</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                 <div><span class="font-medium">Nama:</span> ${dataDiri.nama}</div>
                 <div><span class="font-medium">Email:</span> ${dataDiri.email}</div>
@@ -411,7 +414,7 @@
         `;
     }
 
-    // Event listeners
+    // ==================== EVENT LISTENERS ====================
     document.getElementById('next-step1').addEventListener('click', () => {
         currentStep = 2;
         updateStepUI(currentStep);
@@ -423,14 +426,14 @@
     });
     document.getElementById('form-data-diri').addEventListener('submit', (e) => {
         e.preventDefault();
-        saveDataDiriToProfile();  // simpan perubahan ke localStorage
+        saveDataDiriToProfile();
         currentStep = 3;
         updateStepUI(currentStep);
     });
     document.getElementById('prev-step3').addEventListener('click', () => {
         currentStep = 2;
         updateStepUI(currentStep);
-        fillDataDiriFromProfile(); // refresh data jika ada perubahan dari luar
+        fillDataDiriFromProfile();
     });
     document.getElementById('form-dokumen').addEventListener('submit', (e) => {
         e.preventDefault();
@@ -448,14 +451,13 @@
         updateStepUI(currentStep);
     });
     document.getElementById('submit-daftar').addEventListener('click', () => {
-        // Simulasi penyimpanan lamaran (bisa ditambahkan ke localStorage jika perlu)
         document.getElementById('success-modal').classList.remove('hidden');
     });
     document.getElementById('close-modal').addEventListener('click', () => {
         window.location.href = 'penyandang-cari-lowongan.html';
     });
 
-    // Inisialisasi
+    // ==================== INIT ====================
     if (loadLowonganDetail()) {
         updateStepUI(1);
     }
