@@ -100,7 +100,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-on-surface-variant mb-1">Jenis Disabilitas</label>
-                        <input type="text" id="jenisDisabilitas" readonly class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent text-outline">
+                        <input type="text" id="jenisDisabilitas" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-on-surface-variant mb-1">Alamat</label>
@@ -229,7 +229,7 @@
         document.getElementById('pendidikan').value = profil.pendidikan || '';
         document.getElementById('pengalaman').value = profil.pengalaman || '';
 
-        // Simpan perubahan data diri ke profil saat form diisi (opsional)
+        // Simpan perubahan data diri ke profil
         function updateProfileFromForm() {
             const updated = {
                 nama: document.getElementById('nama').value,
@@ -252,7 +252,7 @@
                 return false;
             }
 
-            // Update profil terlebih dahulu
+            // Update profil
             updateProfileFromForm();
 
             // Buat object lamaran
@@ -279,7 +279,7 @@
             daftarLamaran.push(lamaran);
             localStorage.setItem('daftarLamaran', JSON.stringify(daftarLamaran));
 
-            // Hapus lowonganDipilih agar tidak kembali ke halaman ini setelah sukses
+            // Hapus lowonganDipilih
             localStorage.removeItem('lowonganDipilih');
             return true;
         }
@@ -299,6 +299,7 @@
             }
         });
 
+        // Tombol pada modal: redirect ke halaman pencarian
         document.getElementById('tutupModalBtn').addEventListener('click', () => {
             window.location.href = 'penyandang-cari-lowongan.html';
         });
