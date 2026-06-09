@@ -27,16 +27,25 @@
             outline: 2px solid #feb700;
             outline-offset: 2px;
         }
+        /* status badge */
+        .status-pending { background-color: #fef3c7; color: #b45309; }
+        .status-diproses { background-color: #dbeafe; color: #1e40af; }
+        .status-interview { background-color: #d1fae5; color: #065f46; }
+        .status-diterima { background-color: #a7f3d0; color: #064e3b; }
+        .status-ditolak { background-color: #fee2e2; color: #991b1b; }
     </style>
 </head>
 <body class="bg-gray-100">
 
     <!-- Navbar Horizontal -->
     <nav class="bg-white shadow-md px-6 py-3 flex justify-between items-center border-b border-gray-200">
-        <!-- Diubah: KARYA Pelamar -->
         <div class="text-2xl font-black text-[#001855] tracking-tight">KARYA Pelamar</div>
         <div class="flex items-center space-x-6">
             <span class="text-sm text-gray-700 hidden md:inline">Halo, <span id="user-name-display" class="font-semibold">Penyandang</span></span>
+            <!-- Tambahan: Lamaran Saya -->
+            <a href="#" id="riwayatBtn" class="text-[#001855] hover:text-[#feb700] transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">history</span> Lamaran Saya
+            </a>
             <a href="penyandang-profil.html" class="text-[#001855] hover:text-[#feb700] transition flex items-center gap-1">
                 <span class="material-symbols-outlined text-base">account_circle</span> Profil
             </a>
@@ -46,9 +55,8 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Main Content (sama seperti sebelumnya) -->
     <main class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Header -->
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-[#001855]">Cari Lowongan Kerja</h1>
             <p class="text-gray-500">Temukan lowongan yang ramah disabilitas</p>
@@ -88,16 +96,14 @@
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="tabel-lowongan" class="bg-white divide-y divide-gray-200">
-                        <!-- Data JS -->
-                    </tbody>
+                    <tbody id="tabel-lowongan" class="bg-white divide-y divide-gray-200"></tbody>
                 </table>
             </div>
             <div id="empty-row" class="text-center py-12 text-gray-500 hidden">Belum ada lowongan tersedia.</div>
         </div>
     </main>
 
-    <!-- Modal Detail Lowongan -->
+    <!-- Modal Detail Lowongan (sama) -->
     <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-2xl w-full max-w-md shadow-xl p-6">
             <h3 class="text-xl font-bold text-[#001855] mb-4">Detail Lowongan</h3>
@@ -105,6 +111,34 @@
             <div class="flex justify-end gap-2 mt-4">
                 <button id="closeModal" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">Tutup</button>
                 <button id="lamarBtn" class="btn-accent px-4 py-2 rounded-lg font-medium transition shadow-sm">Lamar Sekarang</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Riwayat Lamaran (baru) -->
+    <div id="riwayatModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] overflow-y-auto shadow-xl">
+            <div class="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
+                <h3 class="text-xl font-bold text-[#001855] flex items-center gap-2">
+                    <span class="material-symbols-outlined">receipt_long</span> Riwayat Lamaran Saya
+                </h3>
+                <button id="closeRiwayatModal" class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <div class="p-4">
+                <div id="daftarLamaranContainer">
+                    <!-- Daftar lamaran akan diisi JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Lamaran (untuk melihat detail lamaran yang sudah dikirim) -->
+    <div id="detailLamaranModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-xl p-6">
+            <h3 class="text-xl font-bold text-[#001855] mb-4">Detail Lamaran</h3>
+            <div id="detailLamaranContent"></div>
+            <div class="flex justify-end mt-4">
+                <button id="closeDetailLamaranModal" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">Tutup</button>
             </div>
         </div>
     </div>
@@ -117,33 +151,142 @@
         } else {
             document.getElementById('user-name-display').innerText = 'Pengunjung';
         }
+        const userEmail = currentUser ? currentUser.email : '';
 
         // ==================== AMBIL DATA LOWONGAN ====================
         function getLowongan() {
             const stored = localStorage.getItem('daftarLowongan');
-            if (stored) {
-                try {
-                    return JSON.parse(stored);
-                } catch(e) {
-                    console.error("Gagal parse lowongan", e);
-                    return [];
-                }
-            }
-            return [];
+            return stored ? JSON.parse(stored) : [];
         }
 
         let semuaLowongan = [];
         let currentLowonganId = null;
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
+        // ==================== LAMARAN ====================
+        function getLamaranUser() {
+            const allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
+            return allLamaran.filter(l => l.pelamarEmail === userEmail);
+        }
+
+        function simpanLamaranUser(lamaran) {
+            let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
+            allLamaran = allLamaran.filter(l => !(l.pelamarEmail === userEmail && l.id === lamaran.id));
+            allLamaran.push(lamaran);
+            localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
+        }
+
+        function hapusLamaran(id) {
+            let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
+            allLamaran = allLamaran.filter(l => !(l.pelamarEmail === userEmail && l.id === id));
+            localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
+            renderRiwayatLamaran(); // refresh modal jika terbuka
+        }
+
+        function updateStatusLamaran(id, statusBaru) {
+            let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
+            const index = allLamaran.findIndex(l => l.pelamarEmail === userEmail && l.id === id);
+            if (index !== -1) {
+                allLamaran[index].status = statusBaru;
+                localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
+                renderRiwayatLamaran();
+            }
+        }
+
+        // Render daftar lamaran di modal
+        function renderRiwayatLamaran() {
+            const lamaranUser = getLamaranUser();
+            const container = document.getElementById('daftarLamaranContainer');
+            if (lamaranUser.length === 0) {
+                container.innerHTML = '<div class="text-center py-8 text-gray-500">Belum ada lamaran yang dikirim.</div>';
+                return;
+            }
+            let html = `<div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr><th class="px-4 py-2 text-left text-xs font-medium">Judul Lowongan</th><th class="px-4 py-2 text-left text-xs font-medium">Perusahaan</th><th class="px-4 py-2 text-left text-xs font-medium">Tanggal Lamar</th><th class="px-4 py-2 text-left text-xs font-medium">Status</th><th class="px-4 py-2 text-center text-xs font-medium">Aksi</th></tr>
+                </thead><tbody>`;
+            lamaranUser.forEach(l => {
+                let statusClass = '';
+                if (l.status === 'pending') statusClass = 'status-pending';
+                else if (l.status === 'diproses') statusClass = 'status-diproses';
+                else if (l.status === 'interview') statusClass = 'status-interview';
+                else if (l.status === 'diterima') statusClass = 'status-diterima';
+                else if (l.status === 'ditolak') statusClass = 'status-ditolak';
+                else statusClass = 'bg-gray-100';
+                const statusText = {
+                    'pending': 'Menunggu',
+                    'diproses': 'Sedang Diproses',
+                    'interview': 'Undangan Interview',
+                    'diterima': 'Diterima',
+                    'ditolak': 'Ditolak'
+                }[l.status] || l.status;
+                html += `<tr class="border-b">
+                    <td class="px-4 py-2">${escapeHtml(l.judulLowongan)}</td>
+                    <td class="px-4 py-2">${escapeHtml(l.perusahaan)}</td>
+                    <td class="px-4 py-2">${l.tglLamaran}</td>
+                    <td class="px-4 py-2"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${statusText}</span></td>
+                    <td class="px-4 py-2 text-center">
+                        <button class="detailLamaranBtn text-blue-600 hover:text-blue-800 mr-2" data-id="${l.id}">Detail</button>
+                        <button class="hapusLamaranBtn text-red-600 hover:text-red-800" data-id="${l.id}">Hapus</button>
+                        <select class="updateStatusSelect ml-2 text-sm border rounded p-1" data-id="${l.id}">
+                            <option value="pending" ${l.status === 'pending' ? 'selected' : ''}>Menunggu</option>
+                            <option value="diproses" ${l.status === 'diproses' ? 'selected' : ''}>Diproses</option>
+                            <option value="interview" ${l.status === 'interview' ? 'selected' : ''}>Interview</option>
+                            <option value="diterima" ${l.status === 'diterima' ? 'selected' : ''}>Diterima</option>
+                            <option value="ditolak" ${l.status === 'ditolak' ? 'selected' : ''}>Ditolak</option>
+                        </select>
+                    </td>
+                </tr>`;
+            });
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
+
+            // Attach event listeners untuk tombol detail, hapus, dan update status
+            document.querySelectorAll('.detailLamaranBtn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(btn.getAttribute('data-id'));
+                    const lamaran = lamaranUser.find(l => l.id === id);
+                    if (lamaran) showDetailLamaran(lamaran);
+                });
+            });
+            document.querySelectorAll('.hapusLamaranBtn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(btn.getAttribute('data-id'));
+                    if (confirm('Hapus lamaran ini? Tindakan tidak dapat dibatalkan.')) {
+                        hapusLamaran(id);
+                    }
+                });
+            });
+            document.querySelectorAll('.updateStatusSelect').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    const id = parseInt(select.getAttribute('data-id'));
+                    const newStatus = select.value;
+                    updateStatusLamaran(id, newStatus);
+                });
             });
         }
+
+        function showDetailLamaran(lamaran) {
+            const content = document.getElementById('detailLamaranContent');
+            content.innerHTML = `
+                <p><strong>Lowongan:</strong> ${escapeHtml(lamaran.judulLowongan)}</p>
+                <p><strong>Perusahaan:</strong> ${escapeHtml(lamaran.perusahaan)}</p>
+                <p><strong>Tanggal Lamar:</strong> ${lamaran.tglLamaran}</p>
+                <p><strong>Status:</strong> ${lamaran.status}</p>
+                <p><strong>Nama Pelamar:</strong> ${escapeHtml(lamaran.pelamarNama)}</p>
+                <p><strong>Email:</strong> ${escapeHtml(lamaran.pelamarEmail)}</p>
+                <p><strong>Telepon:</strong> ${escapeHtml(lamaran.telepon)}</p>
+                <p><strong>Jenis Disabilitas:</strong> ${escapeHtml(lamaran.jenisDisabilitas)}</p>
+                <p><strong>Alamat:</strong> ${escapeHtml(lamaran.alamat)}</p>
+                <p><strong>Pendidikan:</strong> ${escapeHtml(lamaran.pendidikan)}</p>
+                <p><strong>Pengalaman:</strong> ${escapeHtml(lamaran.pengalaman)}</p>
+                <p><strong>CV:</strong> ${escapeHtml(lamaran.cvFileName)}</p>
+                ${lamaran.ijazahFileName ? `<p><strong>Ijazah:</strong> ${escapeHtml(lamaran.ijazahFileName)}</p>` : ''}
+            `;
+            document.getElementById('detailLamaranModal').style.display = 'flex';
+        }
+
+        // ==================== FUNGSI LOWONGAN (sama) ====================
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
         function renderTable(data) {
             const tbody = document.getElementById('tabel-lowongan');
@@ -158,15 +301,13 @@
             data.forEach(l => {
                 const statusBadge = l.status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
                 html += `<tr class="table-row-hover">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${escapeHtml(l.judul)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${escapeHtml(l.perusahaan)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${escapeHtml(l.lokasi)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${escapeHtml(l.jenis_disabilitas || l.jenis)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusBadge}">${escapeHtml(l.status || 'Aktif')}</span></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <button class="detailBtn text-[#001855] hover:text-[#feb700] font-medium" data-id="${l.id}">Detail</button>
-                    </td>
-                <tr>`;
+                    <td class="px-6 py-4">${escapeHtml(l.judul)}</td>
+                    <td class="px-6 py-4">${escapeHtml(l.perusahaan)}</td>
+                    <td class="px-6 py-4">${escapeHtml(l.lokasi)}</td>
+                    <td class="px-6 py-4">${escapeHtml(l.jenis_disabilitas || l.jenis)}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusBadge}">${escapeHtml(l.status || 'Aktif')}</span></td>
+                    <td class="px-6 py-4 text-center"><button class="detailBtn text-[#001855] hover:text-[#feb700] font-medium" data-id="${l.id}">Detail</button></td>
+                </tr>`;
             });
             tbody.innerHTML = html;
         }
@@ -176,8 +317,7 @@
             const jenis = document.getElementById('filterJenis').value;
             let filtered = semuaLowongan.filter(l => {
                 if (l.status && l.status !== 'Aktif') return false;
-                const matchKeyword = (l.judul && l.judul.toLowerCase().includes(keyword)) ||
-                                    (l.perusahaan && l.perusahaan.toLowerCase().includes(keyword));
+                const matchKeyword = (l.judul && l.judul.toLowerCase().includes(keyword)) || (l.perusahaan && l.perusahaan.toLowerCase().includes(keyword));
                 const matchJenis = !jenis || (l.jenis_disabilitas === jenis || l.jenis === jenis);
                 return matchKeyword && matchJenis;
             });
@@ -188,15 +328,7 @@
             const lowongan = semuaLowongan.find(l => l.id == id);
             if (lowongan) {
                 currentLowonganId = id;
-                document.getElementById('modalContent').innerHTML = `
-                    <p><strong>Judul:</strong> ${escapeHtml(lowongan.judul)}</p>
-                    <p><strong>Perusahaan:</strong> ${escapeHtml(lowongan.perusahaan)}</p>
-                    <p><strong>Lokasi:</strong> ${escapeHtml(lowongan.lokasi)}</p>
-                    <p><strong>Disabilitas:</strong> ${escapeHtml(lowongan.jenis_disabilitas || lowongan.jenis)}</p>
-                    <p><strong>Deskripsi:</strong> ${escapeHtml(lowongan.deskripsi)}</p>
-                    <p><strong>Gaji:</strong> ${escapeHtml(lowongan.gaji || 'Tidak disebutkan')}</p>
-                    <p><strong>Tanggal Posting:</strong> ${lowongan.tgl_posting ? new Date(lowongan.tgl_posting).toLocaleDateString('id-ID') : '-'}</p>
-                `;
+                document.getElementById('modalContent').innerHTML = `<p><strong>Judul:</strong> ${escapeHtml(lowongan.judul)}</p><p><strong>Perusahaan:</strong> ${escapeHtml(lowongan.perusahaan)}</p><p><strong>Lokasi:</strong> ${escapeHtml(lowongan.lokasi)}</p><p><strong>Disabilitas:</strong> ${escapeHtml(lowongan.jenis_disabilitas)}</p><p><strong>Deskripsi:</strong> ${escapeHtml(lowongan.deskripsi)}</p><p><strong>Gaji:</strong> ${escapeHtml(lowongan.gaji || 'Tidak disebutkan')}</p><p><strong>Tanggal Posting:</strong> ${lowongan.tgl_posting ? new Date(lowongan.tgl_posting).toLocaleDateString('id-ID') : '-'}</p>`;
                 document.getElementById('modal').style.display = 'flex';
             }
         }
@@ -207,9 +339,7 @@
                 if (lowonganDipilih) {
                     localStorage.setItem('lowonganDipilih', JSON.stringify(lowonganDipilih));
                     window.location.href = 'penyandang-daftar.html';
-                } else {
-                    alert('Data lowongan tidak ditemukan');
-                }
+                } else alert('Data lowongan tidak ditemukan');
             }
         }
 
@@ -218,27 +348,32 @@
         document.getElementById('cari').addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilter(); });
         document.getElementById('filterJenis').addEventListener('change', applyFilter);
         document.getElementById('tabel-lowongan').addEventListener('click', (e) => {
-            if (e.target.classList.contains('detailBtn')) {
-                const id = parseInt(e.target.getAttribute('data-id'));
-                showDetail(id);
-            }
+            if (e.target.classList.contains('detailBtn')) showDetail(parseInt(e.target.getAttribute('data-id')));
         });
-        document.getElementById('closeModal').addEventListener('click', () => {
-            document.getElementById('modal').style.display = 'none';
-        });
+        document.getElementById('closeModal').addEventListener('click', () => document.getElementById('modal').style.display = 'none');
         document.getElementById('lamarBtn').addEventListener('click', lamar);
-        window.addEventListener('click', (e) => {
-            const modal = document.getElementById('modal');
-            if (e.target === modal) modal.style.display = 'none';
-        });
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'daftarLowongan') loadData();
-        });
+        window.addEventListener('click', (e) => { if (e.target === document.getElementById('modal')) document.getElementById('modal').style.display = 'none'; });
+        window.addEventListener('storage', (e) => { if (e.key === 'daftarLowongan') loadData(); });
 
-        function loadData() {
-            semuaLowongan = getLowongan();
-            applyFilter();
-        }
+        // Riwayat modal
+        const riwayatModal = document.getElementById('riwayatModal');
+        const riwayatBtn = document.getElementById('riwayatBtn');
+        const closeRiwayatModal = document.getElementById('closeRiwayatModal');
+        riwayatBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            renderRiwayatLamaran();
+            riwayatModal.style.display = 'flex';
+        });
+        closeRiwayatModal.addEventListener('click', () => riwayatModal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target === riwayatModal) riwayatModal.style.display = 'none'; });
+
+        // Modal detail lamaran
+        const detailLamaranModal = document.getElementById('detailLamaranModal');
+        const closeDetailLamaranModal = document.getElementById('closeDetailLamaranModal');
+        closeDetailLamaranModal.addEventListener('click', () => detailLamaranModal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target === detailLamaranModal) detailLamaranModal.style.display = 'none'; });
+
+        function loadData() { semuaLowongan = getLowongan(); applyFilter(); }
         loadData();
     </script>
 </body>
