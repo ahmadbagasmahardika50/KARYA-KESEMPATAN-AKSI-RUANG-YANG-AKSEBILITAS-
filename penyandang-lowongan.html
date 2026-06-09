@@ -9,24 +9,11 @@
     <style>
         body { font-family: 'Lexend', sans-serif; background: #f3f4f6; }
         .table-row-hover:hover { background-color: #f9fafb; }
-        .btn-primary {
-            background-color: #001855;
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: #002a84;
-        }
-        .btn-accent {
-            background-color: #feb700;
-            color: #001855;
-        }
-        .btn-accent:hover {
-            background-color: #e5a500;
-        }
-        .focus-ring:focus {
-            outline: 2px solid #feb700;
-            outline-offset: 2px;
-        }
+        .btn-primary { background-color: #001855; color: white; }
+        .btn-primary:hover { background-color: #002a84; }
+        .btn-accent { background-color: #feb700; color: #001855; }
+        .btn-accent:hover { background-color: #e5a500; }
+        .focus-ring:focus { outline: 2px solid #feb700; outline-offset: 2px; }
         .status-pending { background-color: #fef3c7; color: #b45309; }
         .status-diproses { background-color: #dbeafe; color: #1e40af; }
         .status-interview { background-color: #d1fae5; color: #065f46; }
@@ -56,7 +43,7 @@
     <main class="max-w-7xl mx-auto px-4 py-8">
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-[#001855]">Cari Lowongan Kerja</h1>
-            <p class="text-gray-500">Temukan lowongan yang ramah disabilitas</p>
+            <p class="text-gray-500">Temukan lowongan yang ramah disabilitas dengan berbagai fasilitas pendukung</p>
         </div>
 
         <!-- Filter Section -->
@@ -66,11 +53,23 @@
                     <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Kata Kunci</label>
                     <input type="text" id="cari" placeholder="Judul atau perusahaan" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#feb700] focus:border-[#feb700] outline-none">
                 </div>
-                <div class="w-48">
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Disabilitas</label>
-                    <select id="filterJenis" class="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#feb700] focus:border-[#feb700] outline-none">
-                        <option value="">Semua</option>
-                        <option>Fisik</option><option>Netra</option><option>Rungu</option><option>Mental</option>
+                <div class="w-64">
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Aksesibilitas</label>
+                    <select id="filterAkses" class="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#feb700] focus:border-[#feb700] outline-none">
+                        <option value="">Semua Aksesibilitas</option>
+                        <optgroup label="Jenis Disabilitas">
+                            <option value="Fisik">Disabilitas Fisik</option>
+                            <option value="Netra">Disabilitas Netra</option>
+                            <option value="Rungu">Disabilitas Rungu</option>
+                            <option value="Mental">Disabilitas Mental</option>
+                        </optgroup>
+                        <optgroup label="Fasilitas Pendukung">
+                            <option value="Kursi Roda">Kursi Roda / Akses Ramah Pengguna Kursi Roda</option>
+                            <option value="Penerjemah Bahasa Isyarat">Penerjemah Bahasa Isyarat (SIBI/BISINDO)</option>
+                            <option value="Screen Reader Friendly">Screen Reader Friendly (JAWS/NVDA)</option>
+                            <option value="Parkir Aksesibel">Parkir Aksesibel</option>
+                            <option value="Ruang Kerja Ramah Disabilitas">Ruang Kerja Ramah Disabilitas</option>
+                        </optgroup>
                     </select>
                 </div>
                 <button id="btnCari" class="btn-primary px-5 py-2 rounded-lg transition flex items-center gap-1 shadow-sm">
@@ -79,7 +78,7 @@
             </div>
         </div>
 
-        <!-- Tabel Lowongan -->
+        <!-- Tabel Lowongan (sama) -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -119,27 +118,25 @@
         </div>
     </div>
 
-    <!-- Modal Edit Lamaran (untuk update data diri dan CV) -->
+    <!-- Modal Edit Lamaran -->
     <div id="editLamaranModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-xl">
             <div class="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
-                <h3 class="text-xl font-bold text-[#001855] flex items-center gap-2">
-                    <span class="material-symbols-outlined">edit</span> Edit Lamaran
-                </h3>
+                <h3 class="text-xl font-bold text-[#001855] flex items-center gap-2"><span class="material-symbols-outlined">edit</span> Edit Lamaran</h3>
                 <button id="closeEditModal" class="text-gray-500 hover:text-gray-700">&times;</button>
             </div>
             <div class="p-6">
                 <form id="formEditLamaran">
                     <input type="hidden" id="editLamaranId">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label><input type="text" id="editNama" class="w-full p-2 border rounded-lg"></div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Email</label><input type="email" id="editEmail" class="w-full p-2 border rounded-lg bg-gray-100" readonly></div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Telepon</label><input type="tel" id="editTelepon" class="w-full p-2 border rounded-lg"></div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Jenis Disabilitas</label><input type="text" id="editJenisDisabilitas" class="w-full p-2 border rounded-lg"></div>
-                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label><textarea id="editAlamat" rows="2" class="w-full p-2 border rounded-lg"></textarea></div>
-                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Pendidikan Terakhir</label><input type="text" id="editPendidikan" class="w-full p-2 border rounded-lg"></div>
-                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Pengalaman Kerja</label><textarea id="editPengalaman" rows="3" class="w-full p-2 border rounded-lg"></textarea></div>
-                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">CV / Resume (biarkan kosong jika tidak mengganti)</label><input type="file" id="editCv" accept=".pdf,.doc,.docx" class="w-full text-sm"></div>
+                        <div><label>Nama Lengkap</label><input type="text" id="editNama" class="w-full p-2 border rounded-lg"></div>
+                        <div><label>Email</label><input type="email" id="editEmail" class="w-full p-2 border rounded-lg bg-gray-100" readonly></div>
+                        <div><label>Telepon</label><input type="tel" id="editTelepon" class="w-full p-2 border rounded-lg"></div>
+                        <div><label>Jenis Disabilitas</label><input type="text" id="editJenisDisabilitas" class="w-full p-2 border rounded-lg"></div>
+                        <div class="md:col-span-2"><label>Alamat</label><textarea id="editAlamat" rows="2" class="w-full p-2 border rounded-lg"></textarea></div>
+                        <div class="md:col-span-2"><label>Pendidikan Terakhir</label><input type="text" id="editPendidikan" class="w-full p-2 border rounded-lg"></div>
+                        <div class="md:col-span-2"><label>Pengalaman Kerja</label><textarea id="editPengalaman" rows="3" class="w-full p-2 border rounded-lg"></textarea></div>
+                        <div class="md:col-span-2"><label>CV / Resume (biarkan kosong jika tidak mengganti)</label><input type="file" id="editCv" accept=".pdf,.doc,.docx" class="w-full text-sm"></div>
                     </div>
                     <div class="flex justify-end gap-3 mt-6">
                         <button type="button" id="cancelEditBtn" class="px-4 py-2 border rounded-lg">Batal</button>
@@ -150,7 +147,7 @@
         </div>
     </div>
 
-    <!-- Modal Detail Lamaran (tampilan informasi lengkap) -->
+    <!-- Modal Detail Lamaran -->
     <div id="detailLamaranModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-2xl w-full max-w-md shadow-xl p-6">
             <h3 class="text-xl font-bold text-[#001855] mb-4">Detail Lamaran</h3>
@@ -171,7 +168,7 @@
         }
         const userEmail = currentUser ? currentUser.email : '';
 
-        // ==================== FUNGSI LOWONGAN ====================
+        // ==================== AMBIL DATA LOWONGAN ====================
         function getLowongan() {
             const stored = localStorage.getItem('daftarLowongan');
             return stored ? JSON.parse(stored) : [];
@@ -183,14 +180,6 @@
         function getLamaranUser() {
             const allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
             return allLamaran.filter(l => l.pelamarEmail === userEmail);
-        }
-
-        function simpanLamaranKeStorage(lamaran) {
-            let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
-            const index = allLamaran.findIndex(l => l.id === lamaran.id);
-            if (index !== -1) allLamaran[index] = lamaran;
-            else allLamaran.push(lamaran);
-            localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
         }
 
         function hapusLamaran(id) {
@@ -206,7 +195,6 @@
             if (index !== -1) {
                 allLamaran[index] = { ...allLamaran[index], ...updatedData };
                 localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
-                // Juga update profil user agar sinkron
                 const userProfil = JSON.parse(localStorage.getItem('userProfil') || '{}');
                 const newProfil = {
                     ...userProfil,
@@ -233,13 +221,9 @@
                 <thead class="bg-gray-50"><tr><th class="px-4 py-2 text-left text-xs font-medium">Judul Lowongan</th><th class="px-4 py-2 text-left text-xs font-medium">Perusahaan</th><th class="px-4 py-2 text-left text-xs font-medium">Tanggal Lamar</th><th class="px-4 py-2 text-left text-xs font-medium">Status</th><th class="px-4 py-2 text-center text-xs font-medium">Aksi</th></tr></thead><tbody>`;
             lamaranUser.forEach(l => {
                 let statusClass = '';
-                if (l.status === 'pending') statusClass = 'status-pending';
-                else if (l.status === 'diproses') statusClass = 'status-diproses';
-                else if (l.status === 'interview') statusClass = 'status-interview';
-                else if (l.status === 'diterima') statusClass = 'status-diterima';
-                else if (l.status === 'ditolak') statusClass = 'status-ditolak';
-                else statusClass = 'bg-gray-100';
-                const statusText = { 'pending':'Menunggu','diproses':'Sedang Diproses','interview':'Undangan Interview','diterima':'Diterima','ditolak':'Ditolak' }[l.status] || l.status;
+                const statusMap = { pending:'status-pending', diproses:'status-diproses', interview:'status-interview', diterima:'status-diterima', ditolak:'status-ditolak' };
+                statusClass = statusMap[l.status] || 'bg-gray-100';
+                const statusText = { pending:'Menunggu', diproses:'Sedang Diproses', interview:'Undangan Interview', diterima:'Diterima', ditolak:'Ditolak' }[l.status] || l.status;
                 html += `<tr class="border-b">
                     <td class="px-4 py-2">${escapeHtml(l.judulLowongan)}</td>
                     <td class="px-4 py-2">${escapeHtml(l.perusahaan)}</td>
@@ -254,16 +238,13 @@
             });
             html += `</tbody></table></div>`;
             container.innerHTML = html;
+            attachLamaranEvents();
+        }
 
-            document.querySelectorAll('.detailLamaranBtn').forEach(btn => {
-                btn.addEventListener('click', () => showDetailLamaran(parseInt(btn.dataset.id)));
-            });
-            document.querySelectorAll('.editLamaranBtn').forEach(btn => {
-                btn.addEventListener('click', () => showEditLamaran(parseInt(btn.dataset.id)));
-            });
-            document.querySelectorAll('.hapusLamaranBtn').forEach(btn => {
-                btn.addEventListener('click', () => { if(confirm('Hapus lamaran ini?')) hapusLamaran(parseInt(btn.dataset.id)); });
-            });
+        function attachLamaranEvents() {
+            document.querySelectorAll('.detailLamaranBtn').forEach(btn => btn.addEventListener('click', () => showDetailLamaran(parseInt(btn.dataset.id))));
+            document.querySelectorAll('.editLamaranBtn').forEach(btn => btn.addEventListener('click', () => showEditLamaran(parseInt(btn.dataset.id))));
+            document.querySelectorAll('.hapusLamaranBtn').forEach(btn => btn.addEventListener('click', () => { if(confirm('Hapus lamaran ini?')) hapusLamaran(parseInt(btn.dataset.id)); }));
         }
 
         function showDetailLamaran(id) {
@@ -305,7 +286,6 @@
             }
         }
 
-        // Proses update lamaran
         document.getElementById('formEditLamaran').addEventListener('submit', (e) => {
             e.preventDefault();
             const id = parseInt(document.getElementById('editLamaranId').value);
@@ -324,7 +304,7 @@
             alert('Lamaran berhasil diperbarui');
         });
 
-        // ==================== FUNGSI LOWONGAN (sama seperti sebelumnya) ====================
+        // ==================== FUNGSI LOWONGAN DENGAN FILTER AKSESIBILITAS ====================
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
         function renderTable(data) {
@@ -340,14 +320,27 @@
             tbody.innerHTML = html;
         }
 
+        // Fungsi filter baru yang memeriksa aksesibilitas (jenis disabilitas atau fasilitas)
         function applyFilter() {
             const keyword = document.getElementById('cari').value.toLowerCase();
-            const jenis = document.getElementById('filterJenis').value;
+            const aksesValue = document.getElementById('filterAkses').value;
             let filtered = semuaLowongan.filter(l => {
                 if (l.status && l.status !== 'Aktif') return false;
                 const matchKeyword = (l.judul && l.judul.toLowerCase().includes(keyword)) || (l.perusahaan && l.perusahaan.toLowerCase().includes(keyword));
-                const matchJenis = !jenis || (l.jenis_disabilitas === jenis || l.jenis === jenis);
-                return matchKeyword && matchJenis;
+                if (!matchKeyword) return false;
+                if (!aksesValue) return true;
+                // Cek apakah lowongan memenuhi filter aksesibilitas
+                // Filter bisa berupa jenis disabilitas atau fasilitas
+                const jenis = l.jenis_disabilitas || l.jenis || '';
+                const fasilitas = l.fasilitas || []; // array string
+                // Jika aksesValue termasuk dalam opsi disabilitas
+                const disabilitasOptions = ['Fisik', 'Netra', 'Rungu', 'Mental'];
+                if (disabilitasOptions.includes(aksesValue)) {
+                    return jenis === aksesValue;
+                } else {
+                    // Cek fasilitas
+                    return fasilitas.includes(aksesValue);
+                }
             });
             renderTable(filtered);
         }
@@ -356,7 +349,20 @@
             const lowongan = semuaLowongan.find(l => l.id == id);
             if (lowongan) {
                 currentLowonganId = id;
-                document.getElementById('modalContent').innerHTML = `<p><strong>Judul:</strong> ${escapeHtml(lowongan.judul)}</p><p><strong>Perusahaan:</strong> ${escapeHtml(lowongan.perusahaan)}</p><p><strong>Lokasi:</strong> ${escapeHtml(lowongan.lokasi)}</p><p><strong>Disabilitas:</strong> ${escapeHtml(lowongan.jenis_disabilitas)}</p><p><strong>Deskripsi:</strong> ${escapeHtml(lowongan.deskripsi)}</p><p><strong>Gaji:</strong> ${escapeHtml(lowongan.gaji || 'Tidak disebutkan')}</p><p><strong>Tanggal Posting:</strong> ${lowongan.tgl_posting ? new Date(lowongan.tgl_posting).toLocaleDateString('id-ID') : '-'}</p>`;
+                let fasilitasHtml = '';
+                if (lowongan.fasilitas && lowongan.fasilitas.length) {
+                    fasilitasHtml = `<p><strong>Fasilitas Aksesibilitas:</strong> ${lowongan.fasilitas.join(', ')}</p>`;
+                }
+                document.getElementById('modalContent').innerHTML = `
+                    <p><strong>Judul:</strong> ${escapeHtml(lowongan.judul)}</p>
+                    <p><strong>Perusahaan:</strong> ${escapeHtml(lowongan.perusahaan)}</p>
+                    <p><strong>Lokasi:</strong> ${escapeHtml(lowongan.lokasi)}</p>
+                    <p><strong>Disabilitas:</strong> ${escapeHtml(lowongan.jenis_disabilitas)}</p>
+                    <p><strong>Deskripsi:</strong> ${escapeHtml(lowongan.deskripsi)}</p>
+                    <p><strong>Gaji:</strong> ${escapeHtml(lowongan.gaji || 'Tidak disebutkan')}</p>
+                    <p><strong>Tanggal Posting:</strong> ${lowongan.tgl_posting ? new Date(lowongan.tgl_posting).toLocaleDateString('id-ID') : '-'}</p>
+                    ${fasilitasHtml}
+                `;
                 document.getElementById('modal').style.display = 'flex';
             }
         }
@@ -374,7 +380,7 @@
         // Event listeners
         document.getElementById('btnCari').addEventListener('click', applyFilter);
         document.getElementById('cari').addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilter(); });
-        document.getElementById('filterJenis').addEventListener('change', applyFilter);
+        document.getElementById('filterAkses').addEventListener('change', applyFilter);
         document.getElementById('tabel-lowongan').addEventListener('click', (e) => {
             if (e.target.classList.contains('detailBtn')) showDetail(parseInt(e.target.dataset.id));
         });
