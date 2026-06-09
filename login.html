@@ -9,14 +9,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
         body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
         }
-        .fade-up { animation: fadeInUp 0.5s ease-out; }
-        .btn-hover { transition: all 0.2s ease; }
-        .btn-hover:hover { transform: scale(1.02); background-color: #002a84; }
-        .input-focus:focus { border-color: #feb700; box-shadow: 0 0 0 3px rgba(254,183,0,0.2); }
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-left { animation: fadeInLeft 0.6s ease-out; }
+        .animate-right { animation: fadeInRight 0.6s ease-out; }
+        .float-slow { animation: float 4s ease-in-out infinite; }
+        .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -12px rgba(0,24,85,0.15); }
+        .input-focus:focus { border-color: #feb700; box-shadow: 0 0 0 3px rgba(254,183,0,0.2); outline: none; }
+        .btn-hover { transition: all 0.2s; }
+        .btn-hover:hover { transform: scale(1.02); background: #002a84; box-shadow: 0 10px 15px -3px rgba(0,24,85,0.3); }
     </style>
     <script>
         tailwind.config = {
@@ -24,32 +36,80 @@
                 extend: {
                     colors: {
                         primary: "#001855",
+                        secondary: "#feb700",
                     },
                     fontFamily: { sans: ["Lexend"] },
+                    borderRadius: { xl: "0.75rem", "2xl": "1rem", "3xl": "1.5rem" }
                 }
             }
         }
     </script>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 fade-up">
-        <div class="text-center">
-            <span class="material-symbols-outlined text-5xl text-primary">work</span>
-            <h2 class="text-2xl font-bold text-primary mt-2">Masuk ke KARYA</h2>
+<body class="min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden card-hover">
+        <div class="flex flex-col md:flex-row">
+            <!-- Left Side: Branding / Ilustrasi -->
+            <div class="md:w-1/2 bg-gradient-to-br from-primary to-primary/80 p-8 flex flex-col justify-between items-center text-center text-white animate-left">
+                <div class="mt-8">
+                    <div class="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6 float-slow">
+                        <span class="material-symbols-outlined text-5xl text-white">work</span>
+                    </div>
+                    <h1 class="text-3xl font-black tracking-tight">KARYA</h1>
+                    <p class="text-white/80 text-sm mt-2">Kesempatan Aksi Ruang Yang Aksesibel</p>
+                </div>
+                <div class="mb-8 space-y-3">
+                    <div class="flex items-center gap-2 text-sm text-white/90"><span class="material-symbols-outlined text-base">check_circle</span> Lowongan Terverifikasi Inklusif</div>
+                    <div class="flex items-center gap-2 text-sm text-white/90"><span class="material-symbols-outlined text-base">accessible_forward</span> Aksesibilitas Penuh</div>
+                    <div class="flex items-center gap-2 text-sm text-white/90"><span class="material-symbols-outlined text-base">diversity_3</span> Komunitas & Mentoring</div>
+                </div>
+            </div>
+
+            <!-- Right Side: Form Login -->
+            <div class="md:w-1/2 p-8 md:p-10 animate-right">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-primary">Selamat Datang</h2>
+                    <p class="text-gray-500 text-sm mt-1">Masuk ke akun KARYA Anda</p>
+                </div>
+                <form id="loginForm" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" 
+                               class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-secondary input-focus transition"
+                               placeholder="nama@perusahaan.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                        <input type="password" id="password" 
+                               class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-secondary input-focus transition"
+                               placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" 
+                            class="w-full bg-primary text-white py-3 rounded-xl font-bold btn-hover shadow-md flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">login</span> Masuk
+                    </button>
+                </form>
+                <div class="relative flex items-center justify-center my-6">
+                    <div class="absolute w-full border-t border-gray-200"></div>
+                    <span class="relative bg-white px-4 text-sm text-gray-400">atau</span>
+                </div>
+                <p class="text-center text-sm">
+                    Belum punya akun? 
+                    <a href="register.html" class="text-primary font-bold hover:underline transition">Daftar Sekarang</a>
+                </p>
+                <div class="mt-6 p-3 bg-gray-50 rounded-xl text-center border border-gray-100">
+                    <p class="text-xs text-gray-500 font-medium">🔐 Demo Akun</p>
+                    <div class="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-primary mt-1">
+                        <span>admin@karya.com / admin</span>
+                        <span>•</span>
+                        <span>perusahaan@karya.com / perusahaan</span>
+                        <span>•</span>
+                        <span>penyandang@karya.com / penyandang</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <form id="loginForm" class="mt-6 space-y-4">
-            <div>
-                <label class="block font-semibold">Email</label>
-                <input type="email" id="email" class="w-full p-3 rounded-xl bg-gray-100 border focus:border-primary input-focus transition" required>
-            </div>
-            <div>
-                <label class="block font-semibold">Password</label>
-                <input type="password" id="password" class="w-full p-3 rounded-xl bg-gray-100 border focus:border-primary input-focus transition" required>
-            </div>
-            <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-bold btn-hover shadow-md transition">Masuk</button>
-        </form>
-        <p class="text-center mt-6">Belum punya akun? <a href="register.html" class="text-primary font-bold">Daftar</a></p>
     </div>
+
     <script>
         const defaultUsers = [
             { nama: "Admin KARYA", email: "admin@karya.com", password: "admin", role: "admin" },
