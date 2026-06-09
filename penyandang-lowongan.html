@@ -46,25 +46,17 @@
     </div>
 
     <script>
-        // ==================== AMBIL DATA LOWONGAN DARI LOCALSTORAGE ====================
-        // Data lowongan disimpan dengan key 'daftarLowongan' oleh modul perusahaan
         function getLowongan() {
             const stored = localStorage.getItem('daftarLowongan');
             if (stored) {
-                try {
-                    return JSON.parse(stored);
-                } catch(e) {
-                    console.error("Gagal parse lowongan", e);
-                    return [];
-                }
+                try { return JSON.parse(stored); } catch(e) { return []; }
             }
-            return []; // Tidak ada lowongan statis
+            return [];
         }
 
         let semuaLowongan = [];
         let currentLowonganId = null;
 
-        // ==================== RENDER DAFTAR LOWONGAN ====================
         function render(data) {
             const container = document.getElementById('list');
             if (!data.length) {
@@ -94,11 +86,11 @@
             });
         }
 
-        // ==================== FILTER DAN PENCARIAN ====================
         function applyFilter() {
             const keyword = document.getElementById('cari').value.toLowerCase();
             const jenis = document.getElementById('filterJenis').value;
             let filtered = semuaLowongan.filter(l => {
+                if (l.status !== 'Aktif') return false;
                 const matchKeyword = (l.judul && l.judul.toLowerCase().includes(keyword)) ||
                                     (l.perusahaan && l.perusahaan.toLowerCase().includes(keyword));
                 const matchJenis = !jenis || (l.jenis_disabilitas === jenis || l.jenis === jenis);
@@ -107,7 +99,6 @@
             render(filtered);
         }
 
-        // ==================== TAMPILKAN MODAL DETAIL ====================
         function showDetail(id) {
             const lowongan = semuaLowongan.find(l => l.id == id);
             if (lowongan) {
@@ -125,7 +116,6 @@
             }
         }
 
-        // ==================== LAMAR ====================
         function lamar() {
             if (currentLowonganId) {
                 const lowonganDipilih = semuaLowongan.find(l => l.id == currentLowonganId);
@@ -138,16 +128,13 @@
             }
         }
 
-        // ==================== INIT & EVENT ====================
         function loadData() {
             semuaLowongan = getLowongan();
             applyFilter();
         }
 
         document.getElementById('btnCari').addEventListener('click', applyFilter);
-        document.getElementById('cari').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') applyFilter();
-        });
+        document.getElementById('cari').addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilter(); });
         document.getElementById('filterJenis').addEventListener('change', applyFilter);
         document.getElementById('list').addEventListener('click', (e) => {
             if (e.target.classList.contains('detailBtn')) {
@@ -159,22 +146,14 @@
             document.getElementById('modal').style.display = 'none';
         });
         document.getElementById('lamarBtn').addEventListener('click', lamar);
-
-        // Tutup modal jika klik di luar konten
         window.addEventListener('click', (e) => {
-            const modal = document.getElementById('modal');
-            if (e.target === modal) {
-                modal.style.display = 'none';
+            if (e.target === document.getElementById('modal')) {
+                document.getElementById('modal').style.display = 'none';
             }
         });
-
-        // Deteksi perubahan storage dari tab lain (misal perusahaan menambah lowongan)
         window.addEventListener('storage', (e) => {
-            if (e.key === 'daftarLowongan') {
-                loadData();
-            }
+            if (e.key === 'daftarLowongan') loadData();
         });
-
         loadData();
     </script>
 </body>
