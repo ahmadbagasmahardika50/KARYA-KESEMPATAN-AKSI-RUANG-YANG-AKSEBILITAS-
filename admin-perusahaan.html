@@ -6,201 +6,265 @@
     <title>KARYA - Kelola Perusahaan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
         body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
+        :focus { outline: 2px solid #feb700; outline-offset: 2px; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 50; }
         .modal-content { background: white; border-radius: 1rem; width: 90%; max-width: 400px; padding: 1.5rem; }
     </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#001855",
+                        "primary-container": "#002a84",
+                        secondary: "#7c5800",
+                        "secondary-container": "#feb700",
+                        surface: "#fcf9f8",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1b1c1c",
+                        "on-surface-variant": "#43474f",
+                        outline: "#737780",
+                        error: "#ba1a1a"
+                    },
+                    fontFamily: { sans: ["Lexend"] },
+                    borderRadius: { xl: "0.75rem", "2xl": "1rem", "3xl": "1.5rem" }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-surface text-on-surface">
 
-<nav class="bg-white shadow px-6 py-4 flex justify-between items-center">
-    <div class="text-xl font-black text-blue-900">KARYA Admin</div>
-    <a href="login.html" onclick="localStorage.removeItem('user')" class="text-red-600">Logout</a>
-</nav>
+    <!-- Navbar KARYA Admin -->
+    <nav class="bg-white shadow-md py-4 px-6 md:px-12 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-2xl text-primary">admin_panel_settings</span>
+            <div class="text-xl font-black text-primary tracking-tighter">KARYA Admin</div>
+        </div>
+        <div class="space-x-4">
+            <a href="admin-dashboard.html" class="text-primary font-medium hover:underline">Dashboard</a>
+            <a href="admin-penyandang.html" class="text-primary font-medium hover:underline">Penyandang</a>
+            <a href="admin-perusahaan.html" class="text-primary font-bold border-b-2 border-secondary-container pb-1">Perusahaan</a>
+            <a href="login.html" onclick="localStorage.removeItem('user')" class="text-error">Logout</a>
+        </div>
+    </nav>
 
-<div class="max-w-6xl mx-auto px-6 py-8">
-    <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold text-blue-900">Data Perusahaan</h1>
-        <button id="tambahBtn" class="bg-blue-900 text-white px-4 py-2 rounded-xl">+ Tambah</button>
-    </div>
-    <div class="bg-white rounded-xl shadow overflow-hidden">
-        <table class="w-full text-left">
-            <thead class="bg-gray-100">
-                <tr><th class="p-3">Nama</th><th>Email</th><th>Telepon</th><th class="text-center">Aksi</th></tr>
-            </thead>
-            <tbody id="tabelPerusahaan"></tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Modal Form -->
-<div id="formModal" class="modal">
-    <div class="modal-content">
-        <h3 id="modalTitle" class="text-xl font-bold mb-4">Tambah Perusahaan</h3>
-        <form id="perusahaanForm">
-            <input type="hidden" id="editId">
-            <div class="mb-3"><label>Nama Perusahaan</label><input type="text" id="nama" class="w-full p-2 border rounded" required></div>
-            <div class="mb-3"><label>Email</label><input type="email" id="email" class="w-full p-2 border rounded" required></div>
-            <div class="mb-3"><label>Telepon</label><input type="text" id="telepon" class="w-full p-2 border rounded"></div>
-            <div class="flex justify-end gap-2 mt-4">
-                <button type="button" class="cancelModalBtn bg-gray-300 px-3 py-1 rounded">Batal</button>
-                <button type="submit" class="bg-blue-900 text-white px-3 py-1 rounded">Simpan</button>
+    <main class="max-w-6xl mx-auto px-6 py-10">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-primary">Kelola Perusahaan</h1>
+                <p class="text-on-surface-variant mt-1">Tambah, edit, atau hapus data perusahaan mitra.</p>
             </div>
-        </form>
-    </div>
-</div>
+            <button id="tambahBtn" class="bg-primary text-white px-5 py-2 rounded-xl font-bold flex items-center gap-2 shadow-md hover:bg-primary/90">
+                <span class="material-symbols-outlined">add</span> Tambah
+            </button>
+        </div>
 
-<!-- Modal Konfirmasi Hapus -->
-<div id="deleteModal" class="modal">
-    <div class="modal-content text-center">
-        <p class="mb-4">Yakin ingin menghapus perusahaan ini?</p>
-        <div class="flex justify-center gap-3">
-            <button id="cancelDeleteBtn" class="bg-gray-300 px-3 py-1 rounded">Batal</button>
-            <button id="confirmDeleteBtn" class="bg-red-600 text-white px-3 py-1 rounded">Hapus</button>
+        <div class="bg-white rounded-2xl shadow-md border border-surface-container-high overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-surface-container-high">
+                        <tr class="border-b border-surface-container">
+                            <th class="p-4 font-bold text-primary">Nama Perusahaan</th>
+                            <th class="p-4 font-bold text-primary">Email</th>
+                            <th class="p-4 font-bold text-primary">Telepon</th>
+                            <th class="p-4 font-bold text-primary text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelPerusahaan"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Form -->
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" class="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">business</span> Tambah Perusahaan
+            </h3>
+            <form id="perusahaanForm">
+                <input type="hidden" id="editId">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-outline mb-1">Nama Perusahaan</label>
+                    <input type="text" id="nama" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-outline mb-1">Email</label>
+                    <input type="email" id="email" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-outline mb-1">Telepon</label>
+                    <input type="text" id="telepon" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" class="cancelModalBtn px-4 py-2 bg-surface-container-high rounded-xl font-medium">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-xl font-bold">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 
-<script>
-    // Data perusahaan (ambil dari localStorage)
-    let perusahaan = JSON.parse(localStorage.getItem('perusahaan_admin') || '[]');
-    let nextId = perusahaan.length ? Math.max(...perusahaan.map(p => p.id)) + 1 : 1;
-    let currentDeleteId = null;
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content text-center">
+            <span class="material-symbols-outlined text-5xl text-error">warning</span>
+            <h3 class="text-xl font-bold text-error mt-2">Hapus Perusahaan?</h3>
+            <p class="text-on-surface-variant mt-2">Data perusahaan akan dihapus permanen. Lowongan terkait juga akan hilang.</p>
+            <div class="flex justify-center gap-3 mt-6">
+                <button id="cancelDeleteBtn" class="px-4 py-2 bg-surface-container-high rounded-xl">Batal</button>
+                <button id="confirmDeleteBtn" class="px-4 py-2 bg-error text-white rounded-xl font-bold">Hapus</button>
+            </div>
+        </div>
+    </div>
 
-    function saveData() {
-        localStorage.setItem('perusahaan_admin', JSON.stringify(perusahaan));
-    }
+    <footer class="bg-surface-container-low py-6 text-center text-sm text-outline border-t border-surface-container mt-12">
+        © 2026 KARYA. Memberdayakan Kemampuan.
+    </footer>
 
-    function renderTable() {
-        const tbody = document.getElementById('tabelPerusahaan');
-        if (perusahaan.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">Belum ada data</td></tr>';
-            return;
+    <script>
+        // Data perusahaan (ambil dari localStorage)
+        let perusahaan = JSON.parse(localStorage.getItem('perusahaan_admin') || '[]');
+        let nextId = perusahaan.length ? Math.max(...perusahaan.map(p => p.id)) + 1 : 1;
+        let currentDeleteId = null;
+
+        function saveData() {
+            localStorage.setItem('perusahaan_admin', JSON.stringify(perusahaan));
         }
-        let html = '';
-        perusahaan.forEach(p => {
-            html += `<tr class="border-b hover:bg-gray-50">
-                <td class="p-3">${escapeHtml(p.nama)}</td>
-                <td class="p-3">${escapeHtml(p.email)}</td>
-                <td class="p-3">${escapeHtml(p.telepon || '-')}</td>
-                <td class="p-3 text-center">
-                    <button class="editBtn text-blue-600 mr-2" data-id="${p.id}">Edit</button>
-                    <button class="deleteBtn text-red-600" data-id="${p.id}">Hapus</button>
-                </td>
-            </tr>`;
-        });
-        tbody.innerHTML = html;
-    }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
-    }
-
-    // Modal Form
-    const formModal = document.getElementById('formModal');
-    const deleteModal = document.getElementById('deleteModal');
-    const form = document.getElementById('perusahaanForm');
-    const editIdField = document.getElementById('editId');
-    const namaField = document.getElementById('nama');
-    const emailField = document.getElementById('email');
-    const teleponField = document.getElementById('telepon');
-    const modalTitle = document.getElementById('modalTitle');
-
-    function openFormModal(editMode = false, data = null) {
-        if (editMode && data) {
-            modalTitle.innerText = 'Edit Perusahaan';
-            editIdField.value = data.id;
-            namaField.value = data.nama;
-            emailField.value = data.email;
-            teleponField.value = data.telepon || '';
-        } else {
-            modalTitle.innerText = 'Tambah Perusahaan';
-            editIdField.value = '';
-            form.reset();
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
         }
-        formModal.style.display = 'flex';
-    }
 
-    function closeFormModal() {
-        formModal.style.display = 'none';
-    }
-
-    function closeDeleteModal() {
-        deleteModal.style.display = 'none';
-        currentDeleteId = null;
-    }
-
-    // Submit form
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const id = editIdField.value;
-        const newData = {
-            nama: namaField.value.trim(),
-            email: emailField.value.trim(),
-            telepon: teleponField.value.trim()
-        };
-        if (!newData.nama || !newData.email) {
-            alert('Nama dan email harus diisi');
-            return;
+        function renderTable() {
+            const tbody = document.getElementById('tabelPerusahaan');
+            if (perusahaan.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-outline">Belum ada data</td></tr>';
+                return;
+            }
+            let html = '';
+            perusahaan.forEach(p => {
+                html += `<tr class="border-b border-surface-container-high hover:bg-surface-container-low">
+                    <td class="p-4">${escapeHtml(p.nama)}</td>
+                    <td class="p-4">${escapeHtml(p.email)}</td>
+                    <td class="p-4">${escapeHtml(p.telepon || '-')}</td>
+                    <td class="p-4 text-center">
+                        <button class="editBtn text-primary font-bold mr-3" data-id="${p.id}">Edit</button>
+                        <button class="deleteBtn text-error font-bold" data-id="${p.id}">Hapus</button>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
         }
-        // Cek duplikat email (kecuali untuk edit dengan email yang sama)
-        if (!id && perusahaan.some(p => p.email === newData.email)) {
-            alert('Email sudah terdaftar!');
-            return;
-        }
-        if (id) {
-            const idx = perusahaan.findIndex(p => p.id == id);
-            if (idx !== -1) perusahaan[idx] = { id: parseInt(id), ...newData };
-        } else {
-            perusahaan.push({ id: nextId++, ...newData });
-        }
-        saveData();
-        renderTable();
-        closeFormModal();
-    });
 
-    // Event delegation untuk tombol edit/hapus (karena tabel di-render ulang)
-    document.getElementById('tabelPerusahaan').addEventListener('click', (e) => {
-        const target = e.target;
-        if (target.classList.contains('editBtn')) {
-            const id = parseInt(target.getAttribute('data-id'));
-            const data = perusahaan.find(p => p.id === id);
-            if (data) openFormModal(true, data);
-        } else if (target.classList.contains('deleteBtn')) {
-            currentDeleteId = parseInt(target.getAttribute('data-id'));
-            deleteModal.style.display = 'flex';
-        }
-    });
+        // Modal Form
+        const formModal = document.getElementById('formModal');
+        const deleteModal = document.getElementById('deleteModal');
+        const form = document.getElementById('perusahaanForm');
+        const editIdField = document.getElementById('editId');
+        const namaField = document.getElementById('nama');
+        const emailField = document.getElementById('email');
+        const teleponField = document.getElementById('telepon');
+        const modalTitle = document.getElementById('modalTitle');
 
-    // Konfirmasi hapus
-    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
-        if (currentDeleteId) {
-            perusahaan = perusahaan.filter(p => p.id !== currentDeleteId);
+        function openFormModal(editMode = false, data = null) {
+            if (editMode && data) {
+                modalTitle.innerHTML = '<span class="material-symbols-outlined">edit</span> Edit Perusahaan';
+                editIdField.value = data.id;
+                namaField.value = data.nama;
+                emailField.value = data.email;
+                teleponField.value = data.telepon || '';
+            } else {
+                modalTitle.innerHTML = '<span class="material-symbols-outlined">add</span> Tambah Perusahaan';
+                editIdField.value = '';
+                form.reset();
+            }
+            formModal.style.display = 'flex';
+        }
+
+        function closeFormModal() {
+            formModal.style.display = 'none';
+        }
+
+        function closeDeleteModal() {
+            deleteModal.style.display = 'none';
+            currentDeleteId = null;
+        }
+
+        // Submit form
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = editIdField.value;
+            const newData = {
+                nama: namaField.value.trim(),
+                email: emailField.value.trim(),
+                telepon: teleponField.value.trim()
+            };
+            if (!newData.nama || !newData.email) {
+                alert('Nama dan email harus diisi');
+                return;
+            }
+            // Cek duplikat email
+            if (!id && perusahaan.some(p => p.email === newData.email)) {
+                alert('Email sudah terdaftar!');
+                return;
+            }
+            if (id) {
+                const idx = perusahaan.findIndex(p => p.id == id);
+                if (idx !== -1) perusahaan[idx] = { id: parseInt(id), ...newData };
+            } else {
+                perusahaan.push({ id: nextId++, ...newData });
+            }
             saveData();
             renderTable();
+            closeFormModal();
+        });
+
+        // Event delegation untuk tombol edit/hapus
+        document.getElementById('tabelPerusahaan').addEventListener('click', (e) => {
+            const target = e.target;
+            if (target.classList.contains('editBtn')) {
+                const id = parseInt(target.getAttribute('data-id'));
+                const data = perusahaan.find(p => p.id === id);
+                if (data) openFormModal(true, data);
+            } else if (target.classList.contains('deleteBtn')) {
+                currentDeleteId = parseInt(target.getAttribute('data-id'));
+                deleteModal.style.display = 'flex';
+            }
+        });
+
+        // Konfirmasi hapus
+        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+            if (currentDeleteId) {
+                perusahaan = perusahaan.filter(p => p.id !== currentDeleteId);
+                saveData();
+                renderTable();
+            }
+            closeDeleteModal();
+        });
+
+        document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+        document.getElementById('tambahBtn').addEventListener('click', () => openFormModal(false));
+        document.querySelectorAll('.cancelModalBtn').forEach(btn => btn.addEventListener('click', closeFormModal));
+
+        window.onclick = (e) => {
+            if (e.target === formModal) closeFormModal();
+            if (e.target === deleteModal) closeDeleteModal();
+        };
+
+        // Proteksi akses: hanya admin
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        if (!currentUser || currentUser.role !== 'admin') {
+            alert('Akses ditolak. Halaman khusus admin.');
+            window.location.href = 'login.html';
         }
-        closeDeleteModal();
-    });
 
-    // Batal hapus
-    document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
-
-    // Tombol tambah
-    document.getElementById('tambahBtn').addEventListener('click', () => openFormModal(false));
-
-    // Tombol batal pada modal form
-    document.querySelectorAll('.cancelModalBtn').forEach(btn => btn.addEventListener('click', closeFormModal));
-
-    // Menutup modal jika klik di luar area konten
-    window.onclick = (e) => {
-        if (e.target === formModal) closeFormModal();
-        if (e.target === deleteModal) closeDeleteModal();
-    };
-
-    // Inisialisasi tampilan
-    renderTable();
-</script>
+        renderTable();
+    </script>
 </body>
 </html>
