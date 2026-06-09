@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KARYA - Mendaftar Lowongan</title>
+    <title>KARYA - Cari Lowongan Pekerjaan</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -82,19 +82,21 @@
             vertical-align: middle;
         }
         body { font-family: 'Lexend', sans-serif; }
-        .step-active {
-            background-color: #001855;
-            color: white;
+        .card-hover:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s ease;
         }
-        .step-completed {
-            background-color: #10b981;
-            color: white;
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
     </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-secondary-container selection:text-on-secondary-container">
 
-<!-- Header dengan style KARYA -->
+<!-- Navbar -->
 <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-sm">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
         <div class="flex items-center space-x-2">
@@ -107,360 +109,339 @@
                 <span class="material-symbols-outlined text-sm mr-1">account_circle</span>
                 Alya Yumna
             </span>
-            <a href="penyandang-cari-lowongan.html" class="text-primary hover:text-primary/80 transition flex items-center">
-                <span class="material-symbols-outlined text-sm mr-1">arrow_back</span>
-                Kembali
-            </a>
+            <button class="bg-error/10 text-error px-3 py-1 rounded-full text-sm hover:bg-error/20 transition">
+                <span class="material-symbols-outlined text-sm mr-1">logout</span>
+                Logout
+            </button>
         </div>
     </div>
 </nav>
 
-<!-- Spacer for fixed navbar -->
+<!-- Spacer -->
 <div class="h-16"></div>
 
-<main class="container mx-auto px-4 py-8 max-w-4xl">
-    <!-- Progress Step -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between">
-            <div class="flex-1 text-center">
-                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-2" id="step1-indicator">1</div>
-                <span class="text-sm text-on-surface-variant">Detail Lowongan</span>
+<main class="container mx-auto px-4 py-6 max-w-7xl">
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-primary-container/10 to-secondary-container/10 rounded-2xl p-6 mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <h2 class="text-2xl md:text-3xl font-bold text-primary mb-2">Temukan Lowongan Kerja</h2>
+                <p class="text-on-surface-variant">Lowongan yang ramah disabilitas dari berbagai perusahaan mitra</p>
             </div>
-            <div class="flex-1 h-0.5 bg-outline-variant"></div>
-            <div class="flex-1 text-center">
-                <div class="w-10 h-10 rounded-full bg-outline-variant text-on-surface-variant flex items-center justify-center mx-auto mb-2" id="step2-indicator">2</div>
-                <span class="text-sm text-on-surface-variant">Isi Data Diri</span>
-            </div>
-            <div class="flex-1 h-0.5 bg-outline-variant"></div>
-            <div class="flex-1 text-center">
-                <div class="w-10 h-10 rounded-full bg-outline-variant text-on-surface-variant flex items-center justify-center mx-auto mb-2" id="step3-indicator">3</div>
-                <span class="text-sm text-on-surface-variant">Upload Dokumen</span>
-            </div>
-            <div class="flex-1 h-0.5 bg-outline-variant"></div>
-            <div class="flex-1 text-center">
-                <div class="w-10 h-10 rounded-full bg-outline-variant text-on-surface-variant flex items-center justify-center mx-auto mb-2" id="step4-indicator">4</div>
-                <span class="text-sm text-on-surface-variant">Konfirmasi</span>
+            <div class="mt-4 md:mt-0">
+                <span class="material-symbols-outlined text-5xl text-primary/40">search</span>
             </div>
         </div>
     </div>
 
-    <!-- Step 1: Detail Lowongan (langsung dari localStorage) -->
-    <div id="step1" class="bg-surface-container-lowest rounded-xl shadow-md p-6 border border-outline-variant/20">
-        <h2 class="text-xl font-bold text-on-surface mb-4">Detail Lowongan</h2>
-        <div id="detail-lowongan" class="bg-surface-container rounded-lg p-4 mb-4">
-            <!-- akan diisi javascript -->
+    <!-- Form Pencarian & Filter -->
+    <div class="bg-surface-container-lowest rounded-xl shadow-md p-6 mb-8 border border-outline-variant/30">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-on-surface-variant mb-1">
+                    <span class="material-symbols-outlined text-sm mr-1">search</span> Kata Kunci
+                </label>
+                <input type="text" id="search-keyword" placeholder="Cari judul lowongan, perusahaan, atau lokasi..." 
+                       class="w-full border border-outline-variant rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary/50 bg-surface">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-on-surface-variant mb-1">
+                    <span class="material-symbols-outlined text-sm mr-1">accessible</span> Jenis Disabilitas
+                </label>
+                <select id="filter-jenis" class="w-full border border-outline-variant rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary/50 bg-surface">
+                    <option value="">Semua Jenis</option>
+                    <option value="Fisik">Fisik (Daksa)</option>
+                    <option value="Netra">Netra</option>
+                    <option value="Rungu">Rungu (Tuli/Wicara)</option>
+                    <option value="Mental">Mental</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-on-surface-variant mb-1">
+                    <span class="material-symbols-outlined text-sm mr-1">location_on</span> Lokasi
+                </label>
+                <select id="filter-lokasi" class="w-full border border-outline-variant rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary/50 bg-surface">
+                    <option value="">Semua Lokasi</option>
+                    <option value="Surakarta">Surakarta</option>
+                    <option value="Jakarta">Jakarta</option>
+                    <option value="Bandung">Bandung</option>
+                    <option value="Semarang">Semarang</option>
+                    <option value="Surabaya">Surabaya</option>
+                    <option value="Remote">Remote (Work From Home)</option>
+                </select>
+            </div>
         </div>
-        <div class="flex justify-end">
-            <button id="next-step1" class="bg-primary text-on-primary px-6 py-2 rounded-lg hover:bg-primary/90 transition shadow-sm">
-                Selanjutnya <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span>
+        <div class="flex justify-end mt-4 gap-2">
+            <button id="reset-filter" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition">
+                <span class="material-symbols-outlined text-sm mr-1">refresh</span> Reset
+            </button>
+            <button id="btn-cari" class="bg-primary text-on-primary px-6 py-2 rounded-lg hover:bg-primary/90 transition shadow-sm">
+                <span class="material-symbols-outlined text-sm mr-1">search</span> Cari Lowongan
             </button>
         </div>
     </div>
 
-    <!-- Step 2: Isi Data Diri (prefilled dari localStorage profil) -->
-    <div id="step2" class="bg-surface-container-lowest rounded-xl shadow-md p-6 border border-outline-variant/20 hidden">
-        <h2 class="text-xl font-bold text-on-surface mb-4">Data Diri Pelamar</h2>
-        <form id="form-data-diri">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Nama Lengkap <span class="text-error">*</span></label>
-                    <input type="text" id="nama" class="w-full border border-outline-variant rounded-lg p-2 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Email <span class="text-error">*</span></label>
-                    <input type="email" id="email" class="w-full border border-outline-variant rounded-lg p-2 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Nomor Telepon <span class="text-error">*</span></label>
-                    <input type="tel" id="telepon" class="w-full border border-outline-variant rounded-lg p-2 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Jenis Disabilitas <span class="text-error">*</span></label>
-                    <input type="text" id="jenis_disabilitas" class="w-full border border-outline-variant rounded-lg p-2 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50">
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Alamat</label>
-                    <textarea id="alamat" rows="2" class="w-full border border-outline-variant rounded-lg p-2 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50"></textarea>
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Pendidikan Terakhir</label>
-                    <input type="text" id="pendidikan" class="w-full border border-outline-variant rounded-lg p-2 bg-surface">
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Pengalaman Kerja</label>
-                    <textarea id="pengalaman" rows="3" class="w-full border border-outline-variant rounded-lg p-2 bg-surface" placeholder="Ceritakan pengalaman kerja Anda (jika ada)"></textarea>
-                </div>
-            </div>
-            <div class="flex justify-between mt-6">
-                <button type="button" id="prev-step2" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition">
-                    <span class="material-symbols-outlined text-sm mr-1">arrow_back</span> Sebelumnya
-                </button>
-                <button type="submit" class="bg-primary text-on-primary px-6 py-2 rounded-lg hover:bg-primary/90 transition shadow-sm">
-                    Selanjutnya <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span>
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Step 3: Upload Dokumen -->
-    <div id="step3" class="bg-surface-container-lowest rounded-xl shadow-md p-6 border border-outline-variant/20 hidden">
-        <h2 class="text-xl font-bold text-on-surface mb-4">Upload Dokumen Pendukung</h2>
-        <form id="form-dokumen">
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-on-surface-variant mb-1">CV / Resume <span class="text-error">*</span></label>
-                    <input type="file" id="cv" accept=".pdf,.doc,.docx" required class="w-full text-sm text-on-surface file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-primary-container file:text-on-primary-container hover:file:bg-primary-container/80">
-                    <p class="text-xs text-outline mt-1">Format PDF, DOC, DOCX (maks 2MB)</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Ijazah / Sertifikat Pendukung</label>
-                    <input type="file" id="ijazah" accept=".pdf,.jpg,.png" class="w-full text-sm text-on-surface file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-primary-container file:text-on-primary-container hover:file:bg-primary-container/80">
-                    <p class="text-xs text-outline mt-1">Format PDF, JPG, PNG (maks 2MB)</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-on-surface-variant mb-1">Surat Keterangan Disabilitas (opsional)</label>
-                    <input type="file" id="surat_keterangan" accept=".pdf,.jpg,.png" class="w-full text-sm text-on-surface file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-primary-container file:text-on-primary-container hover:file:bg-primary-container/80">
-                </div>
-            </div>
-            <div class="flex justify-between mt-6">
-                <button type="button" id="prev-step3" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition">
-                    <span class="material-symbols-outlined text-sm mr-1">arrow_back</span> Sebelumnya
-                </button>
-                <button type="submit" class="bg-primary text-on-primary px-6 py-2 rounded-lg hover:bg-primary/90 transition shadow-sm">
-                    Selanjutnya <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span>
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Step 4: Konfirmasi -->
-    <div id="step4" class="bg-surface-container-lowest rounded-xl shadow-md p-6 border border-outline-variant/20 hidden">
-        <h2 class="text-xl font-bold text-on-surface mb-4">Konfirmasi Pendaftaran</h2>
-        <div id="konfirmasi-data" class="bg-surface-container rounded-lg p-4 mb-4"></div>
-        <div class="bg-error-container/20 border-l-4 border-error p-4 mb-4">
-            <div class="flex items-center">
-                <span class="material-symbols-outlined text-error mr-2">info</span>
-                <p class="text-sm text-on-surface">Pastikan semua data yang Anda masukkan sudah benar. Pendaftaran tidak dapat diubah setelah dikirim.</p>
-            </div>
-        </div>
-        <div class="flex justify-between">
-            <button id="prev-step4" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition">
-                <span class="material-symbols-outlined text-sm mr-1">arrow_back</span> Sebelumnya
-            </button>
-            <button id="submit-daftar" class="bg-secondary text-on-secondary px-6 py-2 rounded-lg hover:bg-secondary/90 transition shadow-sm">
-                <span class="material-symbols-outlined text-sm mr-1">send</span> Kirim Pendaftaran
-            </button>
+    <!-- Hasil Pencarian Header -->
+    <div class="mb-4 flex flex-wrap justify-between items-center gap-3">
+        <h3 class="text-lg font-semibold text-on-surface">
+            <span class="material-symbols-outlined text-lg mr-2">work_history</span> Hasil Pencarian
+            <span id="result-count" class="text-sm text-outline font-normal ml-2"></span>
+        </h3>
+        <div class="flex items-center gap-2">
+            <label class="text-sm text-on-surface-variant">Urutkan:</label>
+            <select id="sort-by" class="border border-outline-variant rounded-lg p-1 text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50">
+                <option value="terbaru">Terbaru</option>
+                <option value="terlama">Terlama</option>
+            </select>
         </div>
     </div>
 
-    <!-- Modal Sukses -->
-    <div id="success-modal" class="fixed inset-0 bg-black/50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-        <div class="relative p-5 border w-96 shadow-lg rounded-xl bg-surface-container-lowest text-center">
-            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                <span class="material-symbols-outlined text-green-600 text-2xl">check</span>
-            </div>
-            <h3 class="text-lg font-semibold text-on-surface mb-2">Pendaftaran Berhasil!</h3>
-            <p class="text-outline mb-4">Lamaran Anda telah terkirim. Perusahaan akan menghubungi Anda melalui email.</p>
-            <button id="close-modal" class="bg-primary text-on-primary px-4 py-2 rounded-lg hover:bg-primary/90 transition">
-                Kembali ke Pencarian Lowongan
-            </button>
-        </div>
+    <!-- Daftar Lowongan (Card Grid) -->
+    <div id="lowongan-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Data akan diisi JavaScript -->
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="text-center py-12 hidden">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+        <p class="text-outline mt-3">Memuat lowongan...</p>
+    </div>
+
+    <!-- Tidak Ada Data -->
+    <div id="no-data" class="text-center py-12 hidden">
+        <span class="material-symbols-outlined text-5xl text-outline-variant mb-3">folder_open</span>
+        <p class="text-outline">Tidak ditemukan lowongan yang sesuai.</p>
+        <p class="text-outline-variant text-sm">Coba ubah kata kunci atau filter pencarian Anda.</p>
+    </div>
+
+    <!-- Paginasi -->
+    <div class="flex justify-between items-center mt-8">
+        <button id="prev-page" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface-variant disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-container transition">
+            <span class="material-symbols-outlined text-sm mr-1">chevron_left</span> Sebelumnya
+        </button>
+        <span id="page-info" class="text-sm text-outline">Halaman 1 dari 1</span>
+        <button id="next-page" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface-variant disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-container transition">
+            Selanjutnya <span class="material-symbols-outlined text-sm ml-1">chevron_right</span>
+        </button>
     </div>
 </main>
 
+<!-- Footer -->
+<footer class="mt-12 py-6 border-t border-outline-variant/30">
+    <div class="container mx-auto px-4 text-center text-sm text-outline">
+        <p>&copy; 2026 Sistem KARYA - Kesempatan Aksi Ruang Yang Aksesibel</p>
+        <p class="text-xs mt-1">Sekolah Vokasi - Universitas Sebelas Maret</p>
+    </div>
+</footer>
+
 <script>
-    // ==================== PROFIL (localStorage) ====================
-    function loadUserProfile() {
-        const defaultProfile = {
-            nama: "Alya Yumna Atiqoh Wibowo",
-            email: "alya.yumna@example.com",
-            telepon: "081234567890",
-            jenis_disabilitas: "Fisik",
-            alamat: "Jl. Merdeka No. 45, Surakarta",
-            pendidikan: "S1 Sistem Informasi - UNS",
-            pengalaman: "Magang di PT. Teknologi Inklusif sebagai Frontend Developer (2025)"
-        };
-        const stored = localStorage.getItem('userProfil');
-        if (stored) {
-            try { return JSON.parse(stored); }
-            catch(e) { return defaultProfile; }
-        }
-        return defaultProfile;
-    }
-
-    function saveUserProfile(profile) {
-        localStorage.setItem('userProfil', JSON.stringify(profile));
-    }
-
-    // ==================== LOWONGAN (dari localStorage) ====================
-    // Lowongan yang dipilih harus sudah disimpan dengan key 'lowonganDipilih'
-    // oleh halaman pencarian (penyandang-cari-lowongan.html) saat user klik "Lihat Detail".
-    // Format object lowongan yang diharapkan:
+    // ==================== DATA LOWONGAN DARI LOCALSTORAGE ====================
+    // Data lowongan disimpan oleh modul perusahaan dengan key 'daftarLowongan'
+    // Format setiap object:
     // {
-    //   id, judul, perusahaan, lokasi, jenis_disabilitas, deskripsi, tgl_posting, gaji
+    //   id, judul, perusahaan, lokasi, jenis_disabilitas, deskripsi, tgl_posting, gaji, status
     // }
-    let lowonganDipilih = null;
-    let currentStep = 1;
-
-    function loadLowonganDetail() {
-        const stored = localStorage.getItem('lowonganDipilih');
-        if (!stored) {
-            alert("Tidak ada lowongan yang dipilih. Silakan cari lowongan terlebih dahulu.");
-            window.location.href = 'penyandang-cari-lowongan.html';
-            return false;
-        }
-        try {
-            lowonganDipilih = JSON.parse(stored);
-            const container = document.getElementById('detail-lowongan');
-            container.innerHTML = `
-                <h3 class="text-lg font-bold text-on-surface mb-2">${lowonganDipilih.judul || 'Lowongan'}</h3>
-                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">business</span>${lowonganDipilih.perusahaan || '-'}</p>
-                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">location_on</span>${lowonganDipilih.lokasi || '-'}</p>
-                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">accessible</span>Disabilitas: ${lowonganDipilih.jenis_disabilitas || '-'}</p>
-                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">payments</span>${lowonganDipilih.gaji || '-'}</p>
-                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">description</span>${lowonganDipilih.deskripsi || '-'}</p>
-                <p class="text-outline text-sm mt-2 flex items-center"><span class="material-symbols-outlined text-sm mr-2">calendar_today</span>Diposting: ${lowonganDipilih.tgl_posting ? new Date(lowonganDipilih.tgl_posting).toLocaleDateString('id-ID') : '-'}</p>
-            `;
-            return true;
-        } catch(e) {
-            console.error(e);
-            alert("Data lowongan tidak valid.");
-            window.location.href = 'penyandang-cari-lowongan.html';
-            return false;
-        }
-    }
-
-    // ==================== STEP UI ====================
-    function updateStepUI(step) {
-        for (let i = 1; i <= 4; i++) {
-            const indicator = document.getElementById(`step${i}-indicator`);
-            if (i < step) {
-                indicator.classList.remove('bg-primary', 'bg-outline-variant', 'step-active');
-                indicator.classList.add('step-completed');
-                indicator.textContent = '✓';
-            } else if (i === step) {
-                indicator.classList.remove('step-completed', 'bg-outline-variant');
-                indicator.classList.add('bg-primary', 'step-active');
-                indicator.textContent = i;
-            } else {
-                indicator.classList.remove('bg-primary', 'step-completed', 'step-active');
-                indicator.classList.add('bg-outline-variant');
-                indicator.textContent = i;
+    function getLowonganFromStorage() {
+        const stored = localStorage.getItem('daftarLowongan');
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch(e) {
+                console.error("Gagal parsing daftar lowongan", e);
+                return [];
             }
         }
-        for (let i = 1; i <= 4; i++) {
-            const el = document.getElementById(`step${i}`);
-            if (i === step) el.classList.remove('hidden');
-            else el.classList.add('hidden');
-        }
+        return []; // Tidak ada lowongan statis
     }
 
-    // ==================== DATA DIRI ====================
-    function fillDataDiriFromProfile() {
-        const profile = loadUserProfile();
-        document.getElementById('nama').value = profile.nama || '';
-        document.getElementById('email').value = profile.email || '';
-        document.getElementById('telepon').value = profile.telepon || '';
-        document.getElementById('jenis_disabilitas').value = profile.jenis_disabilitas || '';
-        document.getElementById('alamat').value = profile.alamat || '';
-        document.getElementById('pendidikan').value = profile.pendidikan || '';
-        document.getElementById('pengalaman').value = profile.pengalaman || '';
+    let semuaLowongan = [];
+    let filteredData = [];
+    let currentPage = 1;
+    const rowsPerPage = 6;
+
+    // Fungsi format tanggal Indonesia
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('id-ID', options);
     }
 
-    function saveDataDiriToProfile() {
-        const updatedProfile = {
-            nama: document.getElementById('nama').value,
-            email: document.getElementById('email').value,
-            telepon: document.getElementById('telepon').value,
-            jenis_disabilitas: document.getElementById('jenis_disabilitas').value,
-            alamat: document.getElementById('alamat').value,
-            pendidikan: document.getElementById('pendidikan').value,
-            pengalaman: document.getElementById('pengalaman').value
-        };
-        saveUserProfile(updatedProfile);
-    }
-
-    // ==================== KONFIRMASI ====================
-    function showKonfirmasi() {
-        const dataDiri = {
-            nama: document.getElementById('nama').value,
-            email: document.getElementById('email').value,
-            telepon: document.getElementById('telepon').value,
-            jenis_disabilitas: document.getElementById('jenis_disabilitas').value,
-            alamat: document.getElementById('alamat').value,
-            pendidikan: document.getElementById('pendidikan').value,
-            pengalaman: document.getElementById('pengalaman').value
-        };
-        const files = {
-            cv: document.getElementById('cv').files[0]?.name || 'Belum diunggah',
-            ijazah: document.getElementById('ijazah').files[0]?.name || 'Tidak ada',
-            surat: document.getElementById('surat_keterangan').files[0]?.name || 'Tidak ada'
-        };
-        const konfirmasiDiv = document.getElementById('konfirmasi-data');
-        konfirmasiDiv.innerHTML = `
-            <h3 class="font-semibold text-on-surface mb-2">Lowongan: ${lowonganDipilih.judul}</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                <div><span class="font-medium">Nama:</span> ${dataDiri.nama}</div>
-                <div><span class="font-medium">Email:</span> ${dataDiri.email}</div>
-                <div><span class="font-medium">Telepon:</span> ${dataDiri.telepon}</div>
-                <div><span class="font-medium">Disabilitas:</span> ${dataDiri.jenis_disabilitas}</div>
-                <div class="md:col-span-2"><span class="font-medium">Alamat:</span> ${dataDiri.alamat}</div>
-                <div class="md:col-span-2"><span class="font-medium">Pendidikan:</span> ${dataDiri.pendidikan}</div>
-                <div class="md:col-span-2"><span class="font-medium">Pengalaman:</span> ${dataDiri.pengalaman || '-'}</div>
-                <div><span class="font-medium">CV:</span> ${files.cv}</div>
-                <div><span class="font-medium">Ijazah:</span> ${files.ijazah}</div>
-                <div class="md:col-span-2"><span class="font-medium">Surat Keterangan:</span> ${files.surat}</div>
-            </div>
-        `;
-    }
-
-    // ==================== EVENT LISTENERS ====================
-    document.getElementById('next-step1').addEventListener('click', () => {
-        currentStep = 2;
-        updateStepUI(currentStep);
-        fillDataDiriFromProfile();
-    });
-    document.getElementById('prev-step2').addEventListener('click', () => {
-        currentStep = 1;
-        updateStepUI(currentStep);
-    });
-    document.getElementById('form-data-diri').addEventListener('submit', (e) => {
-        e.preventDefault();
-        saveDataDiriToProfile();
-        currentStep = 3;
-        updateStepUI(currentStep);
-    });
-    document.getElementById('prev-step3').addEventListener('click', () => {
-        currentStep = 2;
-        updateStepUI(currentStep);
-        fillDataDiriFromProfile();
-    });
-    document.getElementById('form-dokumen').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const cvFile = document.getElementById('cv').files[0];
-        if (!cvFile) {
-            alert('CV / Resume wajib diunggah');
+    // Render daftar lowongan
+    function renderLowongan() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const pageData = filteredData.slice(start, end);
+        const container = document.getElementById('lowongan-container');
+        const resultCount = document.getElementById('result-count');
+        
+        resultCount.textContent = `(${filteredData.length} lowongan ditemukan)`;
+        
+        if (pageData.length === 0) {
+            document.getElementById('no-data').classList.remove('hidden');
+            container.innerHTML = '';
             return;
         }
-        currentStep = 4;
-        updateStepUI(currentStep);
-        showKonfirmasi();
+        
+        document.getElementById('no-data').classList.add('hidden');
+        container.innerHTML = '';
+        
+        pageData.forEach(lowongan => {
+            const card = document.createElement('div');
+            card.className = 'bg-surface-container-lowest rounded-xl shadow-md p-5 border border-outline-variant/20 card-hover transition-all';
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-3">
+                    <h4 class="text-lg font-bold text-primary">${escapeHtml(lowongan.judul)}</h4>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">${lowongan.status === 'dibuka' ? 'Dibuka' : 'Ditutup'}</span>
+                </div>
+                <p class="text-on-surface-variant text-sm mb-2 flex items-center">
+                    <span class="material-symbols-outlined text-sm mr-1 text-outline">business</span> ${escapeHtml(lowongan.perusahaan)}
+                </p>
+                <p class="text-on-surface-variant text-sm mb-2 flex items-center">
+                    <span class="material-symbols-outlined text-sm mr-1 text-outline">location_on</span> ${escapeHtml(lowongan.lokasi)}
+                </p>
+                <p class="text-on-surface-variant text-sm mb-2 flex items-center">
+                    <span class="material-symbols-outlined text-sm mr-1 text-outline">accessible</span> Disabilitas: ${escapeHtml(lowongan.jenis_disabilitas)}
+                </p>
+                <p class="text-on-surface-variant text-sm mb-2 flex items-center">
+                    <span class="material-symbols-outlined text-sm mr-1 text-outline">payments</span> ${escapeHtml(lowongan.gaji || 'Tidak disebutkan')}
+                </p>
+                <p class="text-outline text-sm mb-3 line-clamp-2">${escapeHtml(lowongan.deskripsi || '')}</p>
+                <div class="flex justify-between items-center mt-3 pt-3 border-t border-outline-variant/20">
+                    <span class="text-xs text-outline flex items-center">
+                        <span class="material-symbols-outlined text-xs mr-1">calendar_today</span> ${formatDate(lowongan.tgl_posting)}
+                    </span>
+                    <button class="bg-primary text-on-primary px-3 py-1 rounded-lg text-sm hover:bg-primary/90 transition detail-btn" data-id="${lowongan.id}">
+                        <span class="material-symbols-outlined text-sm mr-1">visibility</span> Lihat Detail
+                    </button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+        
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+        document.getElementById('page-info').innerHTML = `Halaman ${currentPage} dari ${totalPages || 1}`;
+        document.getElementById('prev-page').disabled = currentPage === 1;
+        document.getElementById('next-page').disabled = currentPage === totalPages || filteredData.length === 0;
+    }
+
+    // Escape HTML untuk keamanan
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Filter dan pencarian
+    function applyFilters() {
+        const keyword = document.getElementById('search-keyword').value.toLowerCase();
+        const jenisFilter = document.getElementById('filter-jenis').value;
+        const lokasiFilter = document.getElementById('filter-lokasi').value;
+        const sortBy = document.getElementById('sort-by').value;
+        
+        filteredData = semuaLowongan.filter(lowongan => {
+            let matchKeyword = true;
+            if (keyword) {
+                matchKeyword = (lowongan.judul && lowongan.judul.toLowerCase().includes(keyword)) || 
+                               (lowongan.perusahaan && lowongan.perusahaan.toLowerCase().includes(keyword)) ||
+                               (lowongan.lokasi && lowongan.lokasi.toLowerCase().includes(keyword));
+            }
+            let matchJenis = jenisFilter ? (lowongan.jenis_disabilitas === jenisFilter) : true;
+            let matchLokasi = lokasiFilter ? (lowongan.lokasi === lokasiFilter) : true;
+            return matchKeyword && matchJenis && matchLokasi;
+        });
+        
+        // Sorting
+        if (sortBy === 'terbaru') {
+            filteredData.sort((a, b) => new Date(b.tgl_posting) - new Date(a.tgl_posting));
+        } else {
+            filteredData.sort((a, b) => new Date(a.tgl_posting) - new Date(b.tgl_posting));
+        }
+        
+        currentPage = 1;
+        renderLowongan();
+    }
+
+    function resetFilters() {
+        document.getElementById('search-keyword').value = '';
+        document.getElementById('filter-jenis').value = '';
+        document.getElementById('filter-lokasi').value = '';
+        document.getElementById('sort-by').value = 'terbaru';
+        applyFilters();
+    }
+
+    // Load data dari localStorage dan refresh
+    function loadData() {
+        semuaLowongan = getLowonganFromStorage();
+        applyFilters();
+    }
+
+    // Ketika tombol "Lihat Detail" diklik, simpan lowongan ke localStorage dan arahkan ke halaman pendaftaran
+    function attachDetailEvents() {
+        document.querySelectorAll('.detail-btn').forEach(btn => {
+            btn.removeEventListener('click', handleDetailClick);
+            btn.addEventListener('click', handleDetailClick);
+        });
+    }
+
+    function handleDetailClick(e) {
+        const btn = e.currentTarget;
+        const lowonganId = parseInt(btn.getAttribute('data-id'));
+        const lowongan = semuaLowongan.find(l => l.id === lowonganId);
+        if (lowongan) {
+            localStorage.setItem('lowonganDipilih', JSON.stringify(lowongan));
+            window.location.href = 'penyandang-daftar-lowongan.html';
+        } else {
+            alert('Data lowongan tidak ditemukan');
+        }
+    }
+
+    // Event listeners
+    document.getElementById('btn-cari').addEventListener('click', applyFilters);
+    document.getElementById('reset-filter').addEventListener('click', resetFilters);
+    document.getElementById('sort-by').addEventListener('change', applyFilters);
+    document.getElementById('prev-page').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderLowongan();
+            attachDetailEvents(); // re-attach setelah render ulang
+        }
     });
-    document.getElementById('prev-step4').addEventListener('click', () => {
-        currentStep = 3;
-        updateStepUI(currentStep);
+    document.getElementById('next-page').addEventListener('click', () => {
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderLowongan();
+            attachDetailEvents();
+        }
     });
-    document.getElementById('submit-daftar').addEventListener('click', () => {
-        document.getElementById('success-modal').classList.remove('hidden');
-    });
-    document.getElementById('close-modal').addEventListener('click', () => {
-        window.location.href = 'penyandang-cari-lowongan.html';
+    document.getElementById('search-keyword').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') applyFilters();
     });
 
-    // ==================== INIT ====================
-    if (loadLowonganDetail()) {
-        updateStepUI(1);
-    }
+    // Inisialisasi: load data, lalu setiap ada perubahan storage (misal dari halaman perusahaan) kita bisa reload
+    loadData();
+    
+    // Optional: mendeteksi perubahan storage dari tab lain (misal perusahaan menambah lowongan)
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'daftarLowongan') {
+            loadData();
+        }
+    });
+
+    // Karena renderLowongan dipanggil di applyFilters, kita perlu attach event setelah render
+    // Override renderLowongan untuk memanggil attachDetailEvents setelah selesai
+    const originalRender = renderLowongan;
+    renderLowongan = function() {
+        originalRender();
+        attachDetailEvents();
+    };
+    // Panggil sekali lagi untuk memastikan event terpasang
+    renderLowongan();
 </script>
 </body>
 </html>
