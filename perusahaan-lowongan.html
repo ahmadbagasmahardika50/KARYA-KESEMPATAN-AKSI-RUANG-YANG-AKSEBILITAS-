@@ -2,104 +2,235 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Cari Lowongan - KARYA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KARYA - Cari Lowongan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Lexend', sans-serif; }</style>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+        body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
+        :focus { outline: 2px solid #feb700; outline-offset: 2px; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#001855",
+                        "primary-container": "#002a84",
+                        secondary: "#7c5800",
+                        "secondary-container": "#feb700",
+                        surface: "#fcf9f8",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1b1c1c",
+                        "on-surface-variant": "#43474f",
+                        outline: "#737780",
+                        error: "#ba1a1a"
+                    },
+                    fontFamily: { sans: ["Lexend"] },
+                    borderRadius: { xl: "0.75rem", "2xl": "1rem", "3xl": "1.5rem" }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-50">
-    <nav class="bg-white shadow px-6 py-4 flex justify-between items-center">
-        <div class="text-xl font-black text-blue-900">KARYA</div>
+<body class="bg-surface text-on-surface">
+
+    <!-- Navbar KARYA -->
+    <nav class="bg-white shadow-md py-4 px-6 md:px-12 flex justify-between items-center">
+        <div class="text-2xl font-black text-primary tracking-tighter">KARYA</div>
         <div class="space-x-4">
-            <a href="penyandang-profil.html" class="text-blue-600 hover:underline">Profil</a>
-            <a href="login.html" class="text-red-600 hover:underline">Logout</a>
+            <a href="penyandang-lowongan.html" class="text-primary font-bold border-b-2 border-secondary-container pb-1">Cari Lowongan</a>
+            <a href="penyandang-profil.html" class="text-primary font-medium hover:underline">Profil</a>
+            <a href="login.html" onclick="localStorage.removeItem('user')" class="text-error">Logout</a>
         </div>
     </nav>
-    <div class="max-w-6xl mx-auto px-6 py-8">
-        <h1 class="text-2xl font-bold text-blue-900">Cari Lowongan Kerja</h1>
-        <div class="mt-4 flex flex-wrap gap-4">
-            <input type="text" id="cari" placeholder="Kata kunci (judul, perusahaan)" class="flex-1 p-3 rounded-xl bg-white border border-gray-300">
-            <select id="filterJenis" class="p-3 rounded-xl bg-white border border-gray-300">
-                <option value="">Semua Disabilitas</option>
-                <option>Fisik</option><option>Netra</option><option>Rungu</option><option>Mental</option>
-            </select>
-            <button id="btnCari" class="bg-blue-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-800">Cari</button>
+
+    <main class="max-w-6xl mx-auto px-6 py-12">
+        <h1 class="text-3xl font-black text-primary">Cari Lowongan Kerja</h1>
+        <p class="text-on-surface-variant mt-2">Temukan lowongan yang sesuai dengan kebutuhan dan kemampuan Anda.</p>
+
+        <!-- Filter & Pencarian -->
+        <div class="flex flex-wrap gap-4 mt-8">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-xs font-bold text-outline uppercase tracking-wider mb-1">Kata Kunci</label>
+                <input type="text" id="cari" placeholder="Judul atau nama perusahaan..." class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition">
+            </div>
+            <div class="w-48">
+                <label class="block text-xs font-bold text-outline uppercase tracking-wider mb-1">Jenis Disabilitas</label>
+                <select id="filterJenis" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
+                    <option value="">Semua</option>
+                    <option value="Fisik">Fisik</option>
+                    <option value="Netra">Netra</option>
+                    <option value="Rungu">Rungu</option>
+                    <option value="Mental">Mental</option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button id="btnCari" class="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-primary/90 shadow-md flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">search</span> Cari
+                </button>
+            </div>
         </div>
-        <div id="list" class="grid md:grid-cols-2 gap-6 mt-8"></div>
-    </div>
+
+        <!-- Hasil Pencarian (Grid) -->
+        <div id="list" class="grid md:grid-cols-2 gap-6 mt-10"></div>
+
+        <!-- Pesan jika tidak ada lowongan -->
+        <div id="emptyMessage" class="hidden text-center py-12 text-outline">
+            <span class="material-symbols-outlined text-5xl">search_off</span>
+            <p class="mt-2">Tidak ada lowongan yang ditemukan.</p>
+        </div>
+    </main>
 
     <!-- Modal Detail Lowongan -->
-    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-2xl w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">Detail Lowongan</h3>
-            <div id="modalContent"></div>
-            <div class="flex justify-end gap-2 mt-4">
-                <button id="closeModal" class="bg-gray-300 px-4 py-2 rounded">Tutup</button>
-                <button id="lamarBtn" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Lamar Sekarang</button>
+    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-surface-container-high">
+            <div class="flex justify-between items-center p-5 border-b border-surface-container-high">
+                <h3 class="text-xl font-bold text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined">work</span> Detail Lowongan
+                </h3>
+                <button id="closeModal" class="text-outline hover:text-primary text-2xl leading-none">&times;</button>
+            </div>
+            <div id="modalContent" class="p-5 space-y-3 text-on-surface-variant"></div>
+            <div class="flex justify-end gap-3 p-5 border-t border-surface-container-high">
+                <button id="closeModalBtn" class="px-4 py-2 bg-surface-container-high rounded-xl hover:bg-surface-container transition">Tutup</button>
+                <button id="lamarBtn" class="px-4 py-2 bg-secondary-container text-on-secondary rounded-xl font-bold hover:bg-secondary-container/80 transition flex items-center gap-1">
+                    <span class="material-symbols-outlined text-base">send</span> Lamar Sekarang
+                </button>
             </div>
         </div>
     </div>
 
+    <footer class="bg-surface-container-low py-6 text-center text-sm text-outline border-t border-surface-container mt-12">
+        © 2026 KARYA. Memberdayakan Kemampuan.
+    </footer>
+
     <script>
-        let lowongan = [
-            { id: 1, judul: "Frontend Developer", perusahaan: "PT Teknologi Inklusif", lokasi: "Surakarta", jenis: "Fisik", deskripsi: "Membangun antarmuka web aksesibel. WFH 2 hari/minggu." },
-            { id: 2, judul: "Admin Data Entry", perusahaan: "PT Maju Jaya", lokasi: "Jakarta", jenis: "Netra", deskripsi: "Menginput data dengan screen reader. Pelatihan disediakan." },
-            { id: 3, judul: "Customer Service", perusahaan: "Bank Inklusif", lokasi: "Bandung", jenis: "Rungu", deskripsi: "Melayani chat dan email dengan aplikasi SIBI." }
-        ];
+        // Ambil data lowongan dari localStorage (yang dikelola perusahaan)
+        // Jika belum ada, gunakan data default
+        let lowongan = JSON.parse(localStorage.getItem('lowongan') || '[]');
+        if (lowongan.length === 0) {
+            // Data default jika belum ada lowongan
+            lowongan = [
+                { id: 1, judul: "Frontend Developer", perusahaan: "PT Teknologi Inklusif", lokasi: "Surakarta", jenis: "Fisik", deskripsi: "Membangun antarmuka web yang aksesibel. WFH 2 hari/minggu. Ramah kursi roda.", status: "Aktif" },
+                { id: 2, judul: "Admin Data Entry", perusahaan: "PT Maju Jaya", lokasi: "Jakarta", jenis: "Netra", deskripsi: "Menginput data dengan screen reader. Pelatihan disediakan. Lingkungan kerja inklusif.", status: "Aktif" },
+                { id: 3, judul: "Customer Service", perusahaan: "Bank Inklusif", lokasi: "Bandung", jenis: "Rungu", deskripsi: "Melayani chat dan email dengan aplikasi SIBI. Tersedia interpreter.", status: "Aktif" }
+            ];
+            localStorage.setItem('lowongan', JSON.stringify(lowongan));
+        }
 
         let currentLowonganId = null;
 
+        // Render daftar lowongan
         function render(data) {
+            const container = document.getElementById('list');
+            const emptyMsg = document.getElementById('emptyMessage');
+            if (!data || data.length === 0) {
+                container.innerHTML = '';
+                emptyMsg.classList.remove('hidden');
+                return;
+            }
+            emptyMsg.classList.add('hidden');
             let html = '';
             data.forEach(l => {
-                html += `<div class="bg-white p-5 rounded-2xl shadow-md border border-gray-200">
-                    <h3 class="text-xl font-bold text-blue-900">${l.judul}</h3>
-                    <p class="text-gray-600">${l.perusahaan} • ${l.lokasi}</p>
-                    <p class="text-gray-500 text-sm mt-1">Disabilitas: ${l.jenis}</p>
-                    <p class="mt-2 text-gray-700">${l.deskripsi.substring(0, 100)}...</p>
-                    <button class="detailBtn mt-3 bg-amber-500 text-white px-4 py-2 rounded-xl hover:bg-amber-600" data-id="${l.id}">Lihat Detail</button>
-                </div>`;
+                // Hanya tampilkan lowongan dengan status 'Aktif'
+                if (l.status !== 'Aktif') return;
+                html += `
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-surface-container-high hover:shadow-lg transition">
+                        <h3 class="text-xl font-bold text-primary">${escapeHtml(l.judul)}</h3>
+                        <p class="text-on-surface-variant mt-1">${escapeHtml(l.perusahaan)} • ${escapeHtml(l.lokasi)}</p>
+                        <div class="flex items-center gap-1 mt-2">
+                            <span class="material-symbols-outlined text-sm text-secondary">accessibility_new</span>
+                            <span class="text-sm text-outline">Disabilitas: ${escapeHtml(l.jenis)}</span>
+                        </div>
+                        <p class="mt-3 text-on-surface-variant line-clamp-2">${escapeHtml(l.deskripsi.substring(0, 120))}${l.deskripsi.length > 120 ? '...' : ''}</p>
+                        <button class="detailBtn mt-4 bg-secondary-container text-on-secondary px-4 py-2 rounded-xl font-bold hover:bg-secondary-container/80 transition w-full flex items-center justify-center gap-2" data-id="${l.id}">
+                            <span class="material-symbols-outlined text-base">visibility</span> Lihat Detail
+                        </button>
+                    </div>
+                `;
             });
-            document.getElementById('list').innerHTML = html;
+            container.innerHTML = html;
         }
 
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Show modal detail
         function showDetail(id) {
             const l = lowongan.find(l => l.id == id);
             if (l) {
                 currentLowonganId = id;
-                document.getElementById('modalContent').innerHTML = `
-                    <p><strong>Judul:</strong> ${l.judul}</p>
-                    <p><strong>Perusahaan:</strong> ${l.perusahaan}</p>
-                    <p><strong>Lokasi:</strong> ${l.lokasi}</p>
-                    <p><strong>Disabilitas:</strong> ${l.jenis}</p>
-                    <p><strong>Deskripsi:</strong> ${l.deskripsi}</p>
+                const modalContent = document.getElementById('modalContent');
+                modalContent.innerHTML = `
+                    <div class="space-y-2">
+                        <p><strong class="text-primary">Judul:</strong> ${escapeHtml(l.judul)}</p>
+                        <p><strong class="text-primary">Perusahaan:</strong> ${escapeHtml(l.perusahaan)}</p>
+                        <p><strong class="text-primary">Lokasi:</strong> ${escapeHtml(l.lokasi)}</p>
+                        <p><strong class="text-primary">Disabilitas:</strong> ${escapeHtml(l.jenis)}</p>
+                        <p><strong class="text-primary">Deskripsi:</strong><br>${escapeHtml(l.deskripsi)}</p>
+                    </div>
                 `;
                 document.getElementById('modal').style.display = 'flex';
             }
         }
 
-        document.getElementById('btnCari').onclick = () => {
+        // Filter dan pencarian
+        function applyFilter() {
             const keyword = document.getElementById('cari').value.toLowerCase();
             const jenis = document.getElementById('filterJenis').value;
-            let filtered = lowongan.filter(l => 
-                (l.judul.toLowerCase().includes(keyword) || l.perusahaan.toLowerCase().includes(keyword)) &&
-                (jenis === "" || l.jenis === jenis)
-            );
+            let filtered = lowongan.filter(l => {
+                if (l.status !== 'Aktif') return false;
+                const matchKeyword = l.judul.toLowerCase().includes(keyword) || l.perusahaan.toLowerCase().includes(keyword);
+                const matchJenis = jenis === '' || l.jenis === jenis;
+                return matchKeyword && matchJenis;
+            });
             render(filtered);
-        };
+        }
+
+        // Event listeners
+        document.getElementById('btnCari').addEventListener('click', applyFilter);
+        document.getElementById('cari').addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilter(); });
+        document.getElementById('filterJenis').addEventListener('change', applyFilter);
+        
         document.getElementById('list').addEventListener('click', (e) => {
-            if (e.target.classList.contains('detailBtn')) {
-                const id = e.target.getAttribute('data-id');
+            if (e.target.classList.contains('detailBtn') || e.target.closest('.detailBtn')) {
+                const btn = e.target.closest('.detailBtn');
+                const id = btn.getAttribute('data-id');
                 showDetail(id);
             }
         });
-        document.getElementById('closeModal').onclick = () => document.getElementById('modal').style.display = 'none';
-        document.getElementById('lamarBtn').onclick = () => {
+        
+        function closeModalHandler() {
+            document.getElementById('modal').style.display = 'none';
+        }
+        document.getElementById('closeModal').addEventListener('click', closeModalHandler);
+        document.getElementById('closeModalBtn').addEventListener('click', closeModalHandler);
+        
+        document.getElementById('lamarBtn').addEventListener('click', () => {
             if (currentLowonganId) {
                 window.location.href = `penyandang-daftar.html?id=${currentLowonganId}`;
             }
-        };
-        render(lowongan);
+        });
+
+        // Inisialisasi halaman
+        render(lowongan.filter(l => l.status === 'Aktif'));
+
+        // Proteksi akses: hanya role penyandang yang boleh
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        if (!currentUser || currentUser.role !== 'penyandang') {
+            alert('Akses ditolak. Halaman ini khusus untuk penyandang disabilitas.');
+            window.location.href = 'login.html';
+        }
     </script>
 </body>
 </html>
