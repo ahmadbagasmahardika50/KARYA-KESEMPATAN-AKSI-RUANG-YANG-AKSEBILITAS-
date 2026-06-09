@@ -144,14 +144,11 @@
         </div>
     </div>
 
-    <!-- Step 1: Detail Lowongan -->
+    <!-- Step 1: Detail Lowongan (langsung dari localStorage) -->
     <div id="step1" class="bg-surface-container-lowest rounded-xl shadow-md p-6 border border-outline-variant/20">
         <h2 class="text-xl font-bold text-on-surface mb-4">Detail Lowongan</h2>
         <div id="detail-lowongan" class="bg-surface-container rounded-lg p-4 mb-4">
-            <div class="text-center py-8 text-outline">
-                <span class="material-symbols-outlined text-3xl animate-spin">progress_activity</span>
-                <p class="mt-2">Memuat data lowongan...</p>
-            </div>
+            <!-- akan diisi javascript -->
         </div>
         <div class="flex justify-end">
             <button id="next-step1" class="bg-primary text-on-primary px-6 py-2 rounded-lg hover:bg-primary/90 transition shadow-sm">
@@ -160,18 +157,18 @@
         </div>
     </div>
 
-    <!-- Step 2: Isi Data Diri -->
+    <!-- Step 2: Isi Data Diri (prefilled dari localStorage profil) -->
     <div id="step2" class="bg-surface-container-lowest rounded-xl shadow-md p-6 border border-outline-variant/20 hidden">
         <h2 class="text-xl font-bold text-on-surface mb-4">Data Diri Pelamar</h2>
         <form id="form-data-diri">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-on-surface-variant mb-1">Nama Lengkap <span class="text-error">*</span></label>
-                    <input type="text" id="nama" readonly class="w-full border border-outline-variant rounded-lg p-2 bg-surface-container-high text-on-surface">
+                    <input type="text" id="nama" class="w-full border border-outline-variant rounded-lg p-2 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-on-surface-variant mb-1">Email <span class="text-error">*</span></label>
-                    <input type="email" id="email" readonly class="w-full border border-outline-variant rounded-lg p-2 bg-surface-container-high text-on-surface">
+                    <input type="email" id="email" class="w-full border border-outline-variant rounded-lg p-2 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-on-surface-variant mb-1">Nomor Telepon <span class="text-error">*</span></label>
@@ -179,7 +176,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-on-surface-variant mb-1">Jenis Disabilitas <span class="text-error">*</span></label>
-                    <input type="text" id="jenis_disabilitas" readonly class="w-full border border-outline-variant rounded-lg p-2 bg-surface-container-high">
+                    <input type="text" id="jenis_disabilitas" class="w-full border border-outline-variant rounded-lg p-2 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50">
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-on-surface-variant mb-1">Alamat</label>
@@ -272,63 +269,67 @@
 </main>
 
 <script>
-    // Data profil user
-    const userProfil = {
-        nama: "Alya Yumna Atiqoh Wibowo",
-        email: "alya.yumna@example.com",
-        telepon: "081234567890",
-        jenis_disabilitas: "Fisik",
-        alamat: "Jl. Merdeka No. 45, Surakarta",
-        pendidikan: "S1 Sistem Informasi - UNS",
-        pengalaman: "Magang di PT. Teknologi Inklusif sebagai Frontend Developer (2025)"
-    };
+    // Fungsi untuk mengambil data profil dari localStorage, jika kosong gunakan default
+    function loadUserProfile() {
+        const defaultProfile = {
+            nama: "Alya Yumna Atiqoh Wibowo",
+            email: "alya.yumna@example.com",
+            telepon: "081234567890",
+            jenis_disabilitas: "Fisik",
+            alamat: "Jl. Merdeka No. 45, Surakarta",
+            pendidikan: "S1 Sistem Informasi - UNS",
+            pengalaman: "Magang di PT. Teknologi Inklusif sebagai Frontend Developer (2025)"
+        };
+        const stored = localStorage.getItem('userProfil');
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch(e) { return defaultProfile; }
+        }
+        return defaultProfile;
+    }
+
+    // Fungsi menyimpan profil ke localStorage
+    function saveUserProfile(profile) {
+        localStorage.setItem('userProfil', JSON.stringify(profile));
+    }
 
     let lowonganDipilih = null;
     let currentStep = 1;
 
-    // Load lowongan dari localStorage
+    // Langsung ambil lowongan dari localStorage (tanpa array besar)
     function loadLowonganDetail() {
         const stored = localStorage.getItem('lowonganDipilih');
         if (!stored) {
+            alert("Tidak ada lowongan yang dipilih. Silakan cari lowongan terlebih dahulu.");
             window.location.href = 'penyandang-cari-lowongan.html';
-            return;
+            return false;
         }
         try {
-            const lowonganData = JSON.parse(stored);
-            const semuaLowongan = [
-                { id: 1, judul: "Frontend Developer", perusahaan: "PT. Teknologi Inklusif", lokasi: "Surakarta", jenis_disabilitas: "Fisik", deskripsi: "Mengembangkan antarmuka web yang aksesibel. WFH 2x seminggu.", tgl_posting: "2026-06-01", gaji: "Rp 4.500.000 - Rp 6.000.000", status: "dibuka" },
-                { id: 2, judul: "Admin Data Entry", perusahaan: "CV. Maju Bersama", lokasi: "Remote", jenis_disabilitas: "Netra", deskripsi: "Menginput data dengan software screen reader friendly.", tgl_posting: "2026-06-03", gaji: "Rp 3.500.000 - Rp 4.500.000", status: "dibuka" },
-                { id: 3, judul: "Customer Service", perusahaan: "PT. Layanan Ramah", lokasi: "Jakarta", jenis_disabilitas: "Rungu", deskripsi: "Melayani pelanggan melalui chat dan email.", tgl_posting: "2026-06-05", gaji: "Rp 4.000.000 - Rp 5.500.000", status: "dibuka" },
-                { id: 4, judul: "Graphic Designer", perusahaan: "Studio Kreatif Inklusi", lokasi: "Bandung", jenis_disabilitas: "Fisik", deskripsi: "Desain grafis untuk konten media sosial dan website.", tgl_posting: "2026-06-07", gaji: "Rp 5.000.000 - Rp 7.000.000", status: "dibuka" }
-            ];
-            lowonganDipilih = semuaLowongan.find(l => l.id == lowonganData.id);
-            if (!lowonganDipilih) {
-                alert("Lowongan tidak ditemukan");
-                window.location.href = 'penyandang-cari-lowongan.html';
-                return;
-            }
+            lowonganDipilih = JSON.parse(stored);
             // Tampilkan detail lowongan
             const container = document.getElementById('detail-lowongan');
             container.innerHTML = `
-                <h3 class="text-lg font-bold text-on-surface mb-2">${lowonganDipilih.judul}</h3>
-                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">business</span>${lowonganDipilih.perusahaan}</p>
-                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">location_on</span>${lowonganDipilih.lokasi}</p>
-                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">accessible</span>Disabilitas: ${lowonganDipilih.jenis_disabilitas}</p>
-                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">payments</span>${lowonganDipilih.gaji}</p>
-                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">description</span>${lowonganDipilih.deskripsi}</p>
-                <p class="text-outline text-sm mt-2 flex items-center"><span class="material-symbols-outlined text-sm mr-2">calendar_today</span>Diposting: ${new Date(lowonganDipilih.tgl_posting).toLocaleDateString('id-ID')}</p>
+                <h3 class="text-lg font-bold text-on-surface mb-2">${lowonganDipilih.judul || lowonganDipilih.title || 'Lowongan'}</h3>
+                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">business</span>${lowonganDipilih.perusahaan || '-'}</p>
+                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">location_on</span>${lowonganDipilih.lokasi || '-'}</p>
+                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">accessible</span>Disabilitas: ${lowonganDipilih.jenis_disabilitas || '-'}</p>
+                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">payments</span>${lowonganDipilih.gaji || '-'}</p>
+                <p class="text-on-surface-variant mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-2">description</span>${lowonganDipilih.deskripsi || '-'}</p>
+                <p class="text-outline text-sm mt-2 flex items-center"><span class="material-symbols-outlined text-sm mr-2">calendar_today</span>Diposting: ${lowonganDipilih.tgl_posting ? new Date(lowonganDipilih.tgl_posting).toLocaleDateString('id-ID') : '-'}</p>
             `;
+            return true;
         } catch(e) {
             console.error(e);
+            alert("Data lowongan tidak valid.");
             window.location.href = 'penyandang-cari-lowongan.html';
+            return false;
         }
     }
 
-    // Fungsi update progress step
     function updateStepUI(step) {
         for (let i = 1; i <= 4; i++) {
             const indicator = document.getElementById(`step${i}-indicator`);
-            const stepDiv = document.getElementById(`step${i}`);
             if (i < step) {
                 indicator.classList.remove('bg-primary', 'bg-outline-variant', 'step-active');
                 indicator.classList.add('step-completed');
@@ -350,15 +351,30 @@
         }
     }
 
-    // Prefill data diri dari profil
-    function prefillDataDiri() {
-        document.getElementById('nama').value = userProfil.nama;
-        document.getElementById('email').value = userProfil.email;
-        document.getElementById('telepon').value = userProfil.telepon;
-        document.getElementById('jenis_disabilitas').value = userProfil.jenis_disabilitas;
-        document.getElementById('alamat').value = userProfil.alamat;
-        document.getElementById('pendidikan').value = userProfil.pendidikan;
-        document.getElementById('pengalaman').value = userProfil.pengalaman;
+    // Isi data diri dari profil yang tersimpan di localStorage
+    function fillDataDiriFromProfile() {
+        const profile = loadUserProfile();
+        document.getElementById('nama').value = profile.nama || '';
+        document.getElementById('email').value = profile.email || '';
+        document.getElementById('telepon').value = profile.telepon || '';
+        document.getElementById('jenis_disabilitas').value = profile.jenis_disabilitas || '';
+        document.getElementById('alamat').value = profile.alamat || '';
+        document.getElementById('pendidikan').value = profile.pendidikan || '';
+        document.getElementById('pengalaman').value = profile.pengalaman || '';
+    }
+
+    // Simpan data diri ke localStorage (update profil)
+    function saveDataDiriToProfile() {
+        const updatedProfile = {
+            nama: document.getElementById('nama').value,
+            email: document.getElementById('email').value,
+            telepon: document.getElementById('telepon').value,
+            jenis_disabilitas: document.getElementById('jenis_disabilitas').value,
+            alamat: document.getElementById('alamat').value,
+            pendidikan: document.getElementById('pendidikan').value,
+            pengalaman: document.getElementById('pengalaman').value
+        };
+        saveUserProfile(updatedProfile);
     }
 
     // Tampilkan konfirmasi data
@@ -379,7 +395,7 @@
         };
         const konfirmasiDiv = document.getElementById('konfirmasi-data');
         konfirmasiDiv.innerHTML = `
-            <h3 class="font-semibold text-on-surface mb-2">Lowongan: ${lowonganDipilih.judul}</h3>
+            <h3 class="font-semibold text-on-surface mb-2">Lowongan: ${lowonganDipilih.judul || lowonganDipilih.title}</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                 <div><span class="font-medium">Nama:</span> ${dataDiri.nama}</div>
                 <div><span class="font-medium">Email:</span> ${dataDiri.email}</div>
@@ -399,7 +415,7 @@
     document.getElementById('next-step1').addEventListener('click', () => {
         currentStep = 2;
         updateStepUI(currentStep);
-        prefillDataDiri();
+        fillDataDiriFromProfile();
     });
     document.getElementById('prev-step2').addEventListener('click', () => {
         currentStep = 1;
@@ -407,17 +423,17 @@
     });
     document.getElementById('form-data-diri').addEventListener('submit', (e) => {
         e.preventDefault();
-        // Simpan data diri yang sudah diisi (opsional)
+        saveDataDiriToProfile();  // simpan perubahan ke localStorage
         currentStep = 3;
         updateStepUI(currentStep);
     });
     document.getElementById('prev-step3').addEventListener('click', () => {
         currentStep = 2;
         updateStepUI(currentStep);
+        fillDataDiriFromProfile(); // refresh data jika ada perubahan dari luar
     });
     document.getElementById('form-dokumen').addEventListener('submit', (e) => {
         e.preventDefault();
-        // Validasi file CV wajib
         const cvFile = document.getElementById('cv').files[0];
         if (!cvFile) {
             alert('CV / Resume wajib diunggah');
@@ -432,7 +448,7 @@
         updateStepUI(currentStep);
     });
     document.getElementById('submit-daftar').addEventListener('click', () => {
-        // Simulasi submit
+        // Simulasi penyimpanan lamaran (bisa ditambahkan ke localStorage jika perlu)
         document.getElementById('success-modal').classList.remove('hidden');
     });
     document.getElementById('close-modal').addEventListener('click', () => {
@@ -440,8 +456,9 @@
     });
 
     // Inisialisasi
-    loadLowonganDetail();
-    updateStepUI(1);
+    if (loadLowonganDetail()) {
+        updateStepUI(1);
+    }
 </script>
 </body>
 </html>
