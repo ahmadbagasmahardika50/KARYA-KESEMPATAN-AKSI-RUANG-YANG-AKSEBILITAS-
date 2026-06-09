@@ -9,18 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
         body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
-        @keyframes fadeInLeft {
-            from { opacity: 0; transform: translateX(-30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes fadeInRight {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
+        @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         .animate-left { animation: fadeInLeft 0.6s ease-out; }
         .animate-right { animation: fadeInRight 0.6s ease-out; }
         .float-slow { animation: float 4s ease-in-out infinite; }
@@ -34,10 +25,7 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        primary: "#001855",
-                        secondary: "#feb700",
-                    },
+                    colors: { primary: "#001855", secondary: "#feb700" },
                     fontFamily: { sans: ["Lexend"] },
                     borderRadius: { xl: "0.75rem", "2xl": "1rem", "3xl": "1.5rem" }
                 }
@@ -48,7 +36,7 @@
 <body class="min-h-screen flex items-center justify-center p-6">
     <div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden card-hover">
         <div class="flex flex-col md:flex-row">
-            <!-- Left Side: Branding / Ilustrasi -->
+            <!-- Left Side: Branding -->
             <div class="md:w-1/2 bg-gradient-to-br from-primary to-primary/80 p-8 flex flex-col justify-between items-center text-center text-white animate-left">
                 <div class="mt-8">
                     <div class="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6 float-slow">
@@ -73,18 +61,13 @@
                 <form id="loginForm" class="space-y-5">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                        <input type="email" id="email" 
-                               class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-secondary input-focus transition"
-                               placeholder="nama@perusahaan.com" required>
+                        <input type="email" id="email" class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-secondary input-focus transition" placeholder="nama@perusahaan.com" required>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
-                        <input type="password" id="password" 
-                               class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-secondary input-focus transition"
-                               placeholder="••••••••" required>
+                        <input type="password" id="password" class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-secondary input-focus transition" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" 
-                            class="w-full bg-primary text-white py-3 rounded-xl font-bold btn-hover shadow-md flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-bold btn-hover shadow-md flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined">login</span> Masuk
                     </button>
                 </form>
@@ -96,8 +79,11 @@
                     Belum punya akun? 
                     <a href="register.html" class="text-primary font-bold hover:underline transition">Daftar Sekarang</a>
                 </p>
+                <!-- Bagian Credential - Tanpa kata "Demo" -->
                 <div class="mt-6 p-3 bg-gray-50 rounded-xl text-center border border-gray-100">
-                    <p class="text-xs text-gray-500 font-medium">🔐 Demo Akun</p>
+                    <p class="text-xs text-gray-500 font-medium flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-sm">bolt</span> Coba Sekarang
+                    </p>
                     <div class="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-primary mt-1">
                         <span>admin@karya.com / admin</span>
                         <span>•</span>
