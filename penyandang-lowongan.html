@@ -27,7 +27,6 @@
             outline: 2px solid #feb700;
             outline-offset: 2px;
         }
-        /* status badge */
         .status-pending { background-color: #fef3c7; color: #b45309; }
         .status-diproses { background-color: #dbeafe; color: #1e40af; }
         .status-interview { background-color: #d1fae5; color: #065f46; }
@@ -42,7 +41,6 @@
         <div class="text-2xl font-black text-[#001855] tracking-tight">KARYA Pelamar</div>
         <div class="flex items-center space-x-6">
             <span class="text-sm text-gray-700 hidden md:inline">Halo, <span id="user-name-display" class="font-semibold">Penyandang</span></span>
-            <!-- Lamaran Saya -->
             <a href="#" id="riwayatBtn" class="text-[#001855] hover:text-[#feb700] transition flex items-center gap-1">
                 <span class="material-symbols-outlined text-base">history</span> Lamaran Saya
             </a>
@@ -55,7 +53,6 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-8">
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-[#001855]">Cari Lowongan Kerja</h1>
@@ -87,15 +84,7 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perusahaan</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disabilitas</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                        </tr>
-                    </thead>
+                        <tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perusahaan</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disabilitas</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th><th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th></tr></thead>
                     <tbody id="tabel-lowongan" class="bg-white divide-y divide-gray-200"></tbody>
                 </table>
             </div>
@@ -115,7 +104,7 @@
         </div>
     </div>
 
-    <!-- Modal Riwayat Lamaran (dengan tombol hapus, tanpa update status) -->
+    <!-- Modal Riwayat Lamaran (dengan tombol Edit, Detail, Hapus) -->
     <div id="riwayatModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] overflow-y-auto shadow-xl">
             <div class="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
@@ -130,7 +119,38 @@
         </div>
     </div>
 
-    <!-- Modal Detail Lamaran -->
+    <!-- Modal Edit Lamaran (untuk update data diri dan CV) -->
+    <div id="editLamaranModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-xl">
+            <div class="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
+                <h3 class="text-xl font-bold text-[#001855] flex items-center gap-2">
+                    <span class="material-symbols-outlined">edit</span> Edit Lamaran
+                </h3>
+                <button id="closeEditModal" class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <div class="p-6">
+                <form id="formEditLamaran">
+                    <input type="hidden" id="editLamaranId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label><input type="text" id="editNama" class="w-full p-2 border rounded-lg"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Email</label><input type="email" id="editEmail" class="w-full p-2 border rounded-lg bg-gray-100" readonly></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Telepon</label><input type="tel" id="editTelepon" class="w-full p-2 border rounded-lg"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Jenis Disabilitas</label><input type="text" id="editJenisDisabilitas" class="w-full p-2 border rounded-lg"></div>
+                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label><textarea id="editAlamat" rows="2" class="w-full p-2 border rounded-lg"></textarea></div>
+                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Pendidikan Terakhir</label><input type="text" id="editPendidikan" class="w-full p-2 border rounded-lg"></div>
+                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Pengalaman Kerja</label><textarea id="editPengalaman" rows="3" class="w-full p-2 border rounded-lg"></textarea></div>
+                        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">CV / Resume (biarkan kosong jika tidak mengganti)</label><input type="file" id="editCv" accept=".pdf,.doc,.docx" class="w-full text-sm"></div>
+                    </div>
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button type="button" id="cancelEditBtn" class="px-4 py-2 border rounded-lg">Batal</button>
+                        <button type="submit" class="btn-primary px-4 py-2 rounded-lg">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Lamaran (tampilan informasi lengkap) -->
     <div id="detailLamaranModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-2xl w-full max-w-md shadow-xl p-6">
             <h3 class="text-xl font-bold text-[#001855] mb-4">Detail Lamaran</h3>
@@ -151,12 +171,11 @@
         }
         const userEmail = currentUser ? currentUser.email : '';
 
-        // ==================== AMBIL DATA LOWONGAN ====================
+        // ==================== FUNGSI LOWONGAN ====================
         function getLowongan() {
             const stored = localStorage.getItem('daftarLowongan');
             return stored ? JSON.parse(stored) : [];
         }
-
         let semuaLowongan = [];
         let currentLowonganId = null;
 
@@ -166,14 +185,43 @@
             return allLamaran.filter(l => l.pelamarEmail === userEmail);
         }
 
+        function simpanLamaranKeStorage(lamaran) {
+            let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
+            const index = allLamaran.findIndex(l => l.id === lamaran.id);
+            if (index !== -1) allLamaran[index] = lamaran;
+            else allLamaran.push(lamaran);
+            localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
+        }
+
         function hapusLamaran(id) {
             let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
             allLamaran = allLamaran.filter(l => !(l.pelamarEmail === userEmail && l.id === id));
             localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
-            renderRiwayatLamaran(); // refresh modal
+            renderRiwayatLamaran();
         }
 
-        // Render daftar lamaran (tombol Detail + Hapus, tanpa update status)
+        function updateLamaran(id, updatedData) {
+            let allLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
+            const index = allLamaran.findIndex(l => l.id === id);
+            if (index !== -1) {
+                allLamaran[index] = { ...allLamaran[index], ...updatedData };
+                localStorage.setItem('daftarLamaran', JSON.stringify(allLamaran));
+                // Juga update profil user agar sinkron
+                const userProfil = JSON.parse(localStorage.getItem('userProfil') || '{}');
+                const newProfil = {
+                    ...userProfil,
+                    nama: updatedData.pelamarNama || allLamaran[index].pelamarNama,
+                    telepon: updatedData.telepon || allLamaran[index].telepon,
+                    jenis_disabilitas: updatedData.jenisDisabilitas || allLamaran[index].jenisDisabilitas,
+                    alamat: updatedData.alamat || allLamaran[index].alamat,
+                    pendidikan: updatedData.pendidikan || allLamaran[index].pendidikan,
+                    pengalaman: updatedData.pengalaman || allLamaran[index].pengalaman
+                };
+                localStorage.setItem('userProfil', JSON.stringify(newProfil));
+                renderRiwayatLamaran();
+            }
+        }
+
         function renderRiwayatLamaran() {
             const lamaranUser = getLamaranUser();
             const container = document.getElementById('daftarLamaranContainer');
@@ -182,9 +230,7 @@
                 return;
             }
             let html = `<div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr><th class="px-4 py-2 text-left text-xs font-medium">Judul Lowongan</th><th class="px-4 py-2 text-left text-xs font-medium">Perusahaan</th><th class="px-4 py-2 text-left text-xs font-medium">Tanggal Lamar</th><th class="px-4 py-2 text-left text-xs font-medium">Status</th><th class="px-4 py-2 text-center text-xs font-medium">Aksi</th></tr>
-                </thead><tbody>`;
+                <thead class="bg-gray-50"><tr><th class="px-4 py-2 text-left text-xs font-medium">Judul Lowongan</th><th class="px-4 py-2 text-left text-xs font-medium">Perusahaan</th><th class="px-4 py-2 text-left text-xs font-medium">Tanggal Lamar</th><th class="px-4 py-2 text-left text-xs font-medium">Status</th><th class="px-4 py-2 text-center text-xs font-medium">Aksi</th></tr></thead><tbody>`;
             lamaranUser.forEach(l => {
                 let statusClass = '';
                 if (l.status === 'pending') statusClass = 'status-pending';
@@ -193,13 +239,7 @@
                 else if (l.status === 'diterima') statusClass = 'status-diterima';
                 else if (l.status === 'ditolak') statusClass = 'status-ditolak';
                 else statusClass = 'bg-gray-100';
-                const statusText = {
-                    'pending': 'Menunggu',
-                    'diproses': 'Sedang Diproses',
-                    'interview': 'Undangan Interview',
-                    'diterima': 'Diterima',
-                    'ditolak': 'Ditolak'
-                }[l.status] || l.status;
+                const statusText = { 'pending':'Menunggu','diproses':'Sedang Diproses','interview':'Undangan Interview','diterima':'Diterima','ditolak':'Ditolak' }[l.status] || l.status;
                 html += `<tr class="border-b">
                     <td class="px-4 py-2">${escapeHtml(l.judulLowongan)}</td>
                     <td class="px-4 py-2">${escapeHtml(l.perusahaan)}</td>
@@ -207,75 +247,95 @@
                     <td class="px-4 py-2"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${statusText}</span></td>
                     <td class="px-4 py-2 text-center">
                         <button class="detailLamaranBtn text-blue-600 hover:text-blue-800 mr-2" data-id="${l.id}">Detail</button>
+                        <button class="editLamaranBtn text-green-600 hover:text-green-800 mr-2" data-id="${l.id}">Edit</button>
                         <button class="hapusLamaranBtn text-red-600 hover:text-red-800" data-id="${l.id}">Hapus</button>
                     </td>
-                 </tr>`;
+                </tr>`;
             });
             html += `</tbody></table></div>`;
             container.innerHTML = html;
 
-            // Event listeners untuk tombol detail
             document.querySelectorAll('.detailLamaranBtn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = parseInt(btn.getAttribute('data-id'));
-                    const lamaran = lamaranUser.find(l => l.id === id);
-                    if (lamaran) showDetailLamaran(lamaran);
-                });
+                btn.addEventListener('click', () => showDetailLamaran(parseInt(btn.dataset.id)));
             });
-            // Event listeners untuk tombol hapus
+            document.querySelectorAll('.editLamaranBtn').forEach(btn => {
+                btn.addEventListener('click', () => showEditLamaran(parseInt(btn.dataset.id)));
+            });
             document.querySelectorAll('.hapusLamaranBtn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = parseInt(btn.getAttribute('data-id'));
-                    if (confirm('Hapus lamaran ini? Tindakan tidak dapat dibatalkan.')) {
-                        hapusLamaran(id);
-                    }
-                });
+                btn.addEventListener('click', () => { if(confirm('Hapus lamaran ini?')) hapusLamaran(parseInt(btn.dataset.id)); });
             });
         }
 
-        function showDetailLamaran(lamaran) {
-            const content = document.getElementById('detailLamaranContent');
-            content.innerHTML = `
-                <p><strong>Lowongan:</strong> ${escapeHtml(lamaran.judulLowongan)}</p>
-                <p><strong>Perusahaan:</strong> ${escapeHtml(lamaran.perusahaan)}</p>
-                <p><strong>Tanggal Lamar:</strong> ${lamaran.tglLamaran}</p>
-                <p><strong>Status:</strong> ${lamaran.status}</p>
-                <p><strong>Nama Pelamar:</strong> ${escapeHtml(lamaran.pelamarNama)}</p>
-                <p><strong>Email:</strong> ${escapeHtml(lamaran.pelamarEmail)}</p>
-                <p><strong>Telepon:</strong> ${escapeHtml(lamaran.telepon)}</p>
-                <p><strong>Jenis Disabilitas:</strong> ${escapeHtml(lamaran.jenisDisabilitas)}</p>
-                <p><strong>Alamat:</strong> ${escapeHtml(lamaran.alamat)}</p>
-                <p><strong>Pendidikan:</strong> ${escapeHtml(lamaran.pendidikan)}</p>
-                <p><strong>Pengalaman:</strong> ${escapeHtml(lamaran.pengalaman)}</p>
-                <p><strong>CV:</strong> ${escapeHtml(lamaran.cvFileName)}</p>
-                ${lamaran.ijazahFileName ? `<p><strong>Ijazah:</strong> ${escapeHtml(lamaran.ijazahFileName)}</p>` : ''}
-            `;
-            document.getElementById('detailLamaranModal').style.display = 'flex';
+        function showDetailLamaran(id) {
+            const lamaran = getLamaranUser().find(l => l.id === id);
+            if (lamaran) {
+                const content = document.getElementById('detailLamaranContent');
+                content.innerHTML = `
+                    <p><strong>Lowongan:</strong> ${escapeHtml(lamaran.judulLowongan)}</p>
+                    <p><strong>Perusahaan:</strong> ${escapeHtml(lamaran.perusahaan)}</p>
+                    <p><strong>Tanggal Lamar:</strong> ${lamaran.tglLamaran}</p>
+                    <p><strong>Status:</strong> ${lamaran.status}</p>
+                    <p><strong>Nama:</strong> ${escapeHtml(lamaran.pelamarNama)}</p>
+                    <p><strong>Email:</strong> ${escapeHtml(lamaran.pelamarEmail)}</p>
+                    <p><strong>Telepon:</strong> ${escapeHtml(lamaran.telepon)}</p>
+                    <p><strong>Jenis Disabilitas:</strong> ${escapeHtml(lamaran.jenisDisabilitas)}</p>
+                    <p><strong>Alamat:</strong> ${escapeHtml(lamaran.alamat)}</p>
+                    <p><strong>Pendidikan:</strong> ${escapeHtml(lamaran.pendidikan)}</p>
+                    <p><strong>Pengalaman:</strong> ${escapeHtml(lamaran.pengalaman)}</p>
+                    <p><strong>CV:</strong> ${escapeHtml(lamaran.cvFileName)}</p>
+                    ${lamaran.ijazahFileName ? `<p><strong>Ijazah:</strong> ${escapeHtml(lamaran.ijazahFileName)}</p>` : ''}
+                `;
+                document.getElementById('detailLamaranModal').style.display = 'flex';
+            }
         }
 
-        // ==================== FUNGSI LOWONGAN (sama) ====================
+        function showEditLamaran(id) {
+            const lamaran = getLamaranUser().find(l => l.id === id);
+            if (lamaran) {
+                document.getElementById('editLamaranId').value = lamaran.id;
+                document.getElementById('editNama').value = lamaran.pelamarNama || '';
+                document.getElementById('editEmail').value = lamaran.pelamarEmail || '';
+                document.getElementById('editTelepon').value = lamaran.telepon || '';
+                document.getElementById('editJenisDisabilitas').value = lamaran.jenisDisabilitas || '';
+                document.getElementById('editAlamat').value = lamaran.alamat || '';
+                document.getElementById('editPendidikan').value = lamaran.pendidikan || '';
+                document.getElementById('editPengalaman').value = lamaran.pengalaman || '';
+                document.getElementById('editCv').value = '';
+                document.getElementById('editLamaranModal').style.display = 'flex';
+            }
+        }
+
+        // Proses update lamaran
+        document.getElementById('formEditLamaran').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('editLamaranId').value);
+            const cvFile = document.getElementById('editCv').files[0];
+            const updatedData = {
+                pelamarNama: document.getElementById('editNama').value,
+                telepon: document.getElementById('editTelepon').value,
+                jenisDisabilitas: document.getElementById('editJenisDisabilitas').value,
+                alamat: document.getElementById('editAlamat').value,
+                pendidikan: document.getElementById('editPendidikan').value,
+                pengalaman: document.getElementById('editPengalaman').value
+            };
+            if (cvFile) updatedData.cvFileName = cvFile.name;
+            updateLamaran(id, updatedData);
+            document.getElementById('editLamaranModal').style.display = 'none';
+            alert('Lamaran berhasil diperbarui');
+        });
+
+        // ==================== FUNGSI LOWONGAN (sama seperti sebelumnya) ====================
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
         function renderTable(data) {
             const tbody = document.getElementById('tabel-lowongan');
             const emptyDiv = document.getElementById('empty-row');
-            if (!data.length) {
-                tbody.innerHTML = '';
-                emptyDiv.classList.remove('hidden');
-                return;
-            }
+            if (!data.length) { tbody.innerHTML = ''; emptyDiv.classList.remove('hidden'); return; }
             emptyDiv.classList.add('hidden');
             let html = '';
             data.forEach(l => {
                 const statusBadge = l.status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-                html += `<tr class="table-row-hover">
-                    <td class="px-6 py-4">${escapeHtml(l.judul)}</td>
-                    <td class="px-6 py-4">${escapeHtml(l.perusahaan)}</td>
-                    <td class="px-6 py-4">${escapeHtml(l.lokasi)}</td>
-                    <td class="px-6 py-4">${escapeHtml(l.jenis_disabilitas || l.jenis)}</td>
-                    <td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusBadge}">${escapeHtml(l.status || 'Aktif')}</span></td>
-                    <td class="px-6 py-4 text-center"><button class="detailBtn text-[#001855] hover:text-[#feb700] font-medium" data-id="${l.id}">Detail</button></td>
-                 </tr>`;
+                html += `<tr class="table-row-hover"><td class="px-6 py-4">${escapeHtml(l.judul)}</td><td class="px-6 py-4">${escapeHtml(l.perusahaan)}</td><td class="px-6 py-4">${escapeHtml(l.lokasi)}</td><td class="px-6 py-4">${escapeHtml(l.jenis_disabilitas || l.jenis)}</td><td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusBadge}">${escapeHtml(l.status || 'Aktif')}</span></td><td class="px-6 py-4 text-center"><button class="detailBtn text-[#001855] hover:text-[#feb700] font-medium" data-id="${l.id}">Detail</button></td></tr>`;
             });
             tbody.innerHTML = html;
         }
@@ -316,24 +376,28 @@
         document.getElementById('cari').addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilter(); });
         document.getElementById('filterJenis').addEventListener('change', applyFilter);
         document.getElementById('tabel-lowongan').addEventListener('click', (e) => {
-            if (e.target.classList.contains('detailBtn')) showDetail(parseInt(e.target.getAttribute('data-id')));
+            if (e.target.classList.contains('detailBtn')) showDetail(parseInt(e.target.dataset.id));
         });
         document.getElementById('closeModal').addEventListener('click', () => document.getElementById('modal').style.display = 'none');
         document.getElementById('lamarBtn').addEventListener('click', lamar);
         window.addEventListener('click', (e) => { if (e.target === document.getElementById('modal')) document.getElementById('modal').style.display = 'none'; });
         window.addEventListener('storage', (e) => { if (e.key === 'daftarLowongan') loadData(); });
 
-        // Riwayat modal
+        // Modal riwayat
         const riwayatModal = document.getElementById('riwayatModal');
         const riwayatBtn = document.getElementById('riwayatBtn');
         const closeRiwayatModal = document.getElementById('closeRiwayatModal');
-        riwayatBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            renderRiwayatLamaran();
-            riwayatModal.style.display = 'flex';
-        });
+        riwayatBtn.addEventListener('click', (e) => { e.preventDefault(); renderRiwayatLamaran(); riwayatModal.style.display = 'flex'; });
         closeRiwayatModal.addEventListener('click', () => riwayatModal.style.display = 'none');
         window.addEventListener('click', (e) => { if (e.target === riwayatModal) riwayatModal.style.display = 'none'; });
+
+        // Modal edit lamaran
+        const editModal = document.getElementById('editLamaranModal');
+        const closeEditModal = document.getElementById('closeEditModal');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        closeEditModal.addEventListener('click', () => editModal.style.display = 'none');
+        cancelEditBtn.addEventListener('click', () => editModal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target === editModal) editModal.style.display = 'none'; });
 
         // Modal detail lamaran
         const detailLamaranModal = document.getElementById('detailLamaranModal');
