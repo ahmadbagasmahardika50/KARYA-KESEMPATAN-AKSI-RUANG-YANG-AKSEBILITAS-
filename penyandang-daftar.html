@@ -7,9 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script id="tailwind-config">
+    <script>
         tailwind.config = {
-            darkMode: "class",
             theme: {
                 extend: {
                     colors: {
@@ -26,29 +25,19 @@
                         "secondary-container": "#feb700",
                         "on-surface-variant": "#43474f",
                     },
-                    borderRadius: {
-                        xl: "0.75rem",
-                        "2xl": "1rem",
-                    },
-                    fontFamily: {
-                        sans: ["Lexend"],
-                    },
+                    borderRadius: { xl: "0.75rem", "2xl": "1rem" },
+                    fontFamily: { sans: ["Lexend"] },
                 },
             },
         }
     </script>
     <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
-        }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
         body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
         :focus { outline: 2px solid #feb700; outline-offset: 2px; }
     </style>
 </head>
 <body class="bg-surface text-on-surface">
-
-    <!-- Navbar (hanya teks KARYA) -->
     <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-sm">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <h1 class="text-xl font-bold text-primary">KARYA</h1>
@@ -58,22 +47,19 @@
                     <span id="user-name">Penyandang</span>
                 </span>
                 <button id="logoutBtn" class="bg-error/10 text-error px-3 py-1 rounded-full text-sm hover:bg-error/20 transition">
-                    <span class="material-symbols-outlined text-sm mr-1">logout</span>
-                    Logout
+                    <span class="material-symbols-outlined text-sm mr-1">logout</span> Logout
                 </button>
             </div>
         </div>
     </nav>
     <div class="h-16"></div>
-
     <main class="container mx-auto px-4 py-8 max-w-3xl">
-        <!-- Ringkasan Lowongan yang Dilamar -->
+        <!-- Ringkasan Lowongan -->
         <div class="bg-surface-container-lowest rounded-xl shadow-md p-6 mb-6 border border-outline-variant/30">
             <h2 class="text-xl font-bold text-primary flex items-center gap-2">
                 <span class="material-symbols-outlined">description</span> Lamaran Pekerjaan
             </h2>
             <div id="ringkasanLowongan" class="mt-3 p-4 bg-surface-container-high rounded-lg">
-                <!-- Akan diisi JavaScript -->
                 <p class="text-outline">Memuat data lowongan...</p>
             </div>
         </div>
@@ -84,59 +70,36 @@
                 <span class="material-symbols-outlined">edit_note</span> Isi Data Diri
             </h2>
             <form id="formPendaftaran">
-                <!-- Data diri (prefilled) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-medium text-on-surface-variant mb-1">Nama Lengkap <span class="text-error">*</span></label>
-                        <input type="text" id="nama" required class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-on-surface-variant mb-1">Email <span class="text-error">*</span></label>
-                        <input type="email" id="email" required class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-on-surface-variant mb-1">Nomor Telepon</label>
-                        <input type="tel" id="telepon" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-on-surface-variant mb-1">Jenis Disabilitas</label>
-                        <input type="text" id="jenisDisabilitas" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-on-surface-variant mb-1">Alamat</label>
-                        <textarea id="alamat" rows="2" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></textarea>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-on-surface-variant mb-1">Pendidikan Terakhir</label>
-                        <input type="text" id="pendidikan" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-on-surface-variant mb-1">Pengalaman Kerja</label>
-                        <textarea id="pengalaman" rows="3" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary" placeholder="Ceritakan pengalaman kerja Anda (jika ada)"></textarea>
-                    </div>
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">Nama Lengkap <span class="text-error">*</span></label>
+                        <input type="text" id="nama" required class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary transition"></div>
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">Email <span class="text-error">*</span></label>
+                        <input type="email" id="email" required class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></div>
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">Nomor Telepon</label>
+                        <input type="tel" id="telepon" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></div>
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">Jenis Disabilitas</label>
+                        <input type="text" id="jenisDisabilitas" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></div>
+                    <div class="md:col-span-2"><label class="block text-sm font-medium text-on-surface-variant mb-1">Alamat</label>
+                        <textarea id="alamat" rows="2" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></textarea></div>
+                    <div class="md:col-span-2"><label class="block text-sm font-medium text-on-surface-variant mb-1">Pendidikan Terakhir</label>
+                        <input type="text" id="pendidikan" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary"></div>
+                    <div class="md:col-span-2"><label class="block text-sm font-medium text-on-surface-variant mb-1">Pengalaman Kerja</label>
+                        <textarea id="pengalaman" rows="3" class="w-full p-3 rounded-xl bg-surface-container-high border border-transparent focus:border-primary" placeholder="Ceritakan pengalaman kerja Anda (jika ada)"></textarea></div>
                 </div>
 
-                <!-- Upload Dokumen -->
                 <h3 class="text-lg font-semibold text-primary mt-6 mb-3 flex items-center gap-2">
                     <span class="material-symbols-outlined">attach_file</span> Dokumen Pendukung
                 </h3>
                 <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-on-surface-variant mb-1">CV / Resume <span class="text-error">*</span></label>
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">CV / Resume <span class="text-error">*</span></label>
                         <input type="file" id="cv" accept=".pdf,.doc,.docx" required class="w-full text-sm file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-sm file:bg-primary-container file:text-on-primary-container hover:file:bg-primary-container/80">
-                        <p class="text-xs text-outline mt-1">Format PDF, DOC, DOCX (maks 2MB)</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-on-surface-variant mb-1">Ijazah / Sertifikat (opsional)</label>
-                        <input type="file" id="ijazah" accept=".pdf,.jpg,.png" class="w-full text-sm file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-sm file:bg-primary-container file:text-on-primary-container hover:file:bg-primary-container/80">
-                    </div>
+                        <p class="text-xs text-outline mt-1">Format PDF, DOC, DOCX (maks 2MB)</p></div>
+                    <div><label class="block text-sm font-medium text-on-surface-variant mb-1">Ijazah / Sertifikat (opsional)</label>
+                        <input type="file" id="ijazah" accept=".pdf,.jpg,.png" class="w-full text-sm file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-sm file:bg-primary-container file:text-on-primary-container hover:file:bg-primary-container/80"></div>
                 </div>
 
-                <!-- Tombol aksi -->
                 <div class="flex justify-end gap-3 mt-8">
-                    <button type="button" id="batalBtn" class="px-5 py-2 border border-outline-variant rounded-xl text-on-surface-variant hover:bg-surface-container transition">
-                        Batal
-                    </button>
+                    <button type="button" id="batalBtn" class="px-5 py-2 border border-outline-variant rounded-xl text-on-surface-variant hover:bg-surface-container transition">Batal</button>
                     <button type="submit" class="bg-primary text-on-primary px-6 py-2 rounded-xl font-bold hover:bg-primary/90 shadow-md flex items-center gap-2">
                         <span class="material-symbols-outlined">send</span> Kirim Lamaran
                     </button>
@@ -145,7 +108,6 @@
         </div>
     </main>
 
-    <!-- Modal Sukses -->
     <div id="successModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
         <div class="bg-surface-container-lowest rounded-2xl p-6 max-w-sm text-center shadow-2xl">
             <span class="material-symbols-outlined text-5xl text-green-600">check_circle</span>
@@ -160,7 +122,6 @@
     </footer>
 
     <script>
-        // ==================== CEK USER LOGIN ====================
         const currentUser = JSON.parse(localStorage.getItem('user'));
         if (!currentUser || currentUser.role !== 'penyandang') {
             alert('Silakan login sebagai penyandang disabilitas terlebih dahulu.');
@@ -168,22 +129,15 @@
         }
         document.getElementById('user-name').innerText = currentUser.nama || currentUser.email.split('@')[0];
 
-        // ==================== AMBIL DATA LOWONGAN ====================
         let lowonganDipilih = null;
         const storedLowongan = localStorage.getItem('lowonganDipilih');
         if (!storedLowongan) {
             alert('Tidak ada lowongan yang dipilih. Silakan cari lowongan terlebih dahulu.');
-            window.location.href = 'penyandang-cari-lowongan.html';
+            window.location.href = 'penyandang-lowongan.html';
         } else {
-            try {
-                lowonganDipilih = JSON.parse(storedLowongan);
-            } catch(e) {
-                alert('Data lowongan tidak valid.');
-                window.location.href = 'penyandang-cari-lowongan.html';
-            }
+            try { lowonganDipilih = JSON.parse(storedLowongan); } catch(e) { window.location.href = 'penyandang-lowongan.html'; }
         }
 
-        // Tampilkan ringkasan lowongan
         const ringkasanDiv = document.getElementById('ringkasanLowongan');
         if (lowonganDipilih) {
             ringkasanDiv.innerHTML = `
@@ -195,43 +149,24 @@
             `;
         }
 
-        // ==================== AMBIL / SIMPAN PROFIL (userProfil) ====================
         function loadUserProfile() {
-            const defaultProfile = {
-                nama: currentUser.nama || "",
-                email: currentUser.email,
-                telepon: "",
-                jenis_disabilitas: "",
-                alamat: "",
-                pendidikan: "",
-                pengalaman: ""
-            };
+            const defaultProfile = { nama: currentUser.nama || "", email: currentUser.email, telepon: "", jenis_disabilitas: "", alamat: "", pendidikan: "", pengalaman: "" };
             const stored = localStorage.getItem('userProfil');
-            if (stored) {
-                try {
-                    return { ...defaultProfile, ...JSON.parse(stored) };
-                } catch(e) { return defaultProfile; }
-            }
-            return defaultProfile;
+            return stored ? { ...defaultProfile, ...JSON.parse(stored) } : defaultProfile;
         }
+        function saveUserProfile(profile) { localStorage.setItem('userProfil', JSON.stringify(profile)); }
 
-        function saveUserProfile(profile) {
-            localStorage.setItem('userProfil', JSON.stringify(profile));
-        }
-
-        // Isi form dengan data profil
         const profil = loadUserProfile();
-        document.getElementById('nama').value = profil.nama || '';
-        document.getElementById('email').value = profil.email || '';
-        document.getElementById('telepon').value = profil.telepon || '';
-        document.getElementById('jenisDisabilitas').value = profil.jenis_disabilitas || '';
-        document.getElementById('alamat').value = profil.alamat || '';
-        document.getElementById('pendidikan').value = profil.pendidikan || '';
-        document.getElementById('pengalaman').value = profil.pengalaman || '';
+        document.getElementById('nama').value = profil.nama;
+        document.getElementById('email').value = profil.email;
+        document.getElementById('telepon').value = profil.telepon;
+        document.getElementById('jenisDisabilitas').value = profil.jenis_disabilitas;
+        document.getElementById('alamat').value = profil.alamat;
+        document.getElementById('pendidikan').value = profil.pendidikan;
+        document.getElementById('pengalaman').value = profil.pengalaman;
 
-        // Simpan perubahan data diri ke profil
         function updateProfileFromForm() {
-            const updated = {
+            saveUserProfile({
                 nama: document.getElementById('nama').value,
                 email: document.getElementById('email').value,
                 telepon: document.getElementById('telepon').value,
@@ -239,23 +174,13 @@
                 alamat: document.getElementById('alamat').value,
                 pendidikan: document.getElementById('pendidikan').value,
                 pengalaman: document.getElementById('pengalaman').value
-            };
-            saveUserProfile(updated);
+            });
         }
 
-        // ==================== SIMPAN LAMARAN ====================
         function simpanLamaran() {
-            // Validasi file CV
             const cvFile = document.getElementById('cv').files[0];
-            if (!cvFile) {
-                alert('CV / Resume wajib diunggah.');
-                return false;
-            }
-
-            // Update profil
+            if (!cvFile) { alert('CV / Resume wajib diunggah.'); return false; }
             updateProfileFromForm();
-
-            // Buat object lamaran
             const lamaran = {
                 id: Date.now(),
                 lowonganId: lowonganDipilih.id,
@@ -273,18 +198,13 @@
                 tglLamaran: new Date().toISOString().split('T')[0],
                 status: 'pending'
             };
-
-            // Ambil daftar lamaran yang sudah ada
             let daftarLamaran = JSON.parse(localStorage.getItem('daftarLamaran') || '[]');
             daftarLamaran.push(lamaran);
             localStorage.setItem('daftarLamaran', JSON.stringify(daftarLamaran));
-
-            // Hapus lowonganDipilih
             localStorage.removeItem('lowonganDipilih');
             return true;
         }
 
-        // ==================== EVENT ====================
         document.getElementById('formPendaftaran').addEventListener('submit', (e) => {
             e.preventDefault();
             if (simpanLamaran()) {
@@ -292,33 +212,19 @@
                 document.getElementById('successModal').style.display = 'flex';
             }
         });
-
         document.getElementById('batalBtn').addEventListener('click', () => {
-            if (confirm('Batalkan pendaftaran? Perubahan tidak akan disimpan.')) {
-                window.location.href = 'penyandang-cari-lowongan.html';
-            }
+            if (confirm('Batalkan pendaftaran? Perubahan tidak akan disimpan.')) window.location.href = 'penyandang-lowongan.html';
         });
-
-        // Tombol pada modal: redirect ke halaman pencarian
         document.getElementById('tutupModalBtn').addEventListener('click', () => {
-            window.location.href = 'penyandang-cari-lowongan.html';
+            window.location.href = 'penyandang-lowongan.html';
         });
-
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('user');
             localStorage.removeItem('lowonganDipilih');
             window.location.href = 'login.html';
         });
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
     </script>
 </body>
 </html>
