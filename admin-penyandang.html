@@ -279,11 +279,9 @@
                 const del = penyandang.find(p => p.id === currentDeleteId);
                 if (del) {
                     penyandang = penyandang.filter(p => p.id !== currentDeleteId);
-                    // Hapus juga dari registeredUsers
                     let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
                     users = users.filter(u => u.email !== del.email);
-                    localStorage.setItem('registeredUsers', JSON.stringify(users));
-                    // Hapus data profil dan riwayat terkait
+                    localStorage.setItem('registeredUsers', JSON.stringify(users));               
                     localStorage.removeItem(`profil_${del.email}`);
                     localStorage.removeItem(`riwayat_${del.email}`);
                     saveMaster();
