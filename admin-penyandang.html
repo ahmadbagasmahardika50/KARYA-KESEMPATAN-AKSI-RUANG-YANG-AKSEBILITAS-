@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KARYA - Kelola Penyandang Disabilitas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght=100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
         body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
         :focus { outline: 2px solid #feb700; outline-offset: 2px; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 50; }
-        .modal-content { background: white; border-radius: 1rem; width: 90%; max-width: 400px; padding: 1.5rem; }
+        .modal-content { background: white; border-radius: 1rem; width: 90%; max-width: 400px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; }
     </style>
     <script>
         tailwind.config = {
@@ -35,7 +35,6 @@
 </head>
 <body class="bg-surface text-on-surface">
 
-    <!-- Navbar -->
     <nav class="bg-white shadow-md py-4 px-6 md:px-12 flex justify-between items-center">
         <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-2xl text-primary">admin_panel_settings</span>
@@ -77,7 +76,6 @@
         </div>
     </main>
 
-    <!-- Modal Form -->
     <div id="formModal" class="modal">
         <div class="modal-content">
             <h3 id="modalTitle" class="text-xl font-bold text-primary mb-4 flex items-center gap-2">
@@ -92,6 +90,17 @@
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-outline mb-1">Email</label>
                     <input type="email" id="email" class="w-full p-3 rounded-xl bg-surface-container-high border focus:border-primary" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-outline mb-1">Password</label>
+                    <input type="password" id="password" class="w-full p-3 rounded-xl bg-surface-container-high border focus:border-primary" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-outline mb-1">Tipe Akun</label>
+                    <select id="role" class="w-full p-3 rounded-xl bg-surface-container-high border focus:border-primary">
+                        <option value="penyandang">Penyandang Disabilitas</option>
+                        <option value="perusahaan">Perusahaan</option>
+                    </select>
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-outline mb-1">Jenis Disabilitas</label>
@@ -111,7 +120,6 @@
         </div>
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
     <div id="deleteModal" class="modal">
         <div class="modal-content text-center">
             <span class="material-symbols-outlined text-5xl text-error">warning</span>
@@ -135,7 +143,7 @@
         // Sinkronisasi: ambil semua user dengan role penyandang dari registeredUsers
         function syncFromRegistered() {
             let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-            let penyandangUsers = users.filter(u => u.role === 'penyandang');
+            let penyandangUsers = users.filter(u => u.role === 'penyandang' || u.role === 'perusahaan');
             // Data master admin dengan key 'penyandang_admin'
             let master = JSON.parse(localStorage.getItem('penyandang_admin') || '[]');
             let changed = false;
@@ -147,11 +155,15 @@
                         id: Date.now(),
                         nama: user.nama,
                         email: user.email,
+                        password: user.password || "123456",
+                        role: user.role,
                         jenisDisabilitas: "Fisik (daksa)"
                     });
                     changed = true;
-                } else if (existing.nama !== user.nama) {
+                } else if (existing.nama !== user.nama || existing.role !== user.role || existing.password !== user.password) {
                     existing.nama = user.nama;
+                    existing.role = user.role;
+                    existing.password = user.password || existing.password;
                     changed = true;
                 }
             });
@@ -172,17 +184,20 @@
 
         function saveMaster() {
             localStorage.setItem('penyandang_admin', JSON.stringify(penyandang));
-            // Sinkronkan ke registeredUsers (update nama jika perlu)
+            // Sinkronkan ke registeredUsers
             let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
             penyandang.forEach(p => {
                 let idx = users.findIndex(u => u.email === p.email);
-                if (idx !== -1) users[idx].nama = p.nama;
-                else {
+                if (idx !== -1) {
+                    users[idx].nama = p.nama;
+                    users[idx].role = p.role;
+                    users[idx].password = p.password;
+                } else {
                     users.push({
                         nama: p.nama,
                         email: p.email,
-                        password: "penyandang",
-                        role: "penyandang"
+                        password: p.password,
+                        role: p.role
                     });
                 }
             });
@@ -219,6 +234,8 @@
         const editIdField = document.getElementById('editId');
         const namaField = document.getElementById('nama');
         const emailField = document.getElementById('email');
+        const passwordField = document.getElementById('password'); // Variabel baru
+        const roleField = document.getElementById('role'); // Variabel baru
         const jenisField = document.getElementById('jenisDisabilitas');
         const modalTitle = document.getElementById('modalTitle');
         let currentDeleteId = null;
@@ -229,11 +246,14 @@
                 editIdField.value = data.id;
                 namaField.value = data.nama;
                 emailField.value = data.email;
+                passwordField.value = data.password || ''; // Set value password saat edit
+                roleField.value = data.role || 'penyandang'; // Set value role saat edit
                 jenisField.value = data.jenisDisabilitas || 'Fisik (daksa)';
             } else {
                 modalTitle.innerHTML = '<span class="material-symbols-outlined">add</span> Tambah Penyandang';
                 editIdField.value = '';
                 form.reset();
+                roleField.value = 'penyandang';
                 jenisField.value = 'Fisik (daksa)';
             }
             formModal.style.display = 'flex';
@@ -247,9 +267,11 @@
             const newData = {
                 nama: namaField.value.trim(),
                 email: emailField.value.trim(),
+                password: passwordField.value.trim(), // Ambil data password
+                role: roleField.value, // Ambil data tipe akun
                 jenisDisabilitas: jenisField.value
             };
-            if (!newData.nama || !newData.email) { alert('Nama dan email wajib diisi'); return; }
+            if (!newData.nama || !newData.email || !newData.password) { alert('Nama, email, dan password wajib diisi'); return; }
             if (!id && penyandang.some(p => p.email === newData.email)) { alert('Email sudah terdaftar'); return; }
             if (id) {
                 const idx = penyandang.findIndex(p => p.id == id);
