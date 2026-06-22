@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KARYA - Kelola Penyandang Disabilitas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght=100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
         body { font-family: 'Lexend', sans-serif; background: #fcf9f8; }
         :focus { outline: 2px solid #feb700; outline-offset: 2px; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 50; }
-        /* Mengubah max-width sedikit agar input baru berdampingan/muat dengan rapi */
-        .modal-content { background: white; border-radius: 1rem; width: 90%; max-width: 460px; padding: 1.5rem; }
+        .modal-content { background: white; border-radius: 1rem; width: 90%; max-width: 400px; padding: 1.5rem; }
     </style>
     <script>
         tailwind.config = {
@@ -36,6 +35,7 @@
 </head>
 <body class="bg-surface text-on-surface">
 
+    <!-- Navbar -->
     <nav class="bg-white shadow-md py-4 px-6 md:px-12 flex justify-between items-center">
         <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-2xl text-primary">admin_panel_settings</span>
@@ -77,6 +77,7 @@
         </div>
     </main>
 
+    <!-- Modal Form -->
     <div id="formModal" class="modal">
         <div class="modal-content">
             <h3 id="modalTitle" class="text-xl font-bold text-primary mb-4 flex items-center gap-2">
@@ -92,21 +93,6 @@
                     <label class="block text-sm font-semibold text-outline mb-1">Email</label>
                     <input type="email" id="email" class="w-full p-3 rounded-xl bg-surface-container-high border focus:border-primary" required>
                 </div>
-                
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-outline mb-1">Password</label>
-                        <input type="password" id="password" class="w-full p-3 rounded-xl bg-surface-container-high border focus:border-primary" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-outline mb-1">Tipe Akun</label>
-                        <select id="role" class="w-full p-3 rounded-xl bg-surface-container-high border focus:border-primary">
-                            <option value="penyandang">Penyandang Disabilitas</option>
-                            <option value="perusahaan">Perusahaan</option>
-                        </select>
-                    </div>
-                </div>
-
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-outline mb-1">Jenis Disabilitas</label>
                     <select id="jenisDisabilitas" class="w-full p-3 rounded-xl bg-surface-container-high border focus:border-primary">
@@ -125,6 +111,7 @@
         </div>
     </div>
 
+    <!-- Modal Konfirmasi Hapus -->
     <div id="deleteModal" class="modal">
         <div class="modal-content text-center">
             <span class="material-symbols-outlined text-5xl text-error">warning</span>
@@ -145,10 +132,10 @@
         const currentUser = JSON.parse(localStorage.getItem('user'));
         if (!currentUser || currentUser.role !== 'admin') { alert('Akses ditolak'); window.location.href = 'login.html'; }
 
-        // Sinkronisasi: ambil semua user dengan role penyandang/perusahaan dari registeredUsers
+        // Sinkronisasi: ambil semua user dengan role penyandang dari registeredUsers
         function syncFromRegistered() {
             let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-            let penyandangUsers = users.filter(u => u.role === 'penyandang' || u.role === 'perusahaan');
+            let penyandangUsers = users.filter(u => u.role === 'penyandang');
             // Data master admin dengan key 'penyandang_admin'
             let master = JSON.parse(localStorage.getItem('penyandang_admin') || '[]');
             let changed = false;
@@ -157,18 +144,14 @@
                 let existing = master.find(m => m.email === user.email);
                 if (!existing) {
                     master.push({
-                        id: Date.now() + Math.random(),
+                        id: Date.now(),
                         nama: user.nama,
                         email: user.email,
-                        password: user.password || "penyandang",
-                        role: user.role,
                         jenisDisabilitas: "Fisik (daksa)"
                     });
                     changed = true;
-                } else if (existing.nama !== user.nama || existing.role !== user.role || existing.password !== user.password) {
+                } else if (existing.nama !== user.nama) {
                     existing.nama = user.nama;
-                    existing.role = user.role;
-                    existing.password = user.password || existing.password;
                     changed = true;
                 }
             });
@@ -189,20 +172,17 @@
 
         function saveMaster() {
             localStorage.setItem('penyandang_admin', JSON.stringify(penyandang));
-            // Sinkronkan ke registeredUsers (update nama, role, dan password jika perlu)
+            // Sinkronkan ke registeredUsers (update nama jika perlu)
             let users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
             penyandang.forEach(p => {
                 let idx = users.findIndex(u => u.email === p.email);
-                if (idx !== -1) {
-                    users[idx].nama = p.nama;
-                    users[idx].role = p.role;
-                    users[idx].password = p.password;
-                } else {
+                if (idx !== -1) users[idx].nama = p.nama;
+                else {
                     users.push({
                         nama: p.nama,
                         email: p.email,
-                        password: p.password,
-                        role: p.role
+                        password: "penyandang",
+                        role: "penyandang"
                     });
                 }
             });
@@ -239,8 +219,6 @@
         const editIdField = document.getElementById('editId');
         const namaField = document.getElementById('nama');
         const emailField = document.getElementById('email');
-        const passwordField = document.getElementById('password'); // Variabel Baru
-        const roleField = document.getElementById('role'); // Variabel Baru
         const jenisField = document.getElementById('jenisDisabilitas');
         const modalTitle = document.getElementById('modalTitle');
         let currentDeleteId = null;
@@ -251,14 +229,11 @@
                 editIdField.value = data.id;
                 namaField.value = data.nama;
                 emailField.value = data.email;
-                passwordField.value = data.password || ''; // Set value saat edit
-                roleField.value = data.role || 'penyandang'; // Set value saat edit
                 jenisField.value = data.jenisDisabilitas || 'Fisik (daksa)';
             } else {
                 modalTitle.innerHTML = '<span class="material-symbols-outlined">add</span> Tambah Penyandang';
                 editIdField.value = '';
                 form.reset();
-                roleField.value = 'penyandang';
                 jenisField.value = 'Fisik (daksa)';
             }
             formModal.style.display = 'flex';
@@ -272,17 +247,15 @@
             const newData = {
                 nama: namaField.value.trim(),
                 email: emailField.value.trim(),
-                password: passwordField.value.trim(), // Ambil value password baru
-                role: roleField.value, // Ambil value tipe akun baru
                 jenisDisabilitas: jenisField.value
             };
-            if (!newData.nama || !newData.email || !newData.password) { alert('Nama, email, dan password wajib diisi'); return; }
+            if (!newData.nama || !newData.email) { alert('Nama dan email wajib diisi'); return; }
             if (!id && penyandang.some(p => p.email === newData.email)) { alert('Email sudah terdaftar'); return; }
             if (id) {
                 const idx = penyandang.findIndex(p => p.id == id);
-                if (idx !== -1) penyandang[idx] = { id: parseFloat(id), ...newData };
+                if (idx !== -1) penyandang[idx] = { id: parseInt(id), ...newData };
             } else {
-                penyandang.push({ id: Date.now(), ...newData });
+                penyandang.push({ id: nextId++, ...newData });
             }
             saveMaster();
             renderTable();
@@ -292,11 +265,11 @@
         document.getElementById('tabelPenyandang').addEventListener('click', (e) => {
             const target = e.target;
             if (target.classList.contains('editBtn')) {
-                const id = parseFloat(target.getAttribute('data-id'));
+                const id = parseInt(target.getAttribute('data-id'));
                 const data = penyandang.find(p => p.id === id);
                 if (data) openFormModal(true, data);
             } else if (target.classList.contains('deleteBtn')) {
-                currentDeleteId = parseFloat(target.getAttribute('data-id'));
+                currentDeleteId = parseInt(target.getAttribute('data-id'));
                 deleteModal.style.display = 'flex';
             }
         });
